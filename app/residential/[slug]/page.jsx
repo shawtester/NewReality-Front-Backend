@@ -1,26 +1,36 @@
 import { notFound } from "next/navigation";
-import {getPropertyBySlug} from "../../../lib/firestore/products/read_server";
-// UI COMPONENTS
-import Hero from "./components/Hero";
-import BigServices from "./components/BigServices";
-import OurServices from "./components/OurServices";
-import ValueAdded from "./components/ValueAdded";
+import { getPropertyById } from "@/lib/firestore/products/read_server";
+import ApartmentClient from "./components/ApartmentClient";
+import MobileGallery from "./components/MobileGallery";
+
 
 export const dynamic = "force-dynamic";
 
 export default async function PropertyPage({ params }) {
-  const { slug } = params;
+  const slug = params.slug;
 
-  const property = await getPropertyBySlug(slug);
+  // Firestore se property lao
+  const property = await getPropertyById(slug);
 
-  if (!property) return notFound();
+  if (!property) {
+    return notFound();
+  }
 
   return (
-    <main className="w-full overflow-x-hidden">
-      <Hero property={property} />
-      <BigServices property={property} />
-      <OurServices property={property} />
-      <ValueAdded property={property} />
-    </main>
+    <ApartmentClient>
+      {/* ================= GALLERY ================= */}
+      {property.images && property.images.length > 0 && (
+        <MobileGallery
+          images={property.images}
+          title={property.title}
+        />
+      )}
+      {/* STEP-2 me sirf minimal render */}
+      <main className="p-10">
+        <h1 className="text-2xl font-bold">{property.title}</h1>
+        <p className="text-gray-600">{property.location}</p>
+        <p className="text-green-600 font-semibold">{property.price}</p>
+      </main>
+    </ApartmentClient>
   );
 }

@@ -1,6 +1,6 @@
 import { ProductCard } from "@/app/components/Products";
 import { getCollection } from "@/lib/firestore/collections/read_server";
-import { getProduct } from "@/lib/firestore/products/read_server";
+import { getProduct } from "@/lib/firestore/products/pk";
 
 export async function generateMetadata({ params }) {
   const { collectionId } = params;

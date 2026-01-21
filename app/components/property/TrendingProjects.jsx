@@ -1,19 +1,18 @@
 "use client";
 
-import React from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import PropertyCard from "./PropertyCard";
-import { useEffect } from "react";
-export default function TrendingProjects({ properties }) {
-   useEffect(() => {
-    console.log("🔥 TRENDING PAGE RECEIVED PROPERTIES 👉", properties);
-    console.log(
-      "🔥 FILTERED TRENDING 👉",
-      properties?.filter(p => p.isTrending)
-    );
-  }, [properties]);
+import slugify from "slugify";
 
-  const trending = properties.filter(p => p.isTrending);
+export default function TrendingProjects({ properties = [] }) {
+  // ✅ Filter trending projects safely
+  const trending = properties.filter((p) => p?.isTrending);
+
+  useEffect(() => {
+    console.log("🔥 TRENDING PAGE RECEIVED PROPERTIES 👉", properties);
+    console.log("🔥 FILTERED TRENDING 👉", trending);
+  }, [properties, trending]);
 
   if (!trending.length) return null;
 
@@ -42,8 +41,11 @@ export default function TrendingProjects({ properties }) {
 
       {/* CARDS */}
       <div className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth p-2 pb-8 mt-6">
-        {trending.map(p => (
-          <div key={p.id} className="min-w-[320px] max-w-[320px] flex-shrink-0">
+        {trending.map((p) => (
+          <div
+            key={p.id}
+            className="min-w-[320px] max-w-[320px] flex-shrink-0"
+          >
             <PropertyCard
               property={{
                 title: p.title,
@@ -52,8 +54,18 @@ export default function TrendingProjects({ properties }) {
                 bhk: p.configurations?.join(", "),
                 size: p.areaRange,
                 price: p.priceRange,
-                img: p.image || p.gallery?.[0]?.url,
-                slug: p.slug || p.id,
+
+                // ✅ IMAGE SAFE FALLBACK
+                img:
+                  p.image ||
+                  p.gallery?.[0]?.url ||
+                  "/images/placeholder.jpg",
+
+                // ✅ TITLE BASED SLUG (SEO FRIENDLY)
+                slug: slugify(p.title || p.id, {
+                  lower: true,
+                  strict: true,
+                }),
               }}
             />
           </div>

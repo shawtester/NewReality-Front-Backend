@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+
 import {
   collection,
   getDocs,
@@ -9,6 +10,8 @@ import {
   doc,
   limit,
 } from "firebase/firestore";
+
+
 
 /* =====================================================
    🔹 ALL ACTIVE PROPERTIES (HOME PAGE)
@@ -115,3 +118,22 @@ export async function getPropertyById(id) {
     timestampCreate: data?.timestampCreate?.seconds ?? null,
   };
 }
+
+/* =====================================================
+   🔹 SAFE HELPER: GET PROPERTY BY SLUG OR ID
+   (Client-side fallback utility)
+===================================================== */
+export async function getPropertyBySlugOrId(value) {
+  if (!value) return null;
+
+  // 1️⃣ Try slug
+  let property = await getPropertyBySlug(value);
+
+  // 2️⃣ Fallback to ID
+  if (!property) {
+    property = await getPropertyById(value);
+  }
+
+  return property;
+}
+

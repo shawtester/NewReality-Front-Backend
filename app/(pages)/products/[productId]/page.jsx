@@ -1,4 +1,4 @@
-import { getProduct } from "@/lib/firestore/products/read_server";
+import { getProduct } from "@/lib/firestore/products/pk";
 import Photos from "./components/Photos";
 import Details from "./components/Details";
 import Reviews from "./components/Reviews";

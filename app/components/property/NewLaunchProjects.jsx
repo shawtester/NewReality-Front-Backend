@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import PropertyCard from "./PropertyCard";
+import slugify from "slugify";
 
-export default function NewLaunchProjects({ properties }) {
-  // ✅ Filter only New Launch
-  const newLaunch = (properties || []).filter((p) => p.isNewLaunch);
+export default function NewLaunchProjects({ properties = [] }) {
+  // ✅ Filter only New Launch projects
+  const newLaunch = properties.filter((p) => p?.isNewLaunch);
 
   if (!newLaunch.length) return null;
 
@@ -49,12 +49,13 @@ export default function NewLaunchProjects({ properties }) {
                 size: p.areaRange,
                 price: p.priceRange,
 
-                // ✅ ONLY MAIN IMAGE (NO GALLERY)
-                img: p.mainImage?.url || "/placeholder.jpg",
+                img: p.mainImage?.url || "/images/placeholder.jpg",
 
+                // ✅ SLUG FIRST, ELSE ID (NO BREAKING)
                 slug: p.slug || p.id,
               }}
             />
+
           </div>
         ))}
       </div>

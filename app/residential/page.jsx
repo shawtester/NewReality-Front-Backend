@@ -2,6 +2,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import PropertyCard from "@/app/components/property/PropertyCard";
 
+
 import { getAllProperties } from "@/lib/firestore/properties/read_server";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +41,7 @@ export default async function ResidentialPage() {
                 size: p.areaRange,
                 price: p.priceRange,
                 img: p.mainImage?.url || p.gallery?.[0]?.url,
-                slug: p.slug || p.id,
+                slug: p.id,
               }}
             />
           ))}

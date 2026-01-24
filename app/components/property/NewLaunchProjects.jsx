@@ -11,7 +11,7 @@ export default function NewLaunchProjects({ properties = [] }) {
   if (!newLaunch.length) return null;
 
   return (
-    <section className="max-w-[1240px] mx-auto px-4 mt-20">
+    <section className="max-w-[1240px] mx-auto px-4 mt-40">
       {/* HEADER */}
       <div className="max-w-[1480px] mx-auto px-1 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div className="flex-1 text-center">

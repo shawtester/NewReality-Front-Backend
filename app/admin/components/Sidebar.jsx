@@ -31,6 +31,21 @@ export default function Sidebar() {
       icon: <PackageOpen className="h-5 w-5" />,
     },
     {
+      name: "Developers",
+      link: "/admin/developers",
+      icon: <User className="h-5 w-5" />,
+    },
+    {
+      name: "Hero Section",
+      link: "/admin/hero",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
+      name: "Blogs",
+      link: "/admin/blog",
+      icon: <LibraryBig className="h-5 w-5" />,
+    },
+    {
       name: "Property Types",
       link: "/admin/propertiestypes",
       icon: <Layers2 className="h-5 w-5" />,
@@ -66,6 +81,7 @@ export default function Sidebar() {
       icon: <ShieldCheck className="h-5 w-5" />,
     },
   ];
+
 
   return (
     <section className="sticky top-0 flex flex-col gap-10 bg-white border-r px-5 py-3 h-screen overflow-hidden w-[260px] z-50">
@@ -113,11 +129,10 @@ function Tab({ item }) {
     <Link href={item.link}>
       <li
         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300
-        ${
-          isSelected
+        ${isSelected
             ? "bg-indigo-500 text-white"
             : "text-gray-700 hover:bg-gray-100"
-        }`}
+          }`}
       >
         {item.icon}
         {item.name}

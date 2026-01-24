@@ -9,11 +9,6 @@ export default function TrendingProjects({ properties = [] }) {
   // ✅ Filter trending projects safely
   const trending = properties.filter((p) => p?.isTrending);
 
-  useEffect(() => {
-    console.log("🔥 TRENDING PAGE RECEIVED PROPERTIES 👉", properties);
-    console.log("🔥 FILTERED TRENDING 👉", trending);
-  }, [properties, trending]);
-
   if (!trending.length) return null;
 
   return (
@@ -56,16 +51,10 @@ export default function TrendingProjects({ properties = [] }) {
                 price: p.priceRange,
 
                 // ✅ IMAGE SAFE FALLBACK
-                img:
-                  p.image ||
-                  p.gallery?.[0]?.url ||
-                  "/images/placeholder.jpg",
+                img: p.mainImage?.url || "/placeholder.png",
 
                 // ✅ TITLE BASED SLUG (SEO FRIENDLY)
-                slug: slugify(p.title || p.id, {
-                  lower: true,
-                  strict: true,
-                }),
+                slug: p.id, 
               }}
             />
           </div>

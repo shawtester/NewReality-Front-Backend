@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import ApartmentsPage from "./ResidentialClient";
+import ApartmentsPage from "./CommercialClient";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 
 export const dynamic = "force-dynamic";
 
-export default async function ResidentialPage() {
+export default async function CommercialPage() {
   const properties = await getAllProperties();
 
   return (

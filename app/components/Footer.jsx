@@ -29,7 +29,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#1B121E] text-gray-300 w-full">
+    <footer className="bg-[#1B121E] text-gray-300 w-full mt-5">
       {/* ================= TOP LINKS (DESKTOP SCROLL) ================= */}
       <div className="relative bg-[#29192B] border-b border-[#2c1b32]">
         <div className="max-w-[1380px] mx-auto px-6 py-10">

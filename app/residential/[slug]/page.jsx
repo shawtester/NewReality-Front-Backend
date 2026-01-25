@@ -13,6 +13,7 @@ import FloorPlanSection from "./components/FloorPlanSection";
 import PaymentPlanSection from "./components/PaymentPlanSection";
 import AmenitiesSection from "./components/AmenitiesSection";
 import LocationSection from "./components/LocationSection";
+import EmiCalculatorSection from "./components/EmiCalculatorSection";
 import FAQSection from "./components/FAQSection";
 import SimilarProjectsSection from "./components/SimilarProjectsSection";
 import DisclaimerSection from "./components/DisclaimerSection";
@@ -102,6 +103,8 @@ export default async function PropertyPage({ params }) {
             mapQuery={cleanProperty.mapQuery}
             locationPoints={cleanProperty.locationPoints}
           />
+
+          <EmiCalculatorSection />
 
           <FAQSection faq={cleanProperty.faq} />
 

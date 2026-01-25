@@ -22,6 +22,7 @@ import LogoutButton from "./LogoutButton";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "About us", href: "/about-us" },
+  { label: "Our Servies", href: "/our-services" },
   {
     label: "Residential",
     href: "/residential",

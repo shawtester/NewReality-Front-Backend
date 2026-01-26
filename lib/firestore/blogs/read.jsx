@@ -2,59 +2,58 @@ import { db } from "@/lib/firebase";
 import {
   collection,
   getDocs,
-  orderBy,
-  query,
-  doc,
   getDoc,
+  query,
   where,
+  orderBy,
   limit,
+  doc,
 } from "firebase/firestore";
 
-/* ================= ADMIN BLOG LIST ================= */
+/* ================= ADMIN ================= */
 export const getAdminBlogs = async () => {
-  const q = query(
-    collection(db, "blogs"),
-    orderBy("timestampCreate", "desc")
-  );
+  const q = query(collection(db, "blogs"), orderBy("timestampCreate", "desc"));
+  const snap = await getDocs(q);
 
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((d) => ({
+  return snap.docs.map(d => ({
     id: d.id,
     ...d.data(),
     timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
   }));
 };
 
-/* ================= HOME PAGE BLOGS ================= */
+/* ================= BLOG LIST ================= */
 export const getBlogsForHome = async () => {
   const q = query(
     collection(db, "blogs"),
-    where("isActive", "==", true),   // ✅ optional but recommended
-    orderBy("timestampCreate", "desc"),
-    limit(5)                         // ✅ home pe limited blogs
+    where("isActive", "==", true),
+    orderBy("timestampCreate", "desc")
   );
 
-  const snapshot = await getDocs(q);
+  const snap = await getDocs(q);
 
-  return snapshot.docs.map((d) => ({
+  return snap.docs.map(d => ({
     id: d.id,
     ...d.data(),
     timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
   }));
 };
 
-/* ================= SINGLE BLOG BY ID ================= */
-export const getBlogById = async ({ id }) => {
-  if (!id) return null;
+/* ================= BLOG BY SLUG ================= */
+export const getBlogBySlug = async ({ slug }) => {
+  const q = query(
+    collection(db, "blogs"),
+    where("slug", "==", slug),
+    limit(1)
+  );
 
-  const snap = await getDoc(doc(db, "blogs", id));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
 
-  if (!snap.exists()) return null;
-
+  const d = snap.docs[0];
   return {
-    id: snap.id,
-    ...snap.data(),
-    timestampCreate: snap.data()?.timestampCreate?.seconds ?? null,
+    id: d.id,
+    ...d.data(),
+    timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
   };
 };

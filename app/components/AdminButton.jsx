@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext"
 import { useAdmin } from "@/lib/firestore/admins/read";
 import Link from "next/link";
 

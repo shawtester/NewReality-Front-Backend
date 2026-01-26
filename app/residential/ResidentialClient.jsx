@@ -15,13 +15,59 @@ export default function ApartmentsPage({ apartments = [] }) {
     const initialPage = Number(searchParams.get("page")) || 1;
     const [page, setPage] = useState(initialPage);
 
+    /* ================= SEARCH & FILTER STATES ================= */
+    const [keyword, setKeyword] = useState("");
+    const [type, setType] = useState("");
+    const [status, setStatus] = useState("");
+    const [locality, setLocality] = useState("");
+    const [budget, setBudget] = useState("");
+    const [bhk, setBhk] = useState("");
+
+    const [filteredApartments, setFilteredApartments] =
+        useState(apartments);
+
+    const [loading, setLoading] = useState(false);
+
     const apartmentsPerPage = 12;
 
-    const totalPages = Math.ceil(apartments.length / apartmentsPerPage);
+    /* ================= ALGOLIA SEARCH ================= */
+    const handleSearch = async () => {
+        try {
+            setLoading(true);
+
+            const params = new URLSearchParams({
+                q: keyword,
+                type,
+                status,
+                locality,
+                budget,
+                bhk,
+            });
+
+            const res = await fetch(`/api/search?${params.toString()}`);
+            const data = await res.json();
+
+            setFilteredApartments(Array.isArray(data) ? data : []);
+            setPage(1);
+        } catch (err) {
+            console.error("Search error ❌", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /* ================= PAGINATION ================= */
+    const totalPages = Math.ceil(
+        filteredApartments.length / apartmentsPerPage
+    );
+
     const startIndex = (page - 1) * apartmentsPerPage;
     const endIndex = startIndex + apartmentsPerPage;
 
-    const currentApartments = apartments.slice(startIndex, endIndex);
+    const currentApartments = filteredApartments.slice(
+        startIndex,
+        endIndex
+    );
 
     useEffect(() => {
         router.push(`?page=${page}`, { scroll: false });
@@ -50,7 +96,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                             </p>
                         </div>
 
-                        <div className="text-sm text-gray-500">456 results</div>
+                        <div className="text-sm text-gray-500">{filteredApartments.length} results</div>
                     </div>
                 </div>
             </section>
@@ -117,11 +163,13 @@ export default function ApartmentsPage({ apartments = [] }) {
                     <div className="lg:hidden mt-8 mb-12">
                         <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
                             <input
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
                                 placeholder="Enter Keyword"
                                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0"
                             />
 
-                            <select className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
+                            <select value={type} onChange={(e) => setType(e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option>Type</option>
                                 <option value="residential">Residential Property</option>
                                 <option value="commercial">Commercial Property</option>
@@ -131,7 +179,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="sco-plots">SCO Plots</option>
                             </select>
 
-                            <select className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option>Status</option>
                                 <option value="new-launch">New Launch Project</option>
                                 <option value="ready-to-move">Ready to Move Project</option>
@@ -139,7 +187,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="pre-launch">Pre Launch Project</option>
                             </select>
 
-                            <select className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
+                            <select value={locality} onChange={(e) => setLocality(e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option>Localities</option>
                                 <option value="dwarka-expressway">Dwarka Expressway</option>
                                 <option value="golf-course-road">Golf Course Road</option>
@@ -153,7 +201,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="nh8">NH8</option>
                             </select>
 
-                            <select className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
+                            <select value={budget} onChange={(e) => setBudget(e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option>Budget</option>
                                 <option value="1-2-cr">1 – 2 Cr</option>
                                 <option value="2-3-cr">2 – 3 Cr</option>
@@ -165,7 +213,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="above-8-cr">Above 8 Cr</option>
                             </select>
 
-                            <select className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
+                            <select value={bhk} onChange={(e) => setBhk(e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option value="">Size</option>
                                 <option value="1-bhk">1 BHK</option>
                                 <option value="1.5-bhk">1.5 BHK</option>
@@ -181,8 +229,8 @@ export default function ApartmentsPage({ apartments = [] }) {
 
 
 
-                            <button className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">
-                                Search
+                            <button onClick={handleSearch} className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">
+                                {loading ? "Searching..." : "Search"}
                             </button>
                         </div>
                     </div>
@@ -191,11 +239,13 @@ export default function ApartmentsPage({ apartments = [] }) {
                     <div className="hidden lg:block relative bottom-40 left-1/2 -translate-x-[60%] w-full max-w-[950px]">
                         <div className="bg-white shadow-2xl px-5 py-3  flex items-center gap-3 rounded-full border border-yellow-400">
                             <input
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
                                 placeholder="Enter Keyword"
-                                className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0"
+                                className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm"
                             />
 
-                            <select className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
+                            <select value={type} onChange={(e) => setType(e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option>
                                 <option value="residential">Residential Property</option>
                                 <option value="commercial">Commercial Property</option>
@@ -205,7 +255,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="sco-plots">SCO Plots</option>
                             </select>
 
-                            <select className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Status</option>
                                 <option value="new-launch">New Launch Project</option>
                                 <option value="ready-to-move">Ready to Move Project</option>
@@ -213,7 +263,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="pre-launch">Pre Launch Project</option>
                             </select>
 
-                            <select className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
+                            <select value={locality} onChange={(e) => setLocality(e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Localities</option>
                                 <option value="dwarka-expressway">Dwarka Expressway</option>
                                 <option value="golf-course-road">Golf Course Road</option>
@@ -227,7 +277,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="nh8">NH8</option>
                             </select>
 
-                            <select className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
+                            <select value={budget} onChange={(e) => setBudget(e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Budget</option>
                                 <option value="1-2-cr">1 – 2 Cr</option>
                                 <option value="2-3-cr">2 – 3 Cr</option>
@@ -239,7 +289,7 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="above-8-cr">Above 8 Cr</option>
                             </select>
 
-                            <select className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
+                            <select value={bhk} onChange={(e) => setBhk(e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option value="">Size</option>
                                 <option value="1-bhk">1 BHK </option>
                                 <option value="1.5-bhk">1.5 BHK </option>
@@ -255,8 +305,8 @@ export default function ApartmentsPage({ apartments = [] }) {
 
 
 
-                            <button className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">
-                                Search
+                            <button onClick={handleSearch} className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">
+                                {loading ? "Searching..." : "Search"}
                             </button>
                         </div>
                     </div>

@@ -10,18 +10,18 @@ export default function CountMeter() {
   const { data: ordersCounts } = useOrdersCounts();
   return (
     <section className="grid grid-cols-2 md:grid-cols-4 gap-5">
-      <Card imgURL={"/box.png"} title={"Products"} value={totalProduct ?? 0} />
+      <Card imgURL={"/box.png"} title={"New Launch"} value={totalProduct ?? 0} />
       <Card
         imgURL={"/received.png"}
-        title={"Orders"}
+        title={"Trending"}
         value={ordersCounts?.totalOrders ?? 0}
       />
       <Card
         imgURL={"/profit-up.png"}
-        title={"Revenue"}
+        title={"Properties"}
         value={`₹ ${(ordersCounts?.totalRevenue ?? 0) / 100}`}
       />
-      <Card imgURL={"/team.png"} title={"Customer"} value={totalUsers ?? 0} />
+      <Card imgURL={"/team.png"} title={"Devloper"} value={totalUsers ?? 0} />
     </section>
   );
 }

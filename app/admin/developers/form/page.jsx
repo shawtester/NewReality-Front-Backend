@@ -174,7 +174,7 @@ export default function Page() {
         Active
       </label>
 
-      <Button type="submit" isLoading={loading}>
+      <Button className="bg-[#DBA40D]" type="submit" isLoading={loading}>
         {id ? "Update Developer" : "Save Developer"}
       </Button>
     </form>

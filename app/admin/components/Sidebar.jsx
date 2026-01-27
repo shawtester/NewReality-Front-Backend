@@ -50,20 +50,16 @@ export default function Sidebar() {
       link: "/admin/propertiestypes",
       icon: <Layers2 className="h-5 w-5" />,
     },
+    
     {
-      name: "Locations",
-      link: "/admin/locations",
-      icon: <Cat className="h-5 w-5" />,
+      name: "Jobs",
+      link: "/admin/jobs",
+      icon: <Star className="h-5 w-5" />,
     },
     {
-      name: "Enquiries",
-      link: "/admin/enquiries",
-      icon: <ShoppingCart className="h-5 w-5" />,
-    },
-    {
-      name: "Clients",
-      link: "/admin/clients",
-      icon: <User className="h-5 w-5" />,
+      name: "Contact",
+      link: "/admin/contact",
+      icon: <Star className="h-5 w-5" />,
     },
     {
       name: "Testimonials",
@@ -87,7 +83,7 @@ export default function Sidebar() {
     <section className="sticky top-0 flex flex-col gap-10 bg-white border-r px-5 py-3 h-screen overflow-hidden w-[260px] z-50">
       <div className="flex justify-center py-4">
         <Link href="/">
-          <img className="h-8" src="/logo.png" alt="Logo" />
+          <img className="h-20" src="/images/neevlogo.png" alt="Logo" />
         </Link>
       </div>
 
@@ -130,7 +126,7 @@ function Tab({ item }) {
       <li
         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300
         ${isSelected
-            ? "bg-indigo-500 text-white"
+            ? "bg-[#DBA40D] text-white"
             : "text-gray-700 hover:bg-gray-100"
           }`}
       >

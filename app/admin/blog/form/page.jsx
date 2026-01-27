@@ -18,6 +18,7 @@ export default function BlogForm() {
     excerpt: "",
     content: "",
     image: null,
+    faqs: [{ question: "", answer: "" }],
   });
 
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,21 @@ export default function BlogForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+
+  const addFaq = () =>
+    setData(p => ({ ...p, faqs: [...p.faqs, { question: "", answer: "" }] }));
+
+  const updateFaq = (i, key, value) => {
+    const faqs = [...data.faqs];
+    faqs[i][key] = value;
+    setData({ ...data, faqs });
+  };
+
+  const removeFaq = (i) => {
+    const faqs = data.faqs.filter((_, idx) => idx !== i);
+    setData({ ...data, faqs });
+  };
+
 
   /* ================= FETCH OLD DATA ================= */
   useEffect(() => {
@@ -139,9 +155,39 @@ export default function BlogForm() {
         />
       )}
 
+      <h3 className="font-semibold mt-5">FAQs</h3>
+
+      {data.faqs.map((faq, i) => (
+        <div key={i} className="border p-2 mb-2">
+          <input
+            placeholder="Question"
+            value={faq.question}
+            onChange={e => updateFaq(i, "question", e.target.value)}
+            className="border p-2 w-full mb-2"
+          />
+          <textarea
+            placeholder="Answer"
+            value={faq.answer}
+            onChange={e => updateFaq(i, "answer", e.target.value)}
+            className="border p-2 w-full"
+          />
+          <button
+            onClick={() => removeFaq(i)}
+            className="text-red-500 text-xs mt-1"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+
+      <button onClick={addFaq} className="text-sm text-blue-600">
+        + Add FAQ
+      </button>
+
+
       <Button
         isLoading={loading}
-        className="mt-5"
+        className="mt-5 bg-[#DBA40D]"
         onClick={submit}
       >
         {id ? "Update Blog" : "Create Blog"}

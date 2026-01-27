@@ -142,7 +142,7 @@ export default function Form() {
           </div>
         )}
 
-        <Button type="submit" isLoading={isLoading}>
+        <Button type="submit" isLoading={isLoading} className="bg-[#DBA40D]">
           {id ? "Update" : "Create"}
         </Button>
       </form>

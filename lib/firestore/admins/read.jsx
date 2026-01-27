@@ -3,7 +3,11 @@
 import { db } from "@/lib/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import useSWRSubscription from "swr/subscription";
+import GlobalLoader from "@/lib/firestore/components/GlobalLoader";
 
+/* ======================
+   ADMINS LIST
+====================== */
 export function useAdmins() {
   const { data, error } = useSWRSubscription(
     ["admins"],
@@ -12,16 +16,15 @@ export function useAdmins() {
 
       const unsub = onSnapshot(
         ref,
-        (snapshot) =>
+        (snapshot) => {
           next(
             null,
-            snapshot.empty
-              ? null
-              : snapshot.docs.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-                }))
-          ),
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))
+          );
+        },
         (err) => next(err, null)
       );
 
@@ -31,11 +34,15 @@ export function useAdmins() {
 
   return {
     data,
-    error: error?.message,
-    isLoading: data === undefined,
+    error: error?.message || null,
+    element:
+      data === undefined ? <GlobalLoader /> : null, // 👈 MAGIC
   };
 }
 
+/* ======================
+   SINGLE ADMIN
+====================== */
 export function useAdmin({ email }) {
   const { data, error } = useSWRSubscription(
     email ? ["admins", email] : null,
@@ -55,7 +62,8 @@ export function useAdmin({ email }) {
 
   return {
     data,
-    error: error?.message,
-    isLoading: data === undefined,
+    error: error?.message || null,
+    element:
+      data === undefined ? <GlobalLoader /> : null, 
   };
 }

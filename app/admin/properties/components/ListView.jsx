@@ -130,6 +130,7 @@ function PropertyCard({ item }) {
           </span>
 
           <Button
+            className="bg-[#DBA40D]"
             isIconOnly
             size="sm"
             onClick={() => router.push(`/admin/properties/form?id=${item.id}`)}

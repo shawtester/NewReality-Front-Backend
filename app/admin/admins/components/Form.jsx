@@ -141,7 +141,7 @@ export default function Form() {
             required
           />
         </div>
-        <Button isLoading={isLoading} isDisabled={isLoading} type="submit">
+        <Button className="bg-[#DBA40D]" isLoading={isLoading} isDisabled={isLoading} type="submit">
           {id ? "Update" : "Create"}
         </Button>
       </form>

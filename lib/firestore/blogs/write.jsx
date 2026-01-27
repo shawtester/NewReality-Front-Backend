@@ -14,20 +14,14 @@ export const createBlog = async ({ data }) => {
 
   const newId = doc(collection(db, "ids")).id;
 
-  const image = data.image?.url
-    ? {
-        url: data.image.url,
-        publicId: data.image.publicId || null,
-      }
-    : null;
-
-  await setDoc(doc(db, `blogs/${newId}`), {
+  await setDoc(doc(db, "blogs", newId), {
     id: newId,
     title: data.title,
     slug: data.slug,
     excerpt: data.excerpt || "",
     content: data.content || "",
-    image,
+    image: data.image || null,
+    faqs: data.faqs || [],
     isActive: true,
     timestampCreate: Timestamp.now(),
   });
@@ -37,21 +31,15 @@ export const createBlog = async ({ data }) => {
 export const updateBlog = async ({ data }) => {
   if (!data?.id) throw new Error("Blog ID missing");
 
-  const image = data.image?.url
-    ? {
-        url: data.image.url,
-        publicId: data.image.publicId || null,
-      }
-    : null;
-
   await setDoc(
-    doc(db, `blogs/${data.id}`),
+    doc(db, "blogs", data.id),
     {
       title: data.title,
       slug: data.slug,
       excerpt: data.excerpt,
       content: data.content,
-      image,
+      image: data.image || null,
+      faqs: data.faqs || [],
       timestampUpdate: Timestamp.now(),
     },
     { merge: true }
@@ -60,6 +48,5 @@ export const updateBlog = async ({ data }) => {
 
 /* ================= DELETE ================= */
 export const deleteBlog = async ({ id }) => {
-  if (!id) throw new Error("Blog ID required");
-  await deleteDoc(doc(db, `blogs/${id}`));
+  await deleteDoc(doc(db, "blogs", id));
 };

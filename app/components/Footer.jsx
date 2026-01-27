@@ -206,8 +206,12 @@ export default function Footer() {
             <Link href="/services">Services</Link>
             <Link href={BASE_ROUTE}>Residential</Link>
             <Link href="/commercial">Commercial</Link>
-            <Link href="/blog">Blog</Link>
+            <Link href="/careers">Careers</Link>
+            <Link href="/terms-condition">Terms & Condition</Link>
+            <Link href="/privacy">Privacy Policy</Link>
             <Link href="/faqs">FAQs</Link>
+            <Link href="/blog">Blog</Link>
+            <Link href="/disclaimer">Disclaimer</Link>
             <Link href="/contact">Contact</Link>
           </div>
         </div>

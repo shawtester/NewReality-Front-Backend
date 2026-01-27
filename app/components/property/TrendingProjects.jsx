@@ -26,7 +26,7 @@ export default function TrendingProjects({ properties = [] }) {
 
         <div className="max-sm:text-center">
           <Link
-            href="/residential"
+            href="/trending"
             className="inline-flex items-center justify-center bg-[#DBA40D] border border-[#DBA40D] rounded-sm text-white font-medium px-4 py-2 text-sm"
           >
             Explore More

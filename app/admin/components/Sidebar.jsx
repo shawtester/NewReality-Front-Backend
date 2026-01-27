@@ -57,6 +57,11 @@ export default function Sidebar() {
       icon: <Star className="h-5 w-5" />,
     },
     {
+      name: "Contact",
+      link: "/admin/contact",
+      icon: <Star className="h-5 w-5" />,
+    },
+    {
       name: "Testimonials",
       link: "/admin/testimonials",
       icon: <Star className="h-5 w-5" />,

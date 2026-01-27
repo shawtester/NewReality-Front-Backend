@@ -27,6 +27,8 @@ export default function SearchCard() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showVideo, setShowVideo] = useState(true);
+  const [playMobileVideo, setPlayMobileVideo] = useState(false);
 
   const [hero, setHero] = useState(null);
 
@@ -68,6 +70,7 @@ export default function SearchCard() {
     <section className="relative w-full">
       {/* ================= HERO ================= */}
       <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] overflow-hidden">
+        {/* BACKGROUND IMAGE */}
         <Image
           src={heroImage}
           alt="Hero"
@@ -75,7 +78,67 @@ export default function SearchCard() {
           priority
           className="object-cover"
         />
+
+        {/* ================= DESKTOP FLOATING VIDEO ================= */}
+        {showVideo && (
+          <div className="absolute inset-0 z-20 hidden md:flex items-center justify-end pr-10">
+            <div className="relative w-[280px] h-[300px]">
+              {/* CLOSE */}
+              <button
+                onClick={() => setShowVideo(false)}
+                className="absolute -top-3 -right-3 z-30 h-9 w-9 rounded-full bg-black text-white"
+              >
+                ✕
+              </button>
+
+              {/* VIDEO */}
+              <iframe
+                className="w-full h-full rounded-2xl shadow-2xl"
+                src={videoUrl}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ================= MOBILE PLAY ICON ================= */}
+        {!playMobileVideo && (
+          <div className="md:hidden absolute right-4 bottom-6 z-30">
+            <button
+              onClick={() => setPlayMobileVideo(true)}
+              className="h-11 w-11 rounded-full bg-white shadow-lg flex items-center justify-center"
+            >
+              ▶
+            </button>
+          </div>
+        )}
+
+        {/* ================= MOBILE VIDEO POPUP ================= */}
+        {playMobileVideo && (
+          <div className="md:hidden absolute inset-0 z-40 bg-black/60 flex items-center justify-center px-4">
+            {/* CLOSE */}
+            <button
+              onClick={() => setPlayMobileVideo(false)}
+              className="absolute top-4 right-4 z-50 h-9 w-9 rounded-full bg-black text-white"
+            >
+              ✕
+            </button>
+
+            {/* VIDEO */}
+            <div className="w-[90vw] max-w-[260px] h-[300px] rounded-2xl overflow-hidden shadow-2xl bg-black">
+              <iframe
+                className="w-full h-full"
+                src={videoUrl}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
       </div>
+
+
 
       {/* ================= SEARCH WRAPPER ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[320px] w-full max-w-[990px] px-4 z-20">
@@ -92,11 +155,10 @@ export default function SearchCard() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${
-                    activeTab === tab
-                      ? "bg-white shadow text-gray-900"
-                      : "text-gray-500"
-                  }`}
+                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${activeTab === tab
+                    ? "bg-white shadow text-gray-900"
+                    : "text-gray-500"
+                    }`}
                 >
                   {tab}
                 </button>

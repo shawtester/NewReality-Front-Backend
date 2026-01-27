@@ -90,7 +90,7 @@ export default function JobForm() {
         className="border p-2 w-full mb-3"
       />
 
-      <Button className="mt-4" onClick={submit}>
+      <Button className="bg-[#DBA40D] mt-4" onClick={submit}>
         {id ? "Update Job" : "Create Job"}
       </Button>
     </div>

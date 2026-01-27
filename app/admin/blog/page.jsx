@@ -31,7 +31,7 @@ export default function AdminBlogPage() {
     <div className="p-5 space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Blogs</h1>
-        <Button onClick={() => router.push("/admin/blog/form")}>
+        <Button className="bg-[#DBA40D]" onClick={() => router.push("/admin/blog/form")}>
           Add Blog
         </Button>
       </div>
@@ -49,6 +49,7 @@ export default function AdminBlogPage() {
               <td className="p-3">{blog.title}</td>
               <td className="p-3 flex gap-2">
                 <Button
+                  className="bg-[#DBA40D]"
                   size="sm"
                   onClick={() =>
                     router.push(`/admin/blog/form?id=${blog.id}`)

@@ -93,7 +93,7 @@ export default function HeroAdminPage() {
         />
       </div>
 
-      <Button isLoading={loading} onClick={submit}>
+      <Button className="bg-[#DBA40D]" isLoading={loading} onClick={submit}>
         Update Hero
       </Button>
     </div>

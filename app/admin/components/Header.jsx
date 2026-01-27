@@ -9,7 +9,7 @@ export default function Header({ toggleSidebar }) {
   const { user } = useAuth();
   const { data: admin } = useAdmin({ email: user?.email });
   return (
-    <section className="fixed w-full top-0 flex items-center gap-3 bg-white border-b px-4 py-3">
+    <section className="fixed w-full top-0 flex items-center gap-3 bg-[#DBA40D] border-b px-4 py-3">
       <div className="flex justify-center items-center md:hidden">
         <button onClick={toggleSidebar}>
           <Menu />

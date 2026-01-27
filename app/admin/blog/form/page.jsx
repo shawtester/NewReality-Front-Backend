@@ -187,7 +187,7 @@ export default function BlogForm() {
 
       <Button
         isLoading={loading}
-        className="mt-5"
+        className="mt-5 bg-[#DBA40D]"
         onClick={submit}
       >
         {id ? "Update Blog" : "Create Blog"}

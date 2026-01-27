@@ -20,7 +20,7 @@ export default function Page() {
         <h1 className="text-xl font-semibold">Developers</h1>
 
         <Link href="/admin/developers/form">
-          <Button>Add Developer</Button>
+          <Button className="bg-[#DBA40D]" >Add Developer</Button>
         </Link>
       </div>
 
@@ -66,7 +66,7 @@ export default function Page() {
               onClick={() =>
                 router.push(`/admin/developers/form?id=${dev.id}`)
               }
-              className="self-end"
+              className="self-end bg-[#DBA40D]"
             >
               <Edit2 size={14} />
             </Button>

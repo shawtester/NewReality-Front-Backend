@@ -44,7 +44,7 @@ export default function RevenueChart({ items }) {
       },
       title: {
         display: true,
-        text: "Revenue Line Chart",
+        text: "New Launch Chart",
       },
     },
     scales: {

@@ -31,7 +31,7 @@ export default function AdminJobsPage() {
     <div className="p-6 space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Jobs</h1>
-        <Button onClick={() => router.push("/admin/jobs/form")}>
+        <Button className="bg-[#DBA40D]" onClick={() => router.push("/admin/jobs/form")}>
           Add Job
         </Button>
       </div>
@@ -53,6 +53,7 @@ export default function AdminJobsPage() {
               <td className="p-3">{job.type}</td>
               <td className="p-3 flex gap-2">
                 <Button
+                  className="bg-[#DBA40D]"
                   size="sm"
                   onClick={() =>
                     router.push(`/admin/jobs/form?id=${job.id}`)

@@ -46,7 +46,7 @@ export default function OrdersChart({ items }) {
       },
       title: {
         display: true,
-        text: "Total Order Bar Chart",
+        text: "Trending Properties Chart",
       },
     },
     scales: {

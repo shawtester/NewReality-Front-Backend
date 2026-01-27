@@ -2,15 +2,17 @@ import Navbar from "@/app/components/Header";
 import ContactSection from "./components/contact";
 import Faq from "./components/faq";
 import TestimonialsSection from "@/app/about-us/components/testimonial";
+import { getTestimonials } from "@/lib/firestore/testimonials/read";
 import Footer from "@/app/components/Footer";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+    const testimonials = await getTestimonials();
   return (
     <div>
       <Navbar />
       <ContactSection />
       <Faq />
-      <TestimonialsSection />
+      <TestimonialsSection testimonials={testimonials} />
       <Footer />
     </div>
   );

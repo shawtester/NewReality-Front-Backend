@@ -1,15 +1,15 @@
-"use client";
-
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
 import Section1 from "./components/section1";
 import MeetTheTeam from "./components/MeetTheTeam";
 import TestimonialsSection from "./components/Testimonial";
-
+import { getTestimonials } from "@/lib/firestore/testimonials/read";
 import { MapPin } from "lucide-react";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+
+   const testimonials = await getTestimonials();
   return (
     <div className="w-full overflow-x-hidden">
       
@@ -19,7 +19,7 @@ export default function AboutPage() {
       {/* ABOUT SECTIONS */}
       <Section1 />
       <MeetTheTeam />
-      <TestimonialsSection />
+      <TestimonialsSection testimonials={testimonials}/>
 
       {/* ================= GET IN TOUCH SECTION ================= */}
       <section className="bg-white py-8">

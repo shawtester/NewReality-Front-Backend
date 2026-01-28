@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 /* ================= COUNTRY CODES ================= */
 const countries = [
@@ -17,6 +19,14 @@ export default function PropertyCard({ property = {} }) {
   const [open, setOpen] = useState(false);
   const [countryCode, setCountryCode] = useState("+91");
 
+  // 🔹 FORM STATE (LOGIC ONLY)
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
   const {
     title = "",
     builder = "",
@@ -27,6 +37,28 @@ export default function PropertyCard({ property = {} }) {
     img = "/images/placeholder.jpg",
     slug = "",
   } = property;
+
+  // 🔹 SUBMIT HANDLER
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await addDoc(collection(db, "contacts"), {
+        name: form.name,
+        email: form.email,
+        phone: `${countryCode}${form.phone}`,
+        message: form.message,
+        source: "property-card",
+        propertyTitle: title,
+        createdAt: serverTimestamp(),
+      });
+
+      setForm({ name: "", email: "", phone: "", message: "" });
+      setOpen(false);
+    } catch (error) {
+      console.error("Contact submit error:", error);
+    }
+  };
 
   return (
     <>
@@ -110,7 +142,7 @@ export default function PropertyCard({ property = {} }) {
         </div>
       </Link>
 
-      {/* ================= PROFESSIONAL CONTACT POPUP ================= */}
+      {/* ================= CONTACT POPUP ================= */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6 relative">
@@ -135,8 +167,8 @@ export default function PropertyCard({ property = {} }) {
               </p>
             </div>
 
-            {/* FORM */}
-            <form className="space-y-4">
+            {/* FORM — ORIGINAL LAYOUT PRESERVED */}
+            <form className="space-y-4" onSubmit={handleSubmit}>
               {/* NAME */}
               <div>
                 <label className="text-xs font-medium text-gray-600">
@@ -146,6 +178,11 @@ export default function PropertyCard({ property = {} }) {
                   type="text"
                   placeholder="Enter your name"
                   className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({ ...form, name: e.target.value })
+                  }
+                  required
                 />
               </div>
 
@@ -166,10 +203,16 @@ export default function PropertyCard({ property = {} }) {
                       </option>
                     ))}
                   </select>
+
                   <input
                     type="tel"
                     placeholder="Enter phone number"
                     className="flex-1 px-3 py-2 text-sm outline-none"
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
+                    required
                   />
                 </div>
               </div>
@@ -183,6 +226,11 @@ export default function PropertyCard({ property = {} }) {
                   type="email"
                   placeholder="Enter your email"
                   className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
+                  required
                 />
               </div>
 
@@ -195,6 +243,10 @@ export default function PropertyCard({ property = {} }) {
                   rows={3}
                   placeholder="Any specific requirement?"
                   className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  value={form.message}
+                  onChange={(e) =>
+                    setForm({ ...form, message: e.target.value })
+                  }
                 />
               </div>
 

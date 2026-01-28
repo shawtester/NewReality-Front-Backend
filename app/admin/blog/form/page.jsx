@@ -1,10 +1,7 @@
 "use client";
 
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadImage";
-import {
-  createBlog,
-  updateBlog,
-} from "@/lib/firestore/blogs/write";
+import { createBlog, updateBlog } from "@/lib/firestore/blogs/write";
 import { getBlogById } from "@/lib/firestore/blogs/read";
 import { Button } from "@nextui-org/react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -28,8 +25,9 @@ export default function BlogForm() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
+  // ===== FAQ HANDLERS =====
   const addFaq = () =>
-    setData(p => ({ ...p, faqs: [...p.faqs, { question: "", answer: "" }] }));
+    setData((p) => ({ ...p, faqs: [...p.faqs, { question: "", answer: "" }] }));
 
   const updateFaq = (i, key, value) => {
     const faqs = [...data.faqs];
@@ -42,25 +40,36 @@ export default function BlogForm() {
     setData({ ...data, faqs });
   };
 
-
-  /* ================= FETCH OLD DATA ================= */
+  // ===== FETCH OLD BLOG DATA =====
   useEffect(() => {
     if (!id) return;
 
-    const fetch = async () => {
+    const fetchBlog = async () => {
       try {
         const res = await getBlogById({ id });
         if (!res) return toast.error("Blog not found");
-        setData(res); // ✅ PREFILL
+
+        setData({
+          title: res.title || "",
+          slug: res.slug || "",
+          excerpt: res.excerpt || "",
+          content: res.content || "",
+          image: res.image
+            ? typeof res.image === "string"
+              ? { url: res.image }
+              : res.image
+            : null,
+          faqs: res.faqs?.length ? res.faqs : [{ question: "", answer: "" }],
+        });
       } catch (e) {
         toast.error(e.message);
       }
     };
 
-    fetch();
+    fetchBlog();
   }, [id]);
 
-  /* ================= IMAGE UPLOAD ================= */
+  // ===== IMAGE UPLOAD =====
   const handleImage = async (file) => {
     if (!file) return;
     setImgLoading(true);
@@ -74,15 +83,17 @@ export default function BlogForm() {
     setImgLoading(false);
   };
 
-  /* ================= SUBMIT ================= */
+  // ===== SUBMIT =====
   const submit = async () => {
     if (!data.title) return toast.error("Title required");
 
     setLoading(true);
     try {
-      id
-        ? await updateBlog({ data: { ...data, id } })
-        : await createBlog({ data });
+      if (id) {
+        await updateBlog({ data: { ...data, id } });
+      } else {
+        await createBlog({ data });
+      }
 
       toast.success(id ? "Blog updated" : "Blog created");
       router.push("/admin/blog");
@@ -101,9 +112,7 @@ export default function BlogForm() {
       {/* TITLE */}
       <input
         value={data.title}
-        onChange={(e) =>
-          setData({ ...data, title: e.target.value })
-        }
+        onChange={(e) => setData({ ...data, title: e.target.value })}
         placeholder="Title"
         className="border p-2 w-full mb-3"
       />
@@ -111,9 +120,7 @@ export default function BlogForm() {
       {/* SLUG */}
       <input
         value={data.slug}
-        onChange={(e) =>
-          setData({ ...data, slug: e.target.value })
-        }
+        onChange={(e) => setData({ ...data, slug: e.target.value })}
         placeholder="Slug"
         className="border p-2 w-full mb-3"
       />
@@ -121,9 +128,7 @@ export default function BlogForm() {
       {/* EXCERPT */}
       <textarea
         value={data.excerpt}
-        onChange={(e) =>
-          setData({ ...data, excerpt: e.target.value })
-        }
+        onChange={(e) => setData({ ...data, excerpt: e.target.value })}
         placeholder="Excerpt"
         className="border p-2 w-full mb-3"
       />
@@ -131,9 +136,7 @@ export default function BlogForm() {
       {/* CONTENT */}
       <textarea
         value={data.content}
-        onChange={(e) =>
-          setData({ ...data, content: e.target.value })
-        }
+        onChange={(e) => setData({ ...data, content: e.target.value })}
         rows={6}
         placeholder="Content"
         className="border p-2 w-full mb-3"
@@ -145,30 +148,30 @@ export default function BlogForm() {
         accept="image/*"
         onChange={(e) => handleImage(e.target.files[0])}
       />
-
       {imgLoading && <p className="text-xs mt-1">Uploading...</p>}
 
       {data.image?.url && (
         <img
           src={data.image.url}
           className="h-32 mt-3 rounded border"
+          alt="Blog Image"
         />
       )}
 
+      {/* FAQ SECTION */}
       <h3 className="font-semibold mt-5">FAQs</h3>
-
-      {data.faqs.map((faq, i) => (
+      {data.faqs?.map((faq, i) => (
         <div key={i} className="border p-2 mb-2">
           <input
             placeholder="Question"
             value={faq.question}
-            onChange={e => updateFaq(i, "question", e.target.value)}
+            onChange={(e) => updateFaq(i, "question", e.target.value)}
             className="border p-2 w-full mb-2"
           />
           <textarea
             placeholder="Answer"
             value={faq.answer}
-            onChange={e => updateFaq(i, "answer", e.target.value)}
+            onChange={(e) => updateFaq(i, "answer", e.target.value)}
             className="border p-2 w-full"
           />
           <button
@@ -184,7 +187,7 @@ export default function BlogForm() {
         + Add FAQ
       </button>
 
-
+      {/* SUBMIT BUTTON */}
       <Button
         isLoading={loading}
         className="mt-5 bg-[#DBA40D]"

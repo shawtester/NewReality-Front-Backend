@@ -22,28 +22,48 @@ import LogoutButton from "./LogoutButton";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "About us", href: "/about-us" },
-  { label: "Our Servies", href: "/our-services" },
+  { label: "Our Services", href: "/our-services" },
+
   {
     label: "Residential",
     href: "/residential",
     hasDropdown: true,
     children: [
-      { label: "Apartments", href: "/residential/apartments" },
-      { label: "Builder Floor", href: "/residential/builder-floor" },
+      {
+        label: "Apartments",
+        href: "/residential?type=apartment",
+      },
+      {
+        label: "Builder Floor",
+        href: "/residential?type=builder-floor",
+      },
+      {
+        label: "Luxury Apartments",
+        href: "/residential?type=luxury-apartment",
+      },
     ],
   },
+
   {
     label: "Commercial",
     href: "/commercial",
     hasDropdown: true,
     children: [
-      { label: "Retail", href: "/commercial/retail" },
-      { label: "SCO", href: "/commercial/sco" },
+      {
+        label: "Retail",
+        href: "/commercial?type=retail-shops",
+      },
+      {
+        label: "SCO",
+        href: "/commercial?type=sco-plots",
+      },
     ],
   },
+
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact-us" },
 ];
+
 
 export default function Navbar() {
   const pathname = usePathname();

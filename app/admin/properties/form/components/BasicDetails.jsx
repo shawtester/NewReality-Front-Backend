@@ -85,6 +85,29 @@ export default function BasicDetails({ data, handleData }) {
           checked={data.isTrending}
           onChange={(v) => handleData("isTrending", v)}
         />
+        <Checkbox
+          label="Apartment"
+          checked={data.isApartment}
+          onChange={(v) => handleData("isApartment", v)}
+        />
+
+        <Checkbox
+          label="Builder Floor"
+          checked={data.isBuilderFloor}
+          onChange={(v) => handleData("isBuilderFloor", v)}
+        />
+
+        <Checkbox
+          label="Retail Property"
+          checked={data.isRetail}
+          onChange={(v) => handleData("isRetail", v)}
+        />
+
+        <Checkbox
+          label="SCO Plot"
+          checked={data.isSCO}
+          onChange={(v) => handleData("isSCO", v)}
+        />
       </div>
 
       {/* CONFIGURATIONS (BHK) */}

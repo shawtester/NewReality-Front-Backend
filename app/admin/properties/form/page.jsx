@@ -15,9 +15,10 @@ import Location from "./components/Location";
 import FAQ from "./components/FAQ";
 import Disclaimer from "./components/Disclaimer";
 import Image from "./components/Image";
+import { defaultProperty } from "@/constants/propertyDefaults";
 
 export default function Page() {
-  const [data, setData] = useState({});
+  const [data, setData] = useState(defaultProperty);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();

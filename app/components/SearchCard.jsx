@@ -8,6 +8,14 @@ import { useRouter } from "next/navigation";
 
 import { getHero } from "@/lib/firestore/hero/read";
 
+const filterByType = (list = [], type) => {
+  return list.filter((item) => {
+    if (!item.propertyType) return true; // old data safe
+    return item.propertyType === type;
+  });
+};
+
+
 const TAGS = [
   "Sohna Road",
   "Golf Course Road",
@@ -23,7 +31,7 @@ const DEFAULT_VIDEO =
 export default function SearchCard() {
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState("Residential");
+  const [propertyType, setPropertyType] = useState("residential");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +63,8 @@ export default function SearchCard() {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/search?q=${text}`);
+      const res = await fetch(
+        `/api/search?q=${text}&propertyType=${propertyType}`);
       const data = await res.json();
 
       setResults(Array.isArray(data) ? data : []);
@@ -151,18 +160,25 @@ export default function SearchCard() {
             </h2>
 
             <div className="flex rounded-full bg-gray-100">
-              {["Residential", "Commercial"].map((tab) => (
+              {[
+                { label: "Residential", value: "residential" },
+                { label: "Commercial", value: "commercial" },
+              ].map((tab) => (
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${activeTab === tab
+                  key={tab.value}
+                  onClick={() => {
+                    setPropertyType(tab.value);
+                    setResults([]);
+                  }}
+                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
                     ? "bg-white shadow text-gray-900"
                     : "text-gray-500"
                     }`}
                 >
-                  {tab}
+                  {tab.label}
                 </button>
               ))}
+
             </div>
           </div>
 

@@ -21,7 +21,7 @@ export default function Image({ data, handleData }) {
       }
 
       if (type === "main") {
-        handleData("mainImage", uploaded[0]);
+        handleData("mainImage", uploaded[0] || null);
       } else {
         handleData("gallery", [...(data.gallery || []), ...uploaded]);
       }

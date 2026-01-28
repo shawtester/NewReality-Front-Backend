@@ -26,6 +26,17 @@ export default function ResidentialPage({ apartments = [] }) {
 
     const apartmentsPerPage = 12;
 
+    const filterForResidential = (list = []) => {
+        return list.filter((item) => {
+            // case 1: propertyType hi nahi hai → dono me show
+            if (!item.propertyType) return true;
+
+            // case 2: explicitly residential
+            return item.propertyType === "residential";
+        });
+    };
+
+
     /* ================= UTILITY FUNCTIONS ================= */
     const getBhkDisplayName = (bhkValue) => {
         const bhkMap = {
@@ -80,7 +91,8 @@ export default function ResidentialPage({ apartments = [] }) {
             handleSearch();
         } else {
             // Show all properties when no filters
-            setFilteredApartments(apartments);
+            setFilteredApartments(filterForResidential(apartments));
+
         }
     }, [searchParams, apartments]);
 
@@ -88,7 +100,7 @@ export default function ResidentialPage({ apartments = [] }) {
     const handleSearch = useCallback(async () => {
         try {
             setLoading(true);
-            
+
             const params = new URLSearchParams({
                 q: keyword || undefined,
                 type: type || undefined,
@@ -104,35 +116,40 @@ export default function ResidentialPage({ apartments = [] }) {
 
             const res = await fetch(`/api/search?${params.toString()}`);
             const data = await res.json();
-            
-            // ✅ FALLBACK: If API returns 0 results, show ALL properties
-            if (Array.isArray(data) && data.length === 0) {
-                console.log('🔍 No API results, showing all properties');
-                setFilteredApartments(apartments);
+
+            const safeData = Array.isArray(data) ? data : apartments;
+
+            // ✅ RESIDENTIAL FILTER APPLIED HERE
+            const residentialOnly = filterForResidential(safeData);
+
+            // fallback
+            if (residentialOnly.length === 0) {
+                setFilteredApartments(filterForResidential(apartments));
             } else {
-                setFilteredApartments(Array.isArray(data) ? data : apartments);
+                setFilteredApartments(residentialOnly);
             }
+
             setPage(1);
         } catch (err) {
             console.error("❌ API Error - Using fallback");
-            // Fallback to all properties
-            setFilteredApartments(apartments);
+            setFilteredApartments(filterForResidential(apartments));
         } finally {
             setLoading(false);
         }
     }, [keyword, type, status, locality, budget, bhk, apartments]);
 
+
     /* ================= FILTER CHANGE HANDLER ================= */
     const handleFilterChange = useCallback((filterName, value) => {
         const params = new URLSearchParams(searchParams.toString());
-        
+
         if (value) {
             params.set(filterName, value);
         } else {
             params.delete(filterName);
         }
         params.set('page', '1');
-        
+
         router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
     }, [searchParams, router]);
 
@@ -261,13 +278,13 @@ export default function ResidentialPage({ apartments = [] }) {
                 {/* ✅ FIXED RESULTS HEADER */}
                 <div className="max-w-[1240px] mx-auto px-4 py-6">
                     <div className="text-sm text-gray-500 mb-3">
-                        {bhk ? getBhkDisplayName(bhk) : 
-                         type ? formatFilterName(type) : 
-                         status ? formatFilterName(status) : 
-                         locality ? formatFilterName(locality) : 
-                         budget ? budget.replace(/-/g, ' ') : "Residential"} in Gurgaon
+                        {bhk ? getBhkDisplayName(bhk) :
+                            type ? formatFilterName(type) :
+                                status ? formatFilterName(status) :
+                                    locality ? formatFilterName(locality) :
+                                        budget ? budget.replace(/-/g, ' ') : "Residential"} in Gurgaon
                     </div>
-                    
+
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="max-w-4xl">
                             <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
@@ -275,14 +292,14 @@ export default function ResidentialPage({ apartments = [] }) {
                             </h1>
                             <p className="mt-2 text-sm sm:text-[15px] text-gray-600">
                                 {bhk ? `Discover premium ${getBhkDisplayName(bhk).toLowerCase()} properties in Gurgaon.` :
-                                 type ? `Find ${formatFilterName(type).toLowerCase()} properties with excellent ROI potential.` :
-                                 status ? `Explore ${formatFilterName(status).toLowerCase()} opportunities in Gurgaon.` :
-                                 locality ? `Premium properties in ${formatFilterName(locality)}.` :
-                                 "Booming residential market in Gurgaon offering excellent investment returns."}
+                                    type ? `Find ${formatFilterName(type).toLowerCase()} properties with excellent ROI potential.` :
+                                        status ? `Explore ${formatFilterName(status).toLowerCase()} opportunities in Gurgaon.` :
+                                            locality ? `Premium properties in ${formatFilterName(locality)}.` :
+                                                "Booming residential market in Gurgaon offering excellent investment returns."}
                             </p>
                         </div>
                         <div className="text-sm text-gray-500">
-                            {filteredApartments.length} results 
+                            {filteredApartments.length} results
                             {totalPages > 1 && `| Page ${currentPage} of ${totalPages}`}
                         </div>
                     </div>
@@ -329,7 +346,8 @@ export default function ResidentialPage({ apartments = [] }) {
                             <p className="text-xl text-gray-500 mb-4">No specific matches found</p>
                             <p className="text-gray-600 mb-6">Showing all available properties in Gurgaon</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {apartments.slice(0, 6).map((item) => (
+                                {filterForResidential(apartments).slice(0, 6).map((item) => (
+
                                     <PropertyCard
                                         key={item.id}
                                         property={{

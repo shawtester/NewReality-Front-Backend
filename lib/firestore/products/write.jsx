@@ -1,68 +1,33 @@
 import { db } from "@/lib/firebase";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  setDoc,
-  Timestamp,
-} from "firebase/firestore";
+import { collection, doc, setDoc, Timestamp } from "firebase/firestore";
 import slugify from "slugify";
+import { defaultProperty } from "@/constants/propertyDefaults";
 
-/* =====================================================
-   🔹 CREATE PROPERTY
-===================================================== */
 export const createNewProperty = async ({ data }) => {
   if (!data?.title) throw new Error("Project name is required");
   if (!data?.location) throw new Error("Location is required");
 
   const newId = doc(collection(db, "ids")).id;
-
-  // ✅ AUTO SLUG (TITLE → SLUG)
+  const sanitize = (obj) =>
+  JSON.parse(JSON.stringify(obj));
   const slug =
     data.slug ||
     slugify(data.title, {
       lower: true,
       strict: true,
     });
+  
 
-  await setDoc(doc(db, "properties", newId), {
+  await setDoc(doc(db, "properties", newId), sanitize({
+    ...defaultProperty,   // ✅ saare default fields
+    ...data,              // ✅ form ke values override
     id: newId,
-    title: data.title,
-    slug, // ✅ IMPORTANT
-
-    location: data.location,
-    developer: data.developer || "",
-    areaRange: data.areaRange || "",
-    reraNumber: data.reraNumber || "",
-    lastUpdated: data.lastUpdated || "",
-
-    configurations: data.configurations || [],
-    priceRange: data.priceRange || "",
-
-    // ✅ CLOUDINARY STRUCTURE
-    image: data.image || null,
-    mainImage: data.mainImage || null,
-    gallery: data.gallery || [],
-
-    overview: {
-      title: data.overview?.title || "",
-      subtitle: data.overview?.subtitle || "",
-      description: data.overview?.description || "",
-    },
-
-    floorPlans: data.floorPlans || [],
-    amenities: data.amenities || [],
-    locationPoints: data.locationPoints || [],
-    faq: data.faq || [],
-    disclaimer: data.disclaimer || "",
-
-    isNewLaunch: !!data.isNewLaunch,
-    isTrending: !!data.isTrending,
-    isActive: true,
-
+    slug,
     timestampCreate: Timestamp.now(),
-  });
+    timestampUpdate: null,
+  }));
 };
+
 
 /* =====================================================
    🔹 UPDATE PROPERTY

@@ -7,6 +7,15 @@ import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
+const filterForCommercial = (list = []) => {
+        return list.filter((item) => {
+            // ❗ agar propertyType hi nahi hai → dono me dikhe
+            if (!item.propertyType) return true;
+
+            // ✅ sirf commercial wale
+            return item.propertyType === "commercial";
+        });
+    };
 
 export default function ApartmentsPage({ apartments = [] }) {
     const router = useRouter();
@@ -23,12 +32,15 @@ export default function ApartmentsPage({ apartments = [] }) {
     const [budget, setBudget] = useState("");
     const [bhk, setBhk] = useState("");
 
-    const [filteredApartments, setFilteredApartments] =
-        useState(apartments);
+    const [filteredApartments, setFilteredApartments] = useState(filterForCommercial(apartments));
+
 
     const [loading, setLoading] = useState(false);
 
+    
     const apartmentsPerPage = 12;
+
+
 
     /* ================= ALGOLIA SEARCH ================= */
     const handleSearch = async () => {
@@ -47,10 +59,22 @@ export default function ApartmentsPage({ apartments = [] }) {
             const res = await fetch(`/api/search?${params.toString()}`);
             const data = await res.json();
 
-            setFilteredApartments(Array.isArray(data) ? data : []);
+            const safeData = Array.isArray(data) ? data : [];
+
+            // ✅ COMMERCIAL FILTER APPLY
+            const commercialOnly = filterForCommercial(safeData);
+
+            // fallback
+            if (commercialOnly.length === 0) {
+                setFilteredApartments(filterForCommercial(apartments));
+            } else {
+                setFilteredApartments(commercialOnly);
+            }
+
             setPage(1);
         } catch (err) {
             console.error("Search error ❌", err);
+            setFilteredApartments(filterForCommercial(apartments));
         } finally {
             setLoading(false);
         }

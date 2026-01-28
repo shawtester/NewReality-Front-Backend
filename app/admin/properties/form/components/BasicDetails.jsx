@@ -72,6 +72,23 @@ export default function BasicDetails({ data, handleData }) {
         value={data.lastUpdated}
         onChange={(v) => handleData("lastUpdated", v)}
       />
+       {/* Residential/commercial Toggle */}
+      <div className="flex gap-2 mb-4">
+        {["residential", "commercial"].map((type) => (
+          <button
+            key={type}
+            type="button"
+            onClick={() => handleData("propertyType", type)}
+            className={`px-4 py-2 rounded-full text-sm ${data.propertyType === type
+                ? "bg-black text-white"
+                : "bg-gray-200"
+              }`}
+          >
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        ))}
+      </div>
+
 
       {/* NEW LAUNCH / TRENDING */}
       <div className="flex gap-6 flex-wrap">

@@ -11,7 +11,6 @@ export default function GetInTouchModal({
   onClose,
   propertyTitle = "Property Inquiry",
 }) {
-  // ✅ ALL HOOKS FIRST - BEFORE ANY RETURN!
   const [state, formAction] = useFormState(submitContactForm, { 
     success: false, 
     message: "" 
@@ -24,14 +23,13 @@ export default function GetInTouchModal({
     };
   }, [open]);
 
-  // ✅ NOW safe to return early
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4">
-      {/* MODAL - YOUR ORIGINAL DESIGN */}
+      {/* MODAL */}
       <div className="relative w-full max-w-md bg-white rounded-2xl p-4 shadow-xl">
-        {/* CLOSE - YOUR ORIGINAL */}
+        {/* CLOSE */}
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-black"
@@ -39,7 +37,7 @@ export default function GetInTouchModal({
           <FaTimes size={18} />
         </button>
 
-        {/* HEADER - YOUR ORIGINAL */}
+        {/* HEADER */}
         <div className="flex items-center gap-2">
           <Image
             src="/images/logo.png"
@@ -57,11 +55,13 @@ export default function GetInTouchModal({
           touch with you shortly
         </p>
 
-        {/* FORM - YOUR ORIGINAL SPACING */}
+        {/* FORM */}
         <form className="mt-4 space-y-3" action={formAction}>
           <input type="hidden" name="propertyTitle" value={propertyTitle} />
-          
-          {/* PROPERTY - MINIMAL ADDITION */}
+
+          {/* ✅ SOURCE TRACKING */}
+          <input type="hidden" name="source" value="get-in-touch-modal" />
+
           <p className="text-sm font-semibold text-gray-800">
             I Am Interested In{" "}
             <span className="block mt-1 text-sm text-[#c8950a] font-medium">
@@ -69,7 +69,6 @@ export default function GetInTouchModal({
             </span>
           </p>
 
-          {/* YOUR ORIGINAL INPUTS */}
           <input
             name="name"
             type="text"
@@ -107,7 +106,6 @@ export default function GetInTouchModal({
             className="w-full border border-gray-300 rounded-md px-3 py-1.5 outline-none resize-none focus:border-[#F5A300]"
           />
 
-          {/* CHECKBOX - YOUR ORIGINAL */}
           <label className="flex items-center gap-3 text-sm text-gray-700">
             <input
               name="terms"
@@ -124,10 +122,8 @@ export default function GetInTouchModal({
             </span>
           </label>
 
-          {/* SUBMIT BUTTON - YOUR ORIGINAL + LOADING */}
           <SubmitButton />
 
-          {/* FEEDBACK - NEW */}
           {state.message && (
             <div className={`p-3 rounded-md text-sm font-medium text-center ${
               state.success 

@@ -37,10 +37,6 @@ const navLinks = [
         label: "Builder Floor",
         href: "/residential?type=builder-floor",
       },
-      {
-        label: "Luxury Apartments",
-        href: "/residential?type=luxury-apartment",
-      },
     ],
   },
 

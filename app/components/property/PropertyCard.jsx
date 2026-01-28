@@ -110,10 +110,11 @@ export default function PropertyCard({ property = {} }) {
         </div>
       </Link>
 
-      {/* ================= CONTACT POPUP ================= */}
+      {/* ================= PROFESSIONAL CONTACT POPUP ================= */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6 relative">
+            {/* CLOSE */}
             <button
               onClick={() => setOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-black"
@@ -121,27 +122,87 @@ export default function PropertyCard({ property = {} }) {
               ✕
             </button>
 
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Get in Touch
-            </h3>
+            {/* HEADER */}
+            <div className="mb-5">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Get in Touch
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Interested in{" "}
+                <span className="font-medium text-[#F5A300]">
+                  {title}
+                </span>
+              </p>
+            </div>
 
+            {/* FORM */}
             <form className="space-y-4">
-              <input className="w-full border px-3 py-2 rounded" placeholder="Name" />
-              <div className="flex border rounded overflow-hidden">
-                <select
-                  value={countryCode}
-                  onChange={(e) => setCountryCode(e.target.value)}
-                  className="bg-gray-100 px-3"
-                >
-                  {countries.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.label} {c.code}
-                    </option>
-                  ))}
-                </select>
-                <input className="flex-1 px-3 py-2" placeholder="Phone" />
+              {/* NAME */}
+              <div>
+                <label className="text-xs font-medium text-gray-600">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                />
               </div>
-              <button className="w-full bg-[#F5A300] text-white py-2 rounded">
+
+              {/* PHONE */}
+              <div>
+                <label className="text-xs font-medium text-gray-600">
+                  Phone Number
+                </label>
+                <div className="mt-1 flex border rounded-lg overflow-hidden">
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="bg-gray-100 px-3 text-sm outline-none"
+                  >
+                    {countries.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    placeholder="Enter phone number"
+                    className="flex-1 px-3 py-2 text-sm outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* EMAIL */}
+              <div>
+                <label className="text-xs font-medium text-gray-600">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                />
+              </div>
+
+              {/* MESSAGE */}
+              <div>
+                <label className="text-xs font-medium text-gray-600">
+                  Message (optional)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Any specific requirement?"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                />
+              </div>
+
+              {/* SUBMIT */}
+              <button
+                type="submit"
+                className="w-full bg-[#F5A300] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#e39a00] transition"
+              >
                 Request Callback
               </button>
             </form>

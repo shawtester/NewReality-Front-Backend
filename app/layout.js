@@ -4,6 +4,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Toaster } from "react-hot-toast";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import StickyIcons from "@/app/components/StickyIcons";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       >
         <Toaster />
         <NextUIProvider>{children}</NextUIProvider>
+        <StickyIcons />
       </body>
     </html>
   );

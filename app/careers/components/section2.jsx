@@ -3,19 +3,29 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const images = [
-  "/images/career/img2.png",
-  "/images/career/img3.jpg",
-  "/images/career/img4.jpg",
-  "/images/career/img5.jpg",
-];
+import { getActiveCareerSliderImages } from "@/lib/firestore/career_slider/read";
 
 const AUTOPLAY_DELAY = 3000;
 
 const LifeAtNeev = () => {
+  const [images, setImages] = useState([]);
   const [current, setCurrent] = useState(0);
-  const intervalRef = useRef(null); // ✅ TS removed
+  const intervalRef = useRef(null);
+
+  /* 🔥 FETCH IMAGES FROM FIRESTORE */
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const data = await getActiveCareerSliderImages();
+        console.log("CAREER SLIDER IMAGES 👉", data);
+        setImages(data || []);
+      } catch (err) {
+        console.error("LifeAtNeev error:", err);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   const goToNext = () => {
     setCurrent((prev) =>
@@ -30,22 +40,17 @@ const LifeAtNeev = () => {
   };
 
   const resetAutoplay = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(goToNext, AUTOPLAY_DELAY);
   };
 
+  /* ✅ autoplay ONLY after images load */
   useEffect(() => {
-    resetAutoplay();
+    if (!images.length) return;
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+    resetAutoplay();
+    return () => clearInterval(intervalRef.current);
+  }, [images]);
 
   const handleNext = () => {
     goToNext();
@@ -57,11 +62,20 @@ const LifeAtNeev = () => {
     resetAutoplay();
   };
 
+  /* ✅ LOADING STATE (IMPORTANT FIX) */
+  if (!images.length) {
+    return (
+      <section className="w-full bg-white py-16 text-center text-gray-400">
+        Loading Life at Neev...
+      </section>
+    );
+  }
+
   return (
     <section className="w-full bg-white py-16">
       <div className="mx-auto max-w-6xl space-y-12 px-4 lg:px-0">
 
-        {/* TOP CARDS */}
+        {/* TOP CARDS (UNCHANGED UI) */}
         <div className="grid gap-6 md:grid-cols-3">
           {[
             {
@@ -94,12 +108,12 @@ const LifeAtNeev = () => {
           ))}
         </div>
 
-        {/* SLIDER + TEXT */}
+        {/* SLIDER + TEXT (UNCHANGED UI) */}
         <div className="grid items-center gap-10 rounded-3xl bg-slate-50 px-6 py-10 md:grid-cols-[1.3fr_1fr] md:px-10 lg:px-16">
 
           {/* SLIDER */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-black/5 shadow-[0_20px_50px_rgba(15,23,42,0.1)]">
+            <div className="relative w-full max-w-xl h-[300px] overflow-hidden rounded-3xl bg-black/5 shadow-[0_20px_50px_rgba(15,23,42,0.1)] md:h-[380px]">
               <Image
                 src={images[current]}
                 alt="Life at Neev Realty"

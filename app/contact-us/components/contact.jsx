@@ -1,55 +1,8 @@
 "use client";
 
 import { Mail, MapPin, Phone } from "lucide-react";
-import { useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    helpType: "residential",
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await addDoc(collection(db, "contacts"), {
-        ...formData,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("Message sent successfully ✅");
-
-      setFormData({
-        helpType: "residential",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong ❌");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <main className="bg-white">
 
@@ -112,6 +65,7 @@ export default function ContactPage() {
               </div>
             </div>
 
+            {/* Decorative circles */}
             <div className="relative mt-10 h-24 hidden md:block">
               <div className="absolute right-[-40px] bottom-[-40px] h-40 w-40 rounded-full bg-white/15" />
               <div className="absolute right-6 bottom-10 h-28 w-28 rounded-full bg-white/10" />
@@ -128,10 +82,8 @@ export default function ContactPage() {
                   How can we help you with*
                 </label>
                 <select
-                  name="helpType"
-                  value={formData.helpType}
-                  onChange={handleChange}
                   className="w-full border border-slate-300 text-sm text-slate-600 py-2 px-3 rounded-md focus:outline-none focus:border-[#DBA40D]"
+                  defaultValue="residential"
                 >
                   <option value="residential">Residential</option>
                   <option value="commercial">Commercial</option>
@@ -139,7 +91,7 @@ export default function ContactPage() {
               </div>
 
               {/* FORM */}
-              <form className="space-y-8" onSubmit={handleSubmit}>
+              <form className="space-y-8">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
@@ -148,10 +100,6 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required
                       className="w-full border-0 border-b border-slate-300 text-sm py-1 focus:outline-none focus:border-[#DBA40D]"
                     />
                   </div>
@@ -162,10 +110,6 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required
                       className="w-full border-0 border-b border-slate-300 text-sm py-1 focus:outline-none focus:border-[#DBA40D]"
                     />
                   </div>
@@ -178,10 +122,6 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
                       className="w-full border-0 border-b border-slate-300 text-sm py-1 focus:outline-none focus:border-[#DBA40D]"
                     />
                   </div>
@@ -192,10 +132,6 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
                       className="w-full border-0 border-b border-slate-300 text-sm py-1 focus:outline-none focus:border-[#DBA40D]"
                     />
                   </div>
@@ -207,9 +143,6 @@ export default function ContactPage() {
                   </label>
                   <textarea
                     rows={3}
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
                     className="w-full border-0 border-b border-slate-300 text-sm py-1 resize-none focus:outline-none focus:border-[#DBA40D]"
                   />
                 </div>
@@ -218,10 +151,9 @@ export default function ContactPage() {
                 <div className="pt-4 flex justify-center">
                   <button
                     type="submit"
-                    disabled={loading}
                     className="rounded-md bg-[#DBA40D] px-10 py-3 text-sm font-semibold text-white shadow-md hover:bg-[#c8950a] transition"
                   >
-                    {loading ? "Sending..." : "Send Message"}
+                    Send Message
                   </button>
                 </div>
 

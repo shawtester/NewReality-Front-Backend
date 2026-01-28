@@ -10,19 +10,23 @@ import {
   doc,
 } from "firebase/firestore";
 
-/* ================= ADMIN ================= */
+/* ================= ADMIN : ALL BLOGS ================= */
 export const getAdminBlogs = async () => {
-  const q = query(collection(db, "blogs"), orderBy("timestampCreate", "desc"));
+  const q = query(
+    collection(db, "blogs"),
+    orderBy("timestampCreate", "desc")
+  );
+
   const snap = await getDocs(q);
 
-  return snap.docs.map(d => ({
+  return snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
     timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
   }));
 };
 
-/* ================= BLOG LIST ================= */
+/* ================= HOME : ACTIVE BLOGS ================= */
 export const getBlogsForHome = async () => {
   const q = query(
     collection(db, "blogs"),
@@ -32,7 +36,7 @@ export const getBlogsForHome = async () => {
 
   const snap = await getDocs(q);
 
-  return snap.docs.map(d => ({
+  return snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
     timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
@@ -51,9 +55,26 @@ export const getBlogBySlug = async ({ slug }) => {
   if (snap.empty) return null;
 
   const d = snap.docs[0];
+
   return {
     id: d.id,
     ...d.data(),
     timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
+  };
+};
+
+/* ================= BLOG BY ID (ADMIN EDIT) ================= */
+export const getBlogById = async ({ id }) => {
+  if (!id) return null;
+
+  const ref = doc(db, "blogs", id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return null;
+
+  return {
+    id: snap.id,
+    ...snap.data(),
+    timestampCreate: snap.data()?.timestampCreate?.seconds ?? null,
   };
 };

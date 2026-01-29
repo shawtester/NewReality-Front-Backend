@@ -35,14 +35,34 @@ export default function Footer() {
     { value: "above-5-bhk", label: "5+ BHK property in Gurgaon" },
   ];
 
-  // NEW: Properties by type links
+  // UPDATED: Properties by type links - Commercial types redirect to /commercial
   const propertyTypeLinks = [
-    { value: "residential", label: "Residential property" },
-    { value: "commercial", label: "Commercial property" },
-    { value: "luxury-apartment", label: "Luxury apartment" },
-    { value: "builder-floor", label: "Builder floor" },
-    { value: "retail-shops", label: "Retail shops" },
-    { value: "sco-plots", label: "SCO plots" },
+    { value: "residential", label: "Residential property", href: `${BASE_ROUTE}?type=residential` },
+    { 
+      value: "commercial", 
+      label: "Commercial property", 
+      href: "/commercial?type=commercial" 
+    },
+    { 
+      value: "luxury-apartment", 
+      label: "Luxury apartment", 
+      href: `${BASE_ROUTE}?type=luxury-apartment` 
+    },
+    { 
+      value: "builder-floor", 
+      label: "Builder floor", 
+      href: `${BASE_ROUTE}?type=builder-floor` 
+    },
+    { 
+      value: "retail-shops", 
+      label: "Retail shops", 
+      href: "/commercial?type=retail-shops" 
+    },
+    { 
+      value: "sco-plots", 
+      label: "SCO plots", 
+      href: "/commercial?type=sco-plots" 
+    },
   ];
 
   // NEW: Projects by status links
@@ -107,14 +127,14 @@ export default function Footer() {
                 </ul>
               </div>
 
-              {/* ===== COLUMN 2 - Property Type ===== */}
+              {/* ===== COLUMN 2 - Property Type (UPDATED) ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Properties by type</h4>
                 <ul className="space-y-2 text-sm text-gray-400">
                   {propertyTypeLinks.map((item) => (
                     <li key={item.value}>
                       <Link
-                        href={`${BASE_ROUTE}?type=${item.value}`}
+                        href={item.href}
                         className="hover:text-white"
                       >
                         {item.label}

@@ -1,200 +1,346 @@
 "use client";
 
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
+import { Button } from "@nextui-org/react";
+
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadImage";
 import { createBlog, updateBlog } from "@/lib/firestore/blogs/write";
 import { getBlogById } from "@/lib/firestore/blogs/read";
-import { Button } from "@nextui-org/react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
 export default function BlogForm() {
-  const [data, setData] = useState({
-    title: "",
-    slug: "",
-    excerpt: "",
-    content: "",
-    image: null,
-    faqs: [{ question: "", answer: "" }],
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  // ===== FAQ HANDLERS =====
-  const addFaq = () =>
-    setData((p) => ({ ...p, faqs: [...p.faqs, { question: "", answer: "" }] }));
+  const [loading, setLoading] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+  
+  // 🔥 USE REF TO BYPASS STATE RACE CONDITION
+  const dataRef = useRef({
+    mainTitle: "",
+    detailHeading: "",
+    slug: "",
+    excerpt: "",
+    image: null,
+    sections: [{ heading: "", description: "" }],
+  });
 
-  const updateFaq = (i, key, value) => {
-    const faqs = [...data.faqs];
-    faqs[i][key] = value;
-    setData({ ...data, faqs });
-  };
+  const [data, setData] = useState(dataRef.current);
 
-  const removeFaq = (i) => {
-    const faqs = data.faqs.filter((_, idx) => idx !== i);
-    setData({ ...data, faqs });
-  };
+  /* ================= SYNC REF + STATE ================= */
+  const updateDataField = useCallback((field, value) => {
+    dataRef.current[field] = value;
+    setData(prev => ({ ...prev, [field]: value }));
+  }, []);
 
-  // ===== FETCH OLD BLOG DATA =====
+  /* ================= FETCH BLOG (EDIT MODE) ================= */
   useEffect(() => {
     if (!id) return;
-
+    
+    console.log("🔍 Fetching blog ID:", id);
+    
     const fetchBlog = async () => {
       try {
         const res = await getBlogById({ id });
-        if (!res) return toast.error("Blog not found");
+        
+        if (!res) {
+          toast.error("Blog not found");
+          router.push("/admin/blog");
+          return;
+        }
 
-        setData({
-          title: res.title || "",
+        console.log("📄 Fetched blog:", res);
+        
+        const newData = {
+          mainTitle: res.mainTitle || "",
+          detailHeading: res.detailHeading || "",
           slug: res.slug || "",
           excerpt: res.excerpt || "",
-          content: res.content || "",
-          image: res.image
-            ? typeof res.image === "string"
-              ? { url: res.image }
-              : res.image
-            : null,
-          faqs: res.faqs?.length ? res.faqs : [{ question: "", answer: "" }],
-        });
-      } catch (e) {
-        toast.error(e.message);
+          image: res.image || null,
+          sections: res.sections?.length > 0 ? res.sections : [{ heading: "", description: "" }],
+        };
+        
+        dataRef.current = newData;
+        setData(newData);
+      } catch (err) {
+        console.error("❌ Fetch error:", err);
+        toast.error("Failed to load blog");
       }
     };
 
     fetchBlog();
-  }, [id]);
+  }, [id, router]);
 
-  // ===== IMAGE UPLOAD =====
+  /* ================= SECTION HANDLERS ================= */
+  const addSection = useCallback(() => {
+    const newSections = [...dataRef.current.sections, { heading: "", description: "" }];
+    dataRef.current.sections = newSections;
+    setData(prev => ({ ...prev, sections: newSections }));
+  }, []);
+
+  const updateSection = useCallback((index, key, value) => {
+    const sections = [...dataRef.current.sections];
+    sections[index][key] = value;
+    dataRef.current.sections = sections;
+    setData(prev => ({ ...prev, sections }));
+  }, []);
+
+  const removeSection = useCallback((index) => {
+    const sections = dataRef.current.sections.filter((_, i) => i !== index);
+    dataRef.current.sections = sections;
+    setData(prev => ({ ...prev, sections }));
+  }, []);
+
+  /* ================= IMAGE UPLOAD ================= */
   const handleImage = async (file) => {
     if (!file) return;
+
     setImgLoading(true);
     try {
+      console.log("🖼️ Uploading image...");
       const res = await uploadToCloudinary(file);
-      setData((p) => ({ ...p, image: res }));
-      toast.success("Image uploaded");
-    } catch (e) {
-      toast.error(e.message);
+      updateDataField('image', res);
+      toast.success("Image uploaded successfully!");
+    } catch (err) {
+      console.error("❌ Image upload failed:", err);
+      toast.error("Image upload failed");
+    } finally {
+      setImgLoading(false);
     }
-    setImgLoading(false);
   };
 
-  // ===== SUBMIT =====
+  /* ================= BULLETPROOF SUBMIT ================= */
   const submit = async () => {
-    if (!data.title) return toast.error("Title required");
+    // 🔥 USE REF FOR VALIDATION - NO STATE RACE CONDITION
+    const currentData = dataRef.current;
+    
+    console.log("🔍 REF DATA (100% accurate):", currentData);
+    console.log("mainTitle:", `"${currentData.mainTitle}" (length: ${currentData.mainTitle?.length || 0})`);
+    console.log("detailHeading:", `"${currentData.detailHeading}"`);
+
+    // 🔥 VALIDATE FROM REF - INSTANT ACCESS
+    if (!currentData.mainTitle?.trim()) {
+      console.log("❌ mainTitle FAILED (ref value):", `"${currentData.mainTitle}"`);
+      return toast.error("Main title is required");
+    }
+    
+    if (!currentData.detailHeading?.trim()) {
+      return toast.error("Detail page heading is required");
+    }
+    
+    if (!currentData.slug?.trim()) {
+      return toast.error("Slug is required");
+    }
+
+    const validSections = currentData.sections.filter(
+      (s) => s.heading?.trim() && s.description?.trim()
+    );
+
+    if (validSections.length === 0) {
+      return toast.error("Add at least one complete section");
+    }
+
+    console.log("✅ ALL VALIDATIONS PASSED ✅");
+    console.log("Valid sections:", validSections.length);
 
     setLoading(true);
+
     try {
+      const payload = {
+        mainTitle: currentData.mainTitle.trim(),
+        detailHeading: currentData.detailHeading.trim(),
+        slug: currentData.slug.trim(),
+        excerpt: currentData.excerpt?.trim() || "",
+        image: currentData.image,
+        sections: validSections.map(s => ({
+          heading: s.heading.trim(),
+          description: s.description.trim()
+        })),
+      };
+
+      console.log("📤 FINAL PAYLOAD:", payload);
+
       if (id) {
-        await updateBlog({ data: { ...data, id } });
+        console.log("📝 Calling updateBlog...");
+        await updateBlog({ id, data: payload });
+        toast.success("Blog updated successfully!");
       } else {
-        await createBlog({ data });
+        console.log("➕ Calling createBlog...");
+        await createBlog({ data: payload });
+        toast.success("Blog created successfully!");
       }
 
-      toast.success(id ? "Blog updated" : "Blog created");
       router.push("/admin/blog");
-    } catch (e) {
-      toast.error(e.message);
+      router.refresh();
+    } catch (err) {
+      console.error("💥 SAVE ERROR:", err);
+      toast.error(err.message || "Failed to save blog");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  /* ================= UI ================= */
   return (
-    <div className="p-5 max-w-xl">
-      <h1 className="text-lg font-semibold mb-4">
-        {id ? "Update Blog" : "Create Blog"}
+    <div className="max-w-3xl p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">
+        {id ? "Update Blog" : "Create New Blog"}
       </h1>
 
-      {/* TITLE */}
-      <input
-        value={data.title}
-        onChange={(e) => setData({ ...data, title: e.target.value })}
-        placeholder="Title"
-        className="border p-2 w-full mb-3"
-      />
+      {/* MAIN TITLE */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Main Title (Admin / Listing) <span className="text-red-500">*</span>
+        </label>
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent transition-all"
+          placeholder="Enter main title..."
+          value={data.mainTitle}
+          onChange={(e) => updateDataField('mainTitle', e.target.value)}
+        />
+      </div>
+
+      {/* DETAIL HEADING */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Detail Page Heading (H1) <span className="text-red-500">*</span>
+        </label>
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent transition-all"
+          placeholder="Enter H1 title..."
+          value={data.detailHeading}
+          onChange={(e) => updateDataField('detailHeading', e.target.value)}
+        />
+      </div>
 
       {/* SLUG */}
-      <input
-        value={data.slug}
-        onChange={(e) => setData({ ...data, slug: e.target.value })}
-        placeholder="Slug"
-        className="border p-2 w-full mb-3"
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Slug <span className="text-red-500">*</span>
+        </label>
+        <input
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent transition-all"
+          placeholder="Enter slug (e.g., my-first-blog)"
+          value={data.slug}
+          onChange={(e) => updateDataField('slug', e.target.value)}
+        />
+      </div>
 
       {/* EXCERPT */}
-      <textarea
-        value={data.excerpt}
-        onChange={(e) => setData({ ...data, excerpt: e.target.value })}
-        placeholder="Excerpt"
-        className="border p-2 w-full mb-3"
-      />
-
-      {/* CONTENT */}
-      <textarea
-        value={data.content}
-        onChange={(e) => setData({ ...data, content: e.target.value })}
-        rows={6}
-        placeholder="Content"
-        className="border p-2 w-full mb-3"
-      />
-
-      {/* IMAGE */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => handleImage(e.target.files[0])}
-      />
-      {imgLoading && <p className="text-xs mt-1">Uploading...</p>}
-
-      {data.image?.url && (
-        <img
-          src={data.image.url}
-          className="h-32 mt-3 rounded border"
-          alt="Blog Image"
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
+        <textarea
+          rows={3}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent resize-vertical transition-all"
+          placeholder="Short description for blog listing..."
+          value={data.excerpt}
+          onChange={(e) => updateDataField('excerpt', e.target.value)}
         />
-      )}
+      </div>
 
-      {/* FAQ SECTION */}
-      <h3 className="font-semibold mt-5">FAQs</h3>
-      {data.faqs?.map((faq, i) => (
-        <div key={i} className="border p-2 mb-2">
-          <input
-            placeholder="Question"
-            value={faq.question}
-            onChange={(e) => updateFaq(i, "question", e.target.value)}
-            className="border p-2 w-full mb-2"
-          />
-          <textarea
-            placeholder="Answer"
-            value={faq.answer}
-            onChange={(e) => updateFaq(i, "answer", e.target.value)}
-            className="border p-2 w-full"
-          />
-          <button
-            onClick={() => removeFaq(i)}
-            className="text-red-500 text-xs mt-1"
-          >
-            Remove
-          </button>
+      {/* IMAGE UPLOAD */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImage(e.target.files?.[0])}
+          className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#DBA40D] cursor-pointer transition-all"
+          disabled={imgLoading}
+        />
+        {imgLoading && (
+          <p className="text-sm text-[#DBA40D] mt-2 flex items-center">
+            <span className="w-4 h-4 border-2 border-[#DBA40D] border-t-transparent rounded-full animate-spin mr-2"></span>
+            Uploading...
+          </p>
+        )}
+        {data.image?.url && (
+          <div className="mt-3">
+            <img
+              src={data.image.url}
+              alt="Blog preview"
+              className="h-32 w-48 object-cover border rounded-lg shadow-sm"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* SECTIONS */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Blog Sections <span className="text-red-500">*</span></h3>
+          <span className="text-sm text-gray-500">
+            {data.sections.filter(s => s.heading.trim() && s.description.trim()).length} valid
+          </span>
         </div>
-      ))}
 
-      <button onClick={addFaq} className="text-sm text-blue-600">
-        + Add FAQ
-      </button>
+        {data.sections.map((sec, i) => (
+          <div key={i} className="border border-gray-200 p-6 mb-4 rounded-xl bg-white shadow-sm">
+            <input
+              className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent"
+              placeholder="Section Heading"
+              value={sec.heading}
+              onChange={(e) => updateSection(i, "heading", e.target.value)}
+            />
+            <textarea
+              rows={4}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DBA40D] focus:border-transparent resize-vertical"
+              placeholder="Section Description"
+              value={sec.description}
+              onChange={(e) => updateSection(i, "description", e.target.value)}
+            />
+            {data.sections.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeSection(i)}
+                className="text-red-500 hover:text-red-700 text-sm font-medium mt-3"
+              >
+                ❌ Remove Section
+              </button>
+            )}
+          </div>
+        ))}
 
-      {/* SUBMIT BUTTON */}
-      <Button
-        isLoading={loading}
-        className="mt-5 bg-[#DBA40D]"
-        onClick={submit}
-      >
-        {id ? "Update Blog" : "Create Blog"}
-      </Button>
+        <button
+          type="button"
+          onClick={addSection}
+          className="text-[#DBA40D] hover:text-[#B88A0A] text-sm font-medium flex items-center mt-2"
+          disabled={loading}
+        >
+          ➕ Add New Section
+        </button>
+      </div>
+
+      {/* ACTIONS */}
+      <div className="flex gap-4 pt-4 border-t">
+        <Button
+          type="button"
+          variant="light"
+          onClick={addSection}
+          className="text-[#DBA40D] border-[#DBA40D]"
+          startContent="➕"
+          disabled={loading}
+        >
+          Add Section
+        </Button>
+
+        <Button
+          type="button"
+          color="primary"
+          isLoading={loading}
+          onClick={submit}
+          className="bg-[#DBA40D] hover:bg-[#B88A0A] min-w-[140px] font-medium shadow-lg"
+          disabled={loading}
+        >
+          {id ? "Update Blog" : "Create Blog"}
+        </Button>
+      </div>
+
+      <div className="text-xs text-gray-500 mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+        
+      </div>
     </div>
   );
 }

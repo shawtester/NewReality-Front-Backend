@@ -8,16 +8,30 @@ import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
 const filterForCommercial = (list = []) => {
-        return list.filter((item) => {
-            // ❗ agar propertyType hi nahi hai → dono me dikhe
-            if (!item.propertyType) return true;
+    return list.filter((item) => {
+        // ❗ agar propertyType hi nahi hai → dono me dikhe
+        if (!item.propertyType) return true;
 
-            // ✅ sirf commercial wale
-            return item.propertyType === "commercial";
-        });
-    };
+        // ✅ sirf commercial wale
+        return item.propertyType === "commercial";
+    });
+};
 
-export default function ApartmentsPage({ apartments = [] }) {
+// ✅ DYNAMIC HEADING FUNCTION
+const getDynamicHeading = (type) => {
+    switch (type) {
+        case 'commercial':
+            return "Commercial Properties for Sale in Gurgaon";
+        case 'retail-shops':
+            return "Retail Shops for Sale in Gurgaon";
+        case 'sco-plots':
+            return "SCO Plots for Sale in Gurgaon";
+        default:
+            return "Commercial Properties for Sale in Gurgaon";
+    }
+};
+
+export default function CommercialPage({ apartments = [] }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -26,21 +40,16 @@ export default function ApartmentsPage({ apartments = [] }) {
 
     /* ================= SEARCH & FILTER STATES ================= */
     const [keyword, setKeyword] = useState("");
-    const [type, setType] = useState("");
+    const [type, setType] = useState(searchParams.get("type") || ""); // ✅ Initialize from URL
     const [status, setStatus] = useState("");
     const [locality, setLocality] = useState("");
     const [budget, setBudget] = useState("");
     const [bhk, setBhk] = useState("");
 
     const [filteredApartments, setFilteredApartments] = useState(filterForCommercial(apartments));
-
-
     const [loading, setLoading] = useState(false);
-
     
     const apartmentsPerPage = 12;
-
-
 
     /* ================= ALGOLIA SEARCH ================= */
     const handleSearch = async () => {
@@ -109,14 +118,14 @@ export default function ApartmentsPage({ apartments = [] }) {
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="max-w-4xl">
+                            {/* ✅ DYNAMIC HEADING */}
                             <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
-                                Commercial Apartments Property for Sale in Gurgaon
+                                {getDynamicHeading(type)}
                             </h1>
 
                             <p className="mt-2 text-sm sm:text-[15px] text-gray-600">
-                                Booming Micro Commercial Apartments Market in Gurgaon –
-                                luxury apartments offering massive long-term capital gains.
-
+                                Discover premium {type || 'commercial'} properties in Gurgaon – 
+                                strategic locations with excellent investment potential.
                             </p>
                         </div>
 
@@ -139,10 +148,9 @@ export default function ApartmentsPage({ apartments = [] }) {
             </section>
 
             {/* ================= HERO SECTION ================= */}
-            <section className="lg:bg-[#F6FBFF] pt-4  relative">
+            <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 {/* HERO TEXT – MOBILE & TABLET */}
                 <div className="lg:hidden mb-6 text-center px-2">
-
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
                         Your <span className="text-[#F5A300]">Property</span>, <br />
                         Our Priority.
@@ -153,8 +161,6 @@ export default function ApartmentsPage({ apartments = [] }) {
                     <div className="relative hidden lg:flex items-start gap-10">
                         {/* LEFT */}
                         <div className="flex-1 ml-10">
-
-
                             <h1 className="text-[42px] sm:text-[52px] font-extrabold text-gray-900 leading-tight">
                                 Your <span className="text-[#F5A300]">Property</span>, <br />
                                 Our Priority.
@@ -163,14 +169,14 @@ export default function ApartmentsPage({ apartments = [] }) {
 
                         <div className="flex-1 flex justify-center self-end">
                             <div className="
-    relative
-    w-[240px] h-[240px]
-    sm:w-[310px] sm:h-[310px]
-    md:w-[370px] md:h-[370px]
-    lg:w-[450px] lg:h-[420px]
-    rounded-[40px] lg:rounded-[60px]
-    overflow-hidden shadow-xl
-  ">
+                                relative
+                                w-[240px] h-[240px]
+                                sm:w-[310px] sm:h-[310px]
+                                md:w-[370px] md:h-[370px]
+                                lg:w-[450px] lg:h-[420px]
+                                rounded-[40px] lg:rounded-[60px]
+                                overflow-hidden shadow-xl
+                            ">
                                 <Image
                                     src="/images/residental.jpg"
                                     alt="Property collage"
@@ -180,7 +186,6 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 />
                             </div>
                         </div>
-
                     </div>
 
                     {/* MOBILE/TABLET SEARCH */}
@@ -251,8 +256,6 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="above-5-bhk">Above 5 BHK</option>
                             </select>
 
-
-
                             <button onClick={handleSearch} className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">
                                 {loading ? "Searching..." : "Search"}
                             </button>
@@ -261,7 +264,7 @@ export default function ApartmentsPage({ apartments = [] }) {
 
                     {/* DESKTOP SEARCH BAR */}
                     <div className="hidden lg:block relative bottom-40 left-1/2 -translate-x-[60%] w-full max-w-[950px]">
-                        <div className="bg-white shadow-2xl px-5 py-3  flex items-center gap-3 rounded-full border border-yellow-400">
+                        <div className="bg-white shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
                             <input
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
@@ -326,8 +329,6 @@ export default function ApartmentsPage({ apartments = [] }) {
                                 <option value="5-bhk">5 BHK </option>
                                 <option value="above-5-bhk">Above 5 BHK </option>
                             </select>
-
-
 
                             <button onClick={handleSearch} className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">
                                 {loading ? "Searching..." : "Search"}

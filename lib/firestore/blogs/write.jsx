@@ -1,7 +1,7 @@
 import { db } from "@/lib/firebase";
 import {
   collection,
-  doc,
+  doc,           // 🔥 ADD THIS LINE
   setDoc,
   deleteDoc,
   Timestamp,
@@ -9,19 +9,21 @@ import {
 
 /* ================= CREATE ================= */
 export const createBlog = async ({ data }) => {
-  if (!data?.title) throw new Error("Title is required");
-  if (!data?.slug) throw new Error("Slug is required");
+  // 🔥 FIXED: Use mainTitle OR title
+  const title = data.mainTitle || data.title;
+  if (!title?.trim()) throw new Error("Title required");
+  if (!data?.slug?.trim()) throw new Error("Slug required");
 
-  const newId = doc(collection(db, "ids")).id;
+  // 🔥 FIXED: Import doc + proper ID generation
+  const newId = doc(collection(db, "blogs")).id;  // Changed from "ids" to "blogs"
 
   await setDoc(doc(db, "blogs", newId), {
     id: newId,
-    title: data.title,
-    slug: data.slug,
-    excerpt: data.excerpt || "",
-    content: data.content || "",
+    title: title.trim(),
+    slug: data.slug.trim(),
+    excerpt: data.excerpt?.trim() || "",
     image: data.image || null,
-    faqs: data.faqs || [],
+    sections: data.sections || [],
     isActive: true,
     timestampCreate: Timestamp.now(),
   });
@@ -29,17 +31,17 @@ export const createBlog = async ({ data }) => {
 
 /* ================= UPDATE ================= */
 export const updateBlog = async ({ data }) => {
+  const title = data.mainTitle || data.title;
   if (!data?.id) throw new Error("Blog ID missing");
 
   await setDoc(
     doc(db, "blogs", data.id),
     {
-      title: data.title,
-      slug: data.slug,
-      excerpt: data.excerpt,
-      content: data.content,
+      title: title?.trim(),
+      slug: data.slug?.trim(),
+      excerpt: data.excerpt?.trim() || "",
       image: data.image || null,
-      faqs: data.faqs || [],
+      sections: data.sections || [],
       timestampUpdate: Timestamp.now(),
     },
     { merge: true }

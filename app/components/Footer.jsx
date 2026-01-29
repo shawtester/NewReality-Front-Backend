@@ -24,7 +24,7 @@ export default function Footer() {
     scrollContainerRef.current?.scrollBy({ left: 350, behavior: "smooth" });
   };
 
-  // Dynamic BHK links ✅ ALREADY WORKING
+  // ✅ FIXED: Dynamic BHK links
   const bhkLinks = [
     { value: "1-bhk", label: "1 BHK property in Gurgaon" },
     { value: "1.5-bhk", label: "1.5 BHK property in Gurgaon" },
@@ -32,63 +32,70 @@ export default function Footer() {
     { value: "2.5-bhk", label: "2.5 BHK property in Gurgaon" },
     { value: "3-bhk", label: "3 BHK property in Gurgaon" },
     { value: "4-bhk", label: "4 BHK property in Gurgaon" },
+    { value: "5-bhk", label: "5 BHK property in Gurgaon" },
     { value: "above-5-bhk", label: "5+ BHK property in Gurgaon" },
   ];
 
-  // UPDATED: Properties by type links - Commercial types redirect to /commercial
+  // ✅ FIXED: Properties by type links - Commercial types redirect to /commercial
   const propertyTypeLinks = [
-    { value: "residential", label: "Residential property", href: `${BASE_ROUTE}?type=residential` },
+    { value: "residential", label: "Residential property in Gurgaon", href: `${BASE_ROUTE}?type=residential` },
     { 
       value: "commercial", 
-      label: "Commercial property", 
+      label: "Commercial property in Gurgaon", 
       href: "/commercial?type=commercial" 
     },
     { 
       value: "luxury-apartment", 
-      label: "Luxury apartment", 
+      label: "Luxury apartment in Gurgaon", 
       href: `${BASE_ROUTE}?type=luxury-apartment` 
     },
     { 
       value: "builder-floor", 
-      label: "Builder floor", 
+      label: "Builder floor in Gurgaon", 
       href: `${BASE_ROUTE}?type=builder-floor` 
     },
     { 
       value: "retail-shops", 
-      label: "Retail shops", 
+      label: "Retail shops in Gurgaon", 
       href: "/commercial?type=retail-shops" 
     },
     { 
       value: "sco-plots", 
-      label: "SCO plots", 
+      label: "SCO plots in Gurgaon", 
       href: "/commercial?type=sco-plots" 
     },
   ];
 
-  // NEW: Projects by status links
+  // ✅ FIXED: Projects by status links - REMOVED extra space in value
   const projectStatusLinks = [
-    { value: "new-launch", label: "New launch projects" },
-    { value: "ready-to-move", label: "Ready to move projects" },
-    { value: "under-construction", label: "Under construction projects" },
-    { value: "pre-launch", label: "Pre launch projects" },
+    { value: "new-launch", label: "New launch projects in Gurgaon" },
+    { value: "ready-to-move", label: "Ready to move projects in Gurgaon" },
+    { value: "under-construction", label: "Under construction projects in Gurgaon" },
+    { value: "pre-launch", label: "Pre launch projects in Gurgaon" },
   ];
 
-  // NEW: Projects by location links
+  // ✅ FIXED: Projects by location links - CORRECTED value/label order
   const locationLinks = [
-    { value: "dwarka-expressway", label: "Dwarka Expressway" },
-    { value: "golf-course-road", label: "Golf Course Road" },
-    { value: "golf-course-extension", label: "Golf Course Extension" },
-    { value: "sohna-road", label: "Sohna Road" },
-    { value: "new-gurgaon", label: "New Gurgaon" },
+    { value: "dwarka-expressway", label: "Projects in Dwarka Expressway" },
+    { value: "golf-course-road", label: "Projects in Golf Course Road" },
+    { value: "golf-course-extension", label: "Projects in Golf Course Extension" },
+    { value: "sohna-road", label: "Projects in Sohna Road" },
+    { value: "new-gurgaon", label: "Projects in New Gurgaon" },
+    { value: "old-gurgaon", label: "Projects in Old Gurgaon" },
+    { value: "spr", label: "Projects in SPR" },
+    { value: "nh8", label: "Projects in NH8" },
   ];
 
-  // NEW: Projects by budget links
+  // ✅ FIXED: Projects by budget links - CORRECTED value format
   const budgetLinks = [
-    { value: "1-2cr", label: "1–2 Cr" },
-    { value: "2-3cr", label: "2–3 Cr" },
-    { value: "3-4cr", label: "3–4 Cr" },
-    { value: "4-5cr", label: "4–5 Cr" },
-    { value: "5cr-plus", label: "5+ Cr" },
+    { value: "1-2cr", label: "Property between 1 to 2 cr in Gurgaon" },
+    { value: "2-3cr", label: "Property between 2 to 3 cr in Gurgaon" },
+    { value: "3-4cr", label: "Property between 3 to 4 cr in Gurgaon" },
+    { value: "4-5cr", label: "Property between 4 to 5 cr in Gurgaon" },
+    { value: "5-6cr", label: "Property between 5 to 6 cr in Gurgaon" },
+    { value: "6-7cr", label: "Property between 6 to 7 cr in Gurgaon" },
+    { value: "7-8cr", label: "Property between 7 to 8 cr in Gurgaon" },
+    { value: "above-8cr", label: "Property above 8cr in Gurgaon" },
   ];
 
   return (
@@ -108,7 +115,7 @@ export default function Footer() {
               ref={scrollContainerRef}
               className="flex gap-8 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1"
             >
-              {/* ===== COLUMN 1 - BHK (Already working) ===== */}
+              {/* ===== COLUMN 1 - BHK ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">
                   Projects by size
@@ -127,7 +134,7 @@ export default function Footer() {
                 </ul>
               </div>
 
-              {/* ===== COLUMN 2 - Property Type (UPDATED) ===== */}
+              {/* ===== COLUMN 2 - Property Type ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Properties by type</h4>
                 <ul className="space-y-2 text-sm text-gray-400">

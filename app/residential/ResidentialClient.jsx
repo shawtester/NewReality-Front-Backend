@@ -8,6 +8,24 @@ import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
+const PROPERTY_TYPE_MAP = {
+    apartment: "isApartment",
+    "builder-floor": "isBuilderFloor",
+    villa: "isVilla",
+    plot: "isPlot",
+};
+
+const filterByPropertyType = (list = [], type) => {
+    const field = PROPERTY_TYPE_MAP[type];
+    if (!field) return list;
+    return list.filter((item) => item[field] === true);
+};
+
+const filterApartments = (list = []) => {
+    return list.filter((item) => item.isApartment === true);
+};
+
+
 export default function ResidentialPage({ apartments = [] }) {
     const BASE_ROUTE = "/residential";
     const router = useRouter();
@@ -87,6 +105,13 @@ export default function ResidentialPage({ apartments = [] }) {
 
         // Auto search OR fallback to all properties
         const hasFilters = urlType || urlStatus || urlLocality || urlBudget || urlBhk || urlKeyword;
+        if (urlType && PROPERTY_TYPE_MAP[urlType]) {
+            const filtered = filterByPropertyType(apartments, urlType);
+            setFilteredApartments(filtered);
+            return;
+        }
+
+
         if (hasFilters) {
             handleSearch();
         } else {
@@ -117,7 +142,15 @@ export default function ResidentialPage({ apartments = [] }) {
             const res = await fetch(`/api/search?${params.toString()}`);
             const data = await res.json();
 
-            const safeData = Array.isArray(data) ? data : apartments;
+            let finalData = Array.isArray(data) ? data : [];
+
+            if (type && PROPERTY_TYPE_MAP[type]) {
+                finalData = filterByPropertyType(finalData, type);
+            }
+
+            setFilteredApartments(finalData);
+
+
 
             // ✅ RESIDENTIAL FILTER APPLIED HERE
             const residentialOnly = filterForResidential(safeData);
@@ -368,23 +401,36 @@ export default function ResidentialPage({ apartments = [] }) {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {currentApartments.map((item) => (
-                                <PropertyCard
-                                    key={item.id}
-                                    property={{
-                                        title: item.title,
-                                        developer: item.developer,
-                                        location: item.location,
-                                        bhk: item.configurations?.join(", "),
-                                        size: item.areaRange,
-                                        price: item.priceRange,
-                                        img: item.mainImage?.url || "/placeholder.jpg",
-                                        slug: item.id,
-                                        isTrending: item.isTrending,
-                                        isNewLaunch: item.isNewLaunch,
-                                    }}
-                                />
-                            ))}
+                            {currentApartments.length === 0 && type ? (
+                                <div className="col-span-full text-center py-20">
+                                    <p className="text-xl font-semibold text-gray-600">
+                                        No {type.replace("-", " ")} properties available
+                                    </p>
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        Please try another property type or clear filters.
+                                    </p>
+                                </div>
+                            ) : (
+                                currentApartments.map((item) => (
+                                    <PropertyCard
+                                        key={item.id}
+                                        property={{
+                                            title: item.title,
+                                            developer: item.developer,
+                                            location: item.location,
+                                            bhk: item.configurations?.join(", "),
+                                            size: item.areaRange,
+                                            price: item.priceRange,
+                                            img: item.mainImage?.url || "/placeholder.jpg",
+                                            slug: item.id,
+                                            isTrending: item.isTrending,
+                                            isNewLaunch: item.isNewLaunch,
+                                        }}
+                                    />
+                                ))
+                            )}
+
+
                         </div>
                     )}
                 </div>

@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import {
-  getPropertyById,
   getAllProperties,
 } from "@/lib/firestore/products/read_server";
+import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
 import MobileGallery from "./components/MobileGallery";
@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export default async function PropertyPage({ params }) {
   const slug = params.slug;
 
-  const property = await getPropertyById(slug);
+  const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
 
   const allProjects = await getAllProperties();
@@ -98,7 +98,7 @@ export default async function PropertyPage({ params }) {
 
           <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
 
-          <PaymentPlanSection plans={cleanProperty.paymentPlans} />
+          <PaymentPlanSection  />
 
           <AmenitiesSection amenities={cleanProperty.amenities} />
 

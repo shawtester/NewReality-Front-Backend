@@ -2,7 +2,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
 import Section1 from "./components/section1";
-import MeetTheTeam from "./components/MeetTheTeam";
+
 import TestimonialsSection from "./components/Testimonial";
 import { getTestimonials } from "@/lib/firestore/testimonials/read";
 import { MapPin } from "lucide-react";
@@ -18,7 +18,6 @@ export default async function AboutPage() {
 
       {/* ABOUT SECTIONS */}
       <Section1 />
-      <MeetTheTeam />
       <TestimonialsSection testimonials={testimonials}/>
 
       {/* ================= GET IN TOUCH SECTION ================= */}

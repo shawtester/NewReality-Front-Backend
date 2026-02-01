@@ -190,8 +190,8 @@ export default function BasicDetails({ data, handleData }) {
             type="button"
             onClick={() => handleData("propertyType", type)}
             className={`px-4 py-2 rounded-full text-sm ${data.propertyType === type
-                ? "bg-black text-white"
-                : "bg-gray-200"
+              ? "bg-black text-white"
+              : "bg-gray-200"
               }`}
           >
             {type}
@@ -247,6 +247,52 @@ export default function BasicDetails({ data, handleData }) {
         value={data.priceRange}
         onChange={(v) => handleData("priceRange", v)}
       />
+
+      {/* ================= PAYMENT PLAN ================= */}
+      <div>
+        <h3 className="text-sm font-semibold mb-3">
+          Payment Plan (Percentage)
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Input
+            label="Installment 1 (%)"
+            placeholder="10%"
+            value={data.paymentPlan?.installment1 || ""}
+            onChange={(v) =>
+              handleData("paymentPlan", {
+                ...data.paymentPlan,
+                installment1: v,
+              })
+            }
+          />
+
+          <Input
+            label="Installment 2 (%)"
+            placeholder="80%"
+            value={data.paymentPlan?.installment2 || ""}
+            onChange={(v) =>
+              handleData("paymentPlan", {
+                ...data.paymentPlan,
+                installment2: v,
+              })
+            }
+          />
+
+          <Input
+            label="Installment 3 (%)"
+            placeholder="10%"
+            value={data.paymentPlan?.installment3 || ""}
+            onChange={(v) =>
+              handleData("paymentPlan", {
+                ...data.paymentPlan,
+                installment3: v,
+              })
+            }
+          />
+        </div>
+      </div>
+
 
       {/* BROCHURE */}
       <div>

@@ -28,7 +28,7 @@ export const defaultProperty = {
         publicId: "",
     },
     gallery: [],
-    
+
     brochure: {
         url: "",
         name: "",
@@ -44,12 +44,21 @@ export const defaultProperty = {
     description: "",
     disclaimer: "",
 
+    
+
     // 🔹 ARRAYS
     configurations: [],
     floorPlans: [],
     amenities: [],
     locationPoints: [],
     faq: [],
+
+    // 🔹 PAYMENT PLAN
+    paymentPlan: {
+        installment1: "",
+        installment2: "",
+        installment3: "",
+    },
 
     // 🔹 META
     timestampCreate: Timestamp.now(),

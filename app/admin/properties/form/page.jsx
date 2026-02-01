@@ -13,7 +13,6 @@ import FloorPlans from "./components/FloorPlans";
 import Amenities from "./components/Amenities";
 import Location from "./components/Location";
 import FAQ from "./components/FAQ";
-import Disclaimer from "./components/Disclaimer";
 import Image from "./components/Image";
 import { defaultProperty } from "@/constants/propertyDefaults";
 
@@ -131,7 +130,6 @@ export default function Page() {
       <Amenities data={data} handleData={handleData} />
       <Location data={data} handleData={handleData} />
       <FAQ data={data} handleData={handleData} />
-      <Disclaimer data={data} handleData={handleData} />
     </form>
   );
 }

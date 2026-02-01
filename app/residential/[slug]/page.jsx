@@ -62,13 +62,14 @@ export default async function PropertyPage({ params }) {
       property.gallery?.length > 0
         ? property.gallery.map((g) => g.url)
         : property.mainImage?.url
-        ? [property.mainImage.url]
-        : property.image?.url
-        ? [property.image.url]
-        : [],
+          ? [property.mainImage.url]
+          : property.image?.url
+            ? [property.image.url]
+            : [],
 
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
+    paymentPlan: property.paymentPlan || null,
     amenities: amenitiesData,
 
     mapQuery: property.mapQuery || property.location || "",
@@ -109,7 +110,10 @@ export default async function PropertyPage({ params }) {
 
           <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
 
-          <PaymentPlanSection />
+          <PaymentPlanSection
+            paymentPlan={cleanProperty.paymentPlan}
+          />
+
 
           <AmenitiesSection amenities={cleanProperty.amenities} />
 

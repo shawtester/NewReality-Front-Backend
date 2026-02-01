@@ -5,9 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Search,
-  ShoppingCart,
-  UserCircle2,
+  // Search,
+  // ShoppingCart,
+  // UserCircle2,
   Phone,
   Menu,
 } from "lucide-react";
@@ -57,7 +57,7 @@ const navLinks = [
   },
 
   { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact-us" },
+  // { label: "Contact", href: "/contact-us" },
 ];
 
 
@@ -139,21 +139,21 @@ export default function Navbar() {
             <AdminButton />
           </AuthContextProvider>
 
-          <Link href="/search">
+          {/* <Link href="/search">
             <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100">
               <Search size={16} />
             </button>
-          </Link>
+          </Link> */}
 
-          <AuthContextProvider>
+          {/* <AuthContextProvider>
             <HeaderClientButtons />
-          </AuthContextProvider>
+          </AuthContextProvider> */}
 
-          <Link href="/account">
+          {/* <Link href="/account">
             <button className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-gray-100">
               <UserCircle2 size={16} />
             </button>
-          </Link>
+          </Link> */}
 
           <AuthContextProvider>
             <LogoutButton />

@@ -134,8 +134,8 @@ const WhatWeOffer = () => {
 
   return (
     <>
-      <section className="w-full bg-[#F6FAFF] py-16">
-        <div className="mx-auto max-w-6xl space-y-12 px-4">
+      <section className="w-full bg-[#F6FAFF] ">
+        {/* <div className="mx-auto max-w-6xl space-y-12 px-4">
           <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
             What we <span className="text-[#DBA40D]">Offer</span>
           </h2>
@@ -150,9 +150,9 @@ const WhatWeOffer = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
-        <div className="mt-14 px-4">
+        <div className=" px-4">
           <div className="mx-auto max-w-6xl rounded-3xl bg-slate-50 px-6 py-10 md:px-10 lg:px-16">
             <div className="max-w-xl space-y-6">
               <h3 className="text-3xl font-semibold md:text-4xl">

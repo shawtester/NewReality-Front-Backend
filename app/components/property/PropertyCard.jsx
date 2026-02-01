@@ -69,7 +69,7 @@ export default function PropertyCard({ property = {} }) {
             group flex h-full w-full flex-col overflow-hidden rounded-xl
             bg-white shadow-sm hover:shadow-md transition-all duration-300
             hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg cursor-pointer
-            md:h-72 lg:h-80 xl:h-96
+            md:h-72 lg:h-80 xl:h-96 border-1
           "
         >
           {/* IMAGE */}

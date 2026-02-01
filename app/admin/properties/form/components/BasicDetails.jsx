@@ -1,10 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { uploadBrochureToCloudinary } from "@/lib/cloudinary/uploadBrochure";
+import { useBuilders } from "@/lib/firestore/builders/read";
 
 export default function BasicDetails({ data, handleData }) {
   const [bhkInput, setBhkInput] = useState("");
+
+  /* 🔥 BUILDER SEARCH STATES (MISSING THE) */
+  const [searchBuilder, setSearchBuilder] = useState(
+    data.developer || ""
+  );
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const { builders, isLoading } = useBuilders();
+
+  /* 🔥 FILTERED BUILDERS */
+  const filteredBuilders = useMemo(() => {
+    return builders.filter((b) =>
+      b.name
+        ?.toLowerCase()
+        .includes(searchBuilder.toLowerCase())
+    );
+  }, [builders, searchBuilder]);
 
   /* ================= BROCHURE UPLOAD ================= */
   const uploadBrochure = async (file) => {
@@ -46,7 +64,9 @@ export default function BasicDetails({ data, handleData }) {
 
   return (
     <div className="bg-white rounded-xl p-6 space-y-6 shadow-sm">
-      <h2 className="text-lg font-semibold">Basic Details of Property</h2>
+      <h2 className="text-lg font-semibold">
+        Basic Details of Property
+      </h2>
 
       <Input
         label="Project Name"
@@ -54,17 +74,93 @@ export default function BasicDetails({ data, handleData }) {
         onChange={(v) => handleData("title", v)}
       />
 
+      {/* 🔗 SLUG INPUT */}
+      <div>
+        <label className="text-xs text-gray-500">
+          Custom URL (Slug)
+        </label>
+
+        <input
+          value={data.slug || ""}
+          onChange={(e) =>
+            handleData(
+              "slug",
+              e.target.value
+                .toLowerCase()
+                .replace(/[^a-z0-9-]/g, "")
+                .replace(/\s+/g, "-")
+            )
+          }
+          placeholder="prestige-city-sarjapur"
+          className="w-full border rounded-lg px-3 py-2 text-sm"
+        />
+
+        {/* 🔍 URL PREVIEW */}
+        <p className="text-xs text-gray-400 mt-1">
+          URL Preview:{" "}
+          <span className="text-gray-700 font-medium">
+            https://yourdomain.com/projects/
+            {data.slug || "auto-generated-from-title"}
+          </span>
+        </p>
+      </div>
+
+
       <Input
         label="Location"
         value={data.location}
         onChange={(v) => handleData("location", v)}
       />
 
-      <Input
-        label="Developer Name"
-        value={data.developer}
-        onChange={(v) => handleData("developer", v)}
-      />
+      {/* 🔥 DEVELOPER (SEARCHABLE + TYPEABLE DROPDOWN) */}
+      <div className="relative">
+        <label className="text-xs text-gray-500">
+          Developer
+        </label>
+
+        <input
+          value={searchBuilder}
+          onChange={(e) => {
+            setSearchBuilder(e.target.value);
+            setShowDropdown(true);
+          }}
+          onFocus={() => setShowDropdown(true)}
+          placeholder="Search or select developer"
+          className="w-full border rounded-lg px-3 py-2 text-sm"
+        />
+
+        {showDropdown && (
+          <div className="absolute z-30 mt-1 w-full bg-white border rounded-lg shadow max-h-60 overflow-y-auto">
+            {isLoading && (
+              <p className="p-2 text-sm text-gray-400">
+                Loading builders...
+              </p>
+            )}
+
+            {!isLoading && filteredBuilders.length === 0 && (
+              <p className="p-2 text-sm text-gray-400">
+                No builders found
+              </p>
+            )}
+
+            {filteredBuilders.map((b) => (
+              <div
+                key={b.id}
+                onClick={() => {
+                  setSearchBuilder(b.name);
+                  setShowDropdown(false);
+
+                  handleData("builderId", b.id);
+                  handleData("developer", b.name);
+                }}
+                className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+              >
+                {b.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Input
         label="Area Range (SQ. FT.)"
@@ -93,11 +189,10 @@ export default function BasicDetails({ data, handleData }) {
             key={type}
             type="button"
             onClick={() => handleData("propertyType", type)}
-            className={`px-4 py-2 rounded-full text-sm ${
-              data.propertyType === type
+            className={`px-4 py-2 rounded-full text-sm ${data.propertyType === type
                 ? "bg-black text-white"
                 : "bg-gray-200"
-            }`}
+              }`}
           >
             {type}
           </button>
@@ -116,7 +211,10 @@ export default function BasicDetails({ data, handleData }) {
 
       {/* CONFIGURATIONS */}
       <div>
-        <p className="text-sm font-medium mb-2">Configurations (BHK)</p>
+        <p className="text-sm font-medium mb-2">
+          Configurations (BHK)
+        </p>
+
         <div className="flex gap-2">
           <input
             value={bhkInput}
@@ -124,14 +222,22 @@ export default function BasicDetails({ data, handleData }) {
             placeholder="2 BHK / Studio"
             className="flex-1 border rounded-lg px-3 py-2 text-sm"
           />
-          <button type="button" onClick={addBHK} className="px-4 py-2 bg-black text-white rounded-lg">
+          <button
+            type="button"
+            onClick={addBHK}
+            className="px-4 py-2 bg-black text-white rounded-lg"
+          >
             Add
           </button>
         </div>
 
         <div className="flex gap-2 flex-wrap mt-3">
           {data.configurations?.map((b) => (
-            <Chip key={b} label={b} onRemove={() => removeBHK(b)} />
+            <Chip
+              key={b}
+              label={b}
+              onRemove={() => removeBHK(b)}
+            />
           ))}
         </div>
       </div>
@@ -144,11 +250,15 @@ export default function BasicDetails({ data, handleData }) {
 
       {/* BROCHURE */}
       <div>
-        <p className="text-xs text-gray-500 mb-1">Upload Brochure (PDF)</p>
+        <p className="text-xs text-gray-500 mb-1">
+          Upload Brochure (PDF)
+        </p>
         <input
           type="file"
           accept="application/pdf"
-          onChange={(e) => uploadBrochure(e.target.files[0])}
+          onChange={(e) =>
+            uploadBrochure(e.target.files[0])
+          }
           className="w-full border rounded-lg px-3 py-2 text-sm"
         />
 
@@ -166,7 +276,9 @@ export default function BasicDetails({ data, handleData }) {
 
 const Input = ({ label, value, onChange, type = "text", placeholder }) => (
   <div>
-    <label className="text-xs text-gray-500">{label}</label>
+    <label className="text-xs text-gray-500">
+      {label}
+    </label>
     <input
       type={type}
       value={value ?? ""}
@@ -179,7 +291,11 @@ const Input = ({ label, value, onChange, type = "text", placeholder }) => (
 
 const Checkbox = ({ label, checked, onChange }) => (
   <label className="flex gap-2 text-sm cursor-pointer">
-    <input type="checkbox" checked={!!checked} onChange={(e) => onChange(e.target.checked)} />
+    <input
+      type="checkbox"
+      checked={!!checked}
+      onChange={(e) => onChange(e.target.checked)}
+    />
     {label}
   </label>
 );
@@ -187,6 +303,8 @@ const Checkbox = ({ label, checked, onChange }) => (
 const Chip = ({ label, onRemove }) => (
   <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm">
     {label}
-    <button type="button" onClick={onRemove}>✕</button>
+    <button type="button" onClick={onRemove}>
+      ✕
+    </button>
   </div>
 );

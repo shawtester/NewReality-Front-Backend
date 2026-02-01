@@ -76,13 +76,13 @@ export default function TitleBlockWithBrochure({ property }) {
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
 
               {/* BUILDER */}
-              {property.builder && (
+              {typeof property.builderName ==='string' && (
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs">
                     🏢
                   </span>
                   <span>
-                    By <span className="text-pink-600">{property.builder}</span>
+                    By <span className="text-pink-600">{property.builderName}</span>
                   </span>
                 </div>
               )}

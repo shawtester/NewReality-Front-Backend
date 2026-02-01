@@ -101,7 +101,7 @@ export default function RightSidebar({ property }) {
         <div className="bg-white rounded-xl p-5 shadow-sm">
           <h3 className="font-semibold mb-3 border-b pb-2">Quick Facts</h3>
           <div className="text-sm space-y-2 text-gray-600">
-            <p>Developer : {property.builder}</p>
+            <p>Developer : {property.builderName}</p>
             <p>Area : {property.size}</p>
             <p>Price : {property.price}</p>
             <p>RERA No : {property.rera}</p>

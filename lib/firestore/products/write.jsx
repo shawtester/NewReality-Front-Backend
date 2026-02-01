@@ -5,6 +5,9 @@ import {
   setDoc,
   Timestamp,
   deleteDoc,
+  increment,
+  updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import slugify from "slugify";
 import { defaultProperty } from "@/constants/propertyDefaults";
@@ -12,9 +15,7 @@ import { defaultProperty } from "@/constants/propertyDefaults";
 /* ================= UTILS ================= */
 const removeUndefined = (obj) => {
   if (Array.isArray(obj)) {
-    return obj
-      .map(removeUndefined)
-      .filter((v) => v !== undefined);
+    return obj.map(removeUndefined).filter((v) => v !== undefined);
   }
 
   if (obj !== null && typeof obj === "object") {
@@ -62,9 +63,17 @@ export const createNewProperty = async ({ data }) => {
     timestampUpdate: null,
   });
 
+  // ✅ SAVE PROPERTY
   await setDoc(doc(db, "properties", newId), payload, {
     merge: true,
   });
+
+  // 🔥 AUTO INCREMENT BUILDER TOTAL PROJECTS
+  if (data.builderId) {
+    await updateDoc(doc(db, "builders", data.builderId), {
+      totalProjects: increment(1),
+    });
+  }
 };
 
 /* ================= UPDATE PROPERTY ================= */
@@ -106,10 +115,29 @@ export const updateProperty = async ({ data }) => {
     payload,
     { merge: true }
   );
+
+  // ❌ UPDATE PE totalProjects TOUCH NAHI KARNA
 };
 
 /* ================= DELETE PROPERTY ================= */
 export const deleteProperty = async ({ id }) => {
   if (!id) throw new Error("Property ID is required");
-  await deleteDoc(doc(db, "properties", id));
+
+  const ref = doc(db, "properties", id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  // ❌ DELETE PROPERTY
+  await deleteDoc(ref);
+
+  // 🔥 AUTO DECREMENT BUILDER TOTAL PROJECTS
+  if (data?.builderId) {
+    await updateDoc(doc(db, "builders", data.builderId), {
+      totalProjects: increment(-1),
+    });
+  }
 };
+

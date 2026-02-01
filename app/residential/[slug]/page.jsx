@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import {
-  getAllProperties,
-} from "@/lib/firestore/products/read_server";
+import { getAllProperties } from "@/lib/firestore/products/read_server";
+import { getBuilderById } from "@/lib/firestore/builders/read_server";
 import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
+import { getAmenitiesByIds } from "@/lib/firestore/amenities/read_server";
+
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
 import MobileGallery from "./components/MobileGallery";
@@ -15,6 +16,7 @@ import AmenitiesSection from "./components/AmenitiesSection";
 import LocationSection from "./components/LocationSection";
 import EmiCalculatorSection from "./components/EmiCalculatorSection";
 import FAQSection from "./components/FAQSection";
+import DeveloperSection from "./components/DeveloperSection";
 import SimilarProjectsSection from "./components/SimilarProjectsSection";
 import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
@@ -30,12 +32,25 @@ export default async function PropertyPage({ params }) {
 
   const allProjects = await getAllProperties();
 
+  /* ✅ SAFE BUILDER FETCH */
+  let builder = null;
+  if (property.builderId) {
+    builder = await getBuilderById(property.builderId);
+  }
+
+  const amenitiesData = await getAmenitiesByIds(
+    property.amenities || []
+  );
+
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
     title: property.title,
     location: property.location,
-    builder: property.developer,
+
+    builderId: property.builderId || null,
+    builderName: property.developer || "",
+
     price: property.priceRange,
     size: property.areaRange,
     rera: property.reraNumber,
@@ -43,54 +58,50 @@ export default async function PropertyPage({ params }) {
 
     brochureUrl: property.brochure?.url || "",
 
-    
     images:
-    property.gallery?.length > 0
-      ? property.gallery.map((g) => g.url)
-      : property.mainImage?.url
-      ? [property.mainImage.url]
-      : property.image?.url
-      ? [property.image.url]
-      : [],
+      property.gallery?.length > 0
+        ? property.gallery.map((g) => g.url)
+        : property.mainImage?.url
+        ? [property.mainImage.url]
+        : property.image?.url
+        ? [property.image.url]
+        : [],
 
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
-    amenities: property.amenities || [],
+    amenities: amenitiesData,
+
     mapQuery: property.mapQuery || property.location || "",
     locationPoints: property.locationPoints || [],
+
     faq: (property.faq || []).map((f) => ({
       q: f.question,
       a: f.answer,
     })),
+
+    builder: builder && typeof builder === "object" ? builder : null,
+
     disclaimer: property.disclaimer || "",
   };
 
   return (
     <ApartmentClient>
-      {/*  AUTO POPUP (2.5s after page load) */}
       <AutoPopup propertyTitle={cleanProperty.title} />
 
-      {/* ================= PAGE GRID ================= */}
       <section className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* ================= LEFT CONTENT ================= */}
+        {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
-
-          {/* GALLERY */}
           <MobileGallery
             images={cleanProperty.images}
             title={cleanProperty.title}
           />
 
-          {/* TITLE */}
           <TitleBlockWithBrochure property={cleanProperty} />
 
-          {/* 🔥 STICKY SCROLL TABS 🔥 */}
           <div className="sticky top-[96px] z-30 bg-white">
             <ScrollTabs />
           </div>
 
-          {/* SECTIONS */}
           <OverviewSection
             overview={cleanProperty.overview}
             propertyTitle={cleanProperty.title}
@@ -98,7 +109,7 @@ export default async function PropertyPage({ params }) {
 
           <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
 
-          <PaymentPlanSection  />
+          <PaymentPlanSection />
 
           <AmenitiesSection amenities={cleanProperty.amenities} />
 
@@ -111,6 +122,11 @@ export default async function PropertyPage({ params }) {
 
           <FAQSection faq={cleanProperty.faq} />
 
+          {/* ✅ DEVELOPER SECTION ONLY WHEN BUILDER EXISTS */}
+          {cleanProperty.builder && (
+            <DeveloperSection builder={cleanProperty.builder} />
+          )}
+
           <SimilarProjectsSection
             projects={allProjects}
             currentSlug={cleanProperty.slug}
@@ -119,11 +135,11 @@ export default async function PropertyPage({ params }) {
           <DisclaimerSection text={cleanProperty.disclaimer} />
         </div>
 
-        {/* ================= RIGHT SIDEBAR ================= */}
+        {/* RIGHT */}
         <RightSidebar property={cleanProperty} />
       </section>
+
       <Footer />
     </ApartmentClient>
   );
 }
-

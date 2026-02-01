@@ -1,79 +1,135 @@
 "use client";
 
-import { useState } from "react";
-import { uploadToCloudinary } from "@/lib/cloudinary/uploadImage";
+  import { useState, useRef, useEffect } from "react";
+  import { useAmenities } from "@/lib/firestore/amenities/read";
 
-export default function Amenities({ data, handleData }) {
-  const [amenity, setAmenity] = useState("");
-  const [uploadingIndex, setUploadingIndex] = useState(null);
+  export default function Amenities({ data, handleData }) {
+    const { amenities, isLoading } = useAmenities();
+    const selected = data.amenities || [];
 
-  const amenities =
-    (data.amenities || []).map((a) =>
-      typeof a === "string" ? { name: a, image: null } : a
-    );
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const dropdownRef = useRef(null);
 
-  const addAmenity = () => {
-    if (!amenity.trim()) return;
-    handleData("amenities", [
-      ...amenities,
-      { name: amenity.trim(), image: null },
-    ]);
-    setAmenity("");
-  };
+    // Close on outside click
+    useEffect(() => {
+      const handler = (e) => {
+        if (!dropdownRef.current?.contains(e.target)) {
+          setOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", handler);
+      return () => document.removeEventListener("mousedown", handler);
+    }, []);
 
-  const uploadAmenityImage = async (file, index) => {
-    setUploadingIndex(index);
-    const res = await uploadToCloudinary(file);
-
-    const updated = [...amenities];
-    updated[index].image = {
-      url: res.secure_url,
-      publicId: res.public_id,
+    const toggleAmenity = (id) => {
+      if (selected.includes(id)) {
+        handleData(
+          "amenities",
+          selected.filter((a) => a !== id)
+        );
+      } else {
+        handleData("amenities", [...selected, id]);
+      }
     };
 
-    handleData("amenities", updated);
-    setUploadingIndex(null);
-  };
+    const selectedAmenities = amenities.filter((a) =>
+      selected.includes(a.id)
+    );
 
-  return (
-    <div className="bg-white rounded-xl p-6 space-y-6 shadow-sm">
-      <h2 className="text-lg font-semibold">Amenities</h2>
+    const filteredAmenities = amenities.filter((a) =>
+      a.name.toLowerCase().includes(search.toLowerCase())
+    );
 
-      <div className="flex gap-3">
-        <input
-          value={amenity}
-          onChange={(e) => setAmenity(e.target.value)}
-          className="border px-3 py-2 rounded flex-1"
-          placeholder="Add Amenity"
-        />
-        <button
-          type="button"
-          onClick={addAmenity}
-          className="bg-black text-white px-4 py-2 rounded bg-[#DBA40D]"
-        >
-          Add
-        </button>
-      </div>
+    return (
+      <div className="bg-white rounded-xl p-6 space-y-4 shadow-sm">
+        <h2 className="text-lg font-semibold">Amenities</h2>
 
-      {amenities.map((a, i) => (
-        <div key={i} className="border rounded-lg p-3 flex items-center gap-4">
-          <span className="flex-1">{a.name}</span>
+        {/* DROPDOWN */}
+        <div className="relative" ref={dropdownRef}>
+          <div
+            onClick={() => setOpen(!open)}
+            className="border rounded-lg px-3 py-2 min-h-[42px] cursor-pointer flex flex-wrap gap-2 items-center"
+          >
+            {selectedAmenities.length === 0 && (
+              <span className="text-gray-400 text-sm">
+                Select amenities
+              </span>
+            )}
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => uploadAmenityImage(e.target.files[0], i)}
-          />
+            {selectedAmenities.map((a) => (
+              <span
+                key={a.id}
+                className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-sm"
+              >
+                {a.image?.url && (
+                  <img
+                    src={a.image.url}
+                    className="h-4 w-4 rounded object-cover"
+                  />
+                )}
+                {a.name}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleAmenity(a.id);
+                  }}
+                  className="text-red-500"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
 
-          {a.image?.url && (
-            <img src={a.image.url} className="h-10 w-10 rounded object-cover" />
-          )}
+          {open && (
+            <div className="absolute z-20 mt-2 w-full bg-white border rounded-lg shadow-lg max-h-64 overflow-y-auto">
+              <input
+                className="w-full px-3 py-2 border-b outline-none text-sm"
+                placeholder="Search amenities..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
 
-          {uploadingIndex === i && (
-            <span className="text-xs text-gray-400">Uploading...</span>
+              {isLoading && (
+                <p className="p-3 text-sm text-gray-400">
+                  Loading...
+                </p>
+              )}
+
+              {!isLoading &&
+                filteredAmenities.map((a) => (
+                  <div
+                    key={a.id}
+                    onClick={() => toggleAmenity(a.id)}
+                    className="px-3 py-2 flex items-center gap-3 cursor-pointer hover:bg-gray-50"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(a.id)}
+                      readOnly
+                    />
+
+                    {a.image?.url && (
+                      <img
+                        src={a.image.url}
+                        className="h-6 w-6 rounded object-cover"
+                      />
+                    )}
+
+                    <span>{a.name}</span>
+                  </div>
+                ))}
+
+              {!isLoading && filteredAmenities.length === 0 && (
+                <p className="p-3 text-sm text-gray-400">
+                  No amenities found
+                </p>
+              )}
+            </div>
           )}
         </div>
-      ))}
-    </div>
-  );
-}
+      </div>
+    );
+  }

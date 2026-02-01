@@ -3,7 +3,6 @@
 import Image from "next/image";
 
 export default function AmenitiesSection({ amenities = [] }) {
-  // Agar amenities hi nahi hain → section mat dikhao
   if (!amenities || amenities.length === 0) return null;
 
   return (
@@ -12,43 +11,30 @@ export default function AmenitiesSection({ amenities = [] }) {
 
       {/* ================= MOBILE + TABLET ================= */}
       <div className="lg:hidden overflow-x-auto scrollbar-hide">
-        <div
-          className="
-            grid
-            grid-rows-2
-            grid-flow-col
-            auto-cols-max
-            gap-4
-          "
-        >
+        <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-4">
           {amenities.map((a, i) => (
             <div
               key={i}
-              className="
-                w-[160px] h-[140px]
-                bg-white
-                border border-gray-300
-                rounded-[4px]
-                overflow-hidden
-                flex flex-col
-                flex-shrink-0
-              "
+              className="w-[160px] h-[140px] bg-white border border-gray-300 rounded-[4px] overflow-hidden flex flex-col flex-shrink-0"
             >
-              {/* IMAGE */}
               <div className="h-[90px] w-full bg-gray-50 flex items-center justify-center">
-                <Image
-                  src={a.image?.url || a.image}
-                  alt={a.label || "Amenity"}
-                  width={160}
-                  height={90}
-                />
-
+                {a.image?.url ? (
+                  <Image
+                    src={a.image.url}
+                    alt={a.name || "Amenity"}
+                    width={160}
+                    height={90}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                    No Image
+                  </div>
+                )}
               </div>
 
-              {/* TEXT */}
               <div className="flex-1 flex items-center justify-center px-2 text-center">
                 <p className="text-xs font-medium text-gray-700 leading-tight">
-                  {a.label}
+                  {a.name}
                 </p>
               </div>
             </div>
@@ -56,38 +42,31 @@ export default function AmenitiesSection({ amenities = [] }) {
         </div>
       </div>
 
-      {/* ================= DESKTOP GRID ================= */}
+      {/* ================= DESKTOP GRID (🔥 FIXED) ================= */}
       <div className="hidden lg:grid grid-cols-4 gap-6">
         {amenities.map((a, i) => (
           <div
             key={i}
-            className="
-              w-[172px] h-[149px]
-              bg-white
-              border border-gray-300
-              rounded-[4px]
-              overflow-hidden
-              flex flex-col
-              hover:-translate-y-1
-              hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]
-              hover:border-gray-400
-            "
+            className="w-[172px] h-[149px] bg-white border border-gray-300 rounded-[4px] overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:border-gray-400"
           >
-            {/* IMAGE */}
             <div className="h-[100px] w-full bg-gray-50 flex items-center justify-center">
-              <Image
-                src={a.image?.url || a.image}
-                alt={a.label || "Amenity"}
-                width={160}
-                height={90}
-              />
-
+              {a.image?.url ? (
+                <Image
+                  src={a.image.url}
+                  alt={a.name || "Amenity"}
+                  width={160}
+                  height={90}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                  No Image
+                </div>
+              )}
             </div>
 
-            {/* TEXT */}
             <div className="flex-1 flex items-center justify-center px-2 text-center">
               <p className="text-xs font-medium text-gray-700 leading-tight">
-                {a.label}
+                {a.name}
               </p>
             </div>
           </div>

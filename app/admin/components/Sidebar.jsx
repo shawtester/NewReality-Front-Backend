@@ -78,8 +78,13 @@ export default function Sidebar() {
       icon: <Star className="h-5 w-5" />,
     },
     {
-      name: "Projects / Gallery",
-      link: "/admin/projects",
+      name: "Builders Manager",
+      link: "/admin/builders",
+      icon: <LibraryBig className="h-5 w-5" />,
+    },
+    {
+      name: "Amenities Manager",
+      link: "/admin/amenities",
       icon: <LibraryBig className="h-5 w-5" />,
     },
     {

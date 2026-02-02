@@ -31,6 +31,11 @@ export const defaultProperty = {
     },
     gallery: [],
 
+    video: {
+        url: "",
+        publicId: "",
+    },
+
     brochure: {
         url: "",
         name: "",
@@ -46,7 +51,7 @@ export const defaultProperty = {
     description: "",
     disclaimer: "",
 
-    
+
 
     // 🔹 ARRAYS
     configurations: [],

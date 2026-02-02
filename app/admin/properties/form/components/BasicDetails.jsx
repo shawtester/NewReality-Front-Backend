@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { uploadBrochureToCloudinary } from "@/lib/cloudinary/uploadBrochure";
 import { useBuilders } from "@/lib/firestore/builders/read";
+import { uploadVideoToCloudinary } from "@/lib/cloudinary/uploadVideo";
+
 
 export default function BasicDetails({ data, handleData }) {
   const [bhkInput, setBhkInput] = useState("");
@@ -104,6 +106,39 @@ export default function BasicDetails({ data, handleData }) {
           </span>
         </p>
       </div>
+
+      {/* ================= VIDEO UPLOAD ================= */}
+      <div>
+        <p className="text-xs text-gray-500 mb-1">
+          Upload Property Video (MP4)
+        </p>
+
+        <input
+          type="file"
+          accept="video/mp4"
+          onChange={async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+              const video = await uploadVideoToCloudinary(file);
+              handleData("video", video);
+              alert("Video uploaded successfully!");
+            } catch (err) {
+              alert(err.message);
+            }
+          }}
+          className="w-full border rounded-lg px-3 py-2 text-sm"
+        />
+
+        {data.video?.url && (
+          <p className="text-xs text-green-600 mt-1">
+            Video uploaded
+          </p>
+        )}
+      </div>
+
+
 
 
       <Input

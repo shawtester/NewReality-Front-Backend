@@ -31,14 +31,12 @@ const removeUndefined = (obj) => {
 
 /* ================= SLUG HELPER ================= */
 const generateSlug = (data) => {
-  if (data.slug && data.slug.trim()) {
-    return slugify(data.slug, {
-      lower: true,
-      strict: true,
-    });
-  }
+  const base =
+    data?.slug?.trim() ||
+    data?.title?.trim() ||
+    `property-${Date.now()}`;
 
-  return slugify(data.title || "", {
+  return slugify(base, {
     lower: true,
     strict: true,
   });
@@ -50,7 +48,6 @@ export const createNewProperty = async ({ data }) => {
   if (!data?.location) throw new Error("Location is required");
 
   const newId = doc(collection(db, "ids")).id;
-
   const slug = generateSlug(data);
 
   const safeMainImage = {
@@ -66,11 +63,11 @@ export const createNewProperty = async ({ data }) => {
     : null;
 
   const payload = removeUndefined({
-    ...defaultProperty,
-    ...data,
+    ...defaultProperty, // fallback defaults
+    ...data,            // admin data overrides defaults
 
     id: newId,
-    slug, // ✅ FINAL SLUG
+    slug,
 
     mainImage: safeMainImage,
     brochure: safeBrochure,
@@ -79,8 +76,10 @@ export const createNewProperty = async ({ data }) => {
     timestampUpdate: null,
   });
 
-  // ✅ SAVE PROPERTY
-  await setDoc(doc(db, "properties", newId), payload);
+  // ✅ SAVE PROPERTY (SAFE)
+  await setDoc(doc(db, "properties", newId), payload, {
+    merge: true,
+  });
 
   // 🔥 AUTO INCREMENT BUILDER TOTAL PROJECTS (ONLY ON CREATE)
   if (data.builderId) {
@@ -111,7 +110,7 @@ export const updateProperty = async ({ data }) => {
   const payload = removeUndefined({
     ...data,
 
-    slug, // ✅ ALWAYS UPDATE SLUG
+    slug,
 
     // 🔥 FORCE INCLUDE FLOOR PLANS
     floorPlans: Array.isArray(data.floorPlans)
@@ -154,4 +153,3 @@ export const deleteProperty = async ({ id }) => {
     });
   }
 };
-

@@ -15,22 +15,70 @@ import BrandCTA from "./BrandCTA";
 export default function RightSidebar({ property }) {
   if (!property) return null;
 
-  // ✅ Social media links configuration (same for mobile & desktop)
+  /* ================= HELPERS ================= */
+
+  // ✅ Safe video URL getter (object | string | null)
+  const getVideoUrl = (video) => {
+    if (!video) return "";
+
+    if (typeof video === "object" && video.url) {
+      return video.url;
+    }
+
+    if (typeof video === "string") {
+      return video;
+    }
+
+    return "";
+  };
+
+  // ✅ YouTube ID extractor
+  const getYouTubeId = (url = "") => {
+    if (!url) return "";
+
+    if (url.includes("youtu.be/")) {
+      return url.split("youtu.be/")[1].split("?")[0];
+    }
+
+    if (url.includes("v=")) {
+      return url.split("v=")[1].split("&")[0];
+    }
+
+    if (url.includes("/embed/")) {
+      return url.split("/embed/")[1].split("?")[0];
+    }
+
+    if (url.includes("/shorts/")) {
+      return url.split("/shorts/")[1].split("?")[0];
+    }
+
+    return "";
+  };
+
+  const videoUrl = getVideoUrl(property.video);
+
+  /* ================= SOCIAL LINKS ================= */
+
   const socialLinks = [
     { Icon: FaInstagram, href: "https://www.instagram.com/neevrealty" },
-    { Icon: FaLinkedinIn, href: "https://www.linkedin.com/company/neev-realty-services" },
+    {
+      Icon: FaLinkedinIn,
+      href: "https://www.linkedin.com/company/neev-realty-services",
+    },
     { Icon: FaPinterestP, href: "https://pinterest.com/neevreality" },
-    { Icon: FaFacebookF, href: "https://www.facebook.com/p/NeevRealty-61558971842531" },
+    {
+      Icon: FaFacebookF,
+      href: "https://www.facebook.com/p/NeevRealty-61558971842531",
+    },
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
   return (
     <>
-      {/* ================= RIGHT SIDEBAR (MOBILE VIEW) ================= */}
+      {/* ================= RIGHT SIDEBAR (MOBILE) ================= */}
       <div className="block lg:hidden mt-12 space-y-4">
         <BrandCTA propertyTitle={property.title} />
 
-        {/* SHARE */}
         <div className="bg-white rounded-xl p-5 shadow-sm text-center">
           <p className="font-medium mb-4">Share</p>
 
@@ -41,7 +89,7 @@ export default function RightSidebar({ property }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded hover:bg-[#c8950b] transition-all duration-200 flex items-center justify-center"
+                className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded hover:bg-[#c8950b] flex items-center justify-center"
               >
                 <Icon className="w-5 h-5" />
               </Link>
@@ -52,18 +100,17 @@ export default function RightSidebar({ property }) {
 
       {/* ================= RIGHT SIDEBAR (DESKTOP) ================= */}
       <div className="w-[340px] hidden lg:block space-y-4">
-        {/* IMAGE + VIDEO PREVIEW */}
+        {/* IMAGE + VIDEO */}
         <div className="bg-white rounded-xl overflow-hidden">
+          {/* IMAGES */}
           <div className="grid grid-cols-2 gap-1 mb-1">
-            <div className="relative">
-              <Image
-                src={property.images?.[0] || "/images/s1.png"}
-                alt="Gallery"
-                width={200}
-                height={120}
-                className="object-cover rounded"
-              />
-            </div>
+            <Image
+              src={property.images?.[0] || "/images/s1.png"}
+              alt="Gallery"
+              width={200}
+              height={120}
+              className="object-cover rounded"
+            />
 
             <div className="relative">
               <Image
@@ -79,21 +126,37 @@ export default function RightSidebar({ property }) {
             </div>
           </div>
 
-          {/* VIDEO PREVIEW */}
-          <div className="relative">
-            <Image
-              src="/images/s3.png"
-              alt="Video Preview"
-              width={400}
-              height={200}
-              className="w-full h-[185px] object-cover"
-            />
-
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow cursor-pointer text-xl">
-                ▶
-              </div>
-            </div>
+          {/* 🎥 VIDEO PREVIEW (FIXED) */}
+          <div className="relative bg-black rounded-lg overflow-hidden">
+            {videoUrl ? (
+              videoUrl.includes("youtube") ||
+              videoUrl.includes("youtu.be") ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${getYouTubeId(
+                    videoUrl
+                  )}`}
+                  className="w-full h-[185px]"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={videoUrl}
+                  controls
+                  playsInline
+                  className="w-full h-[185px] object-cover"
+                  poster={property.images?.[0] || "/images/s3.png"}
+                />
+              )
+            ) : (
+              <Image
+                src={property.images?.[0] || "/images/s3.png"}
+                alt="Video Preview"
+                width={400}
+                height={200}
+                className="w-full h-[185px] object-cover"
+              />
+            )}
           </div>
         </div>
 
@@ -113,11 +176,10 @@ export default function RightSidebar({ property }) {
         <aside className="sticky top-[135px] space-y-4 z-20">
           <BrandCTA propertyTitle={property.title} />
 
-          {/* SHARE */}
-          <div className="bg-white rounded-xl p-5 py-5 shadow-sm text-center">
+          <div className="bg-white rounded-xl p-5 text-center shadow-sm">
             <div className="flex items-center justify-center gap-2 mb-4">
               <p className="font-medium">Share</p>
-              <FaLink className="text-gray-400 text-sm cursor-pointer" />
+              <FaLink className="text-gray-400 text-sm" />
             </div>
 
             <div className="flex justify-center gap-3">
@@ -127,7 +189,7 @@ export default function RightSidebar({ property }) {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded hover:bg-[#c8950b] transition-all duration-200 flex items-center justify-center cursor-pointer"
+                  className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded hover:bg-[#c8950b] flex items-center justify-center"
                 >
                   <Icon className="w-5 h-5" />
                 </Link>

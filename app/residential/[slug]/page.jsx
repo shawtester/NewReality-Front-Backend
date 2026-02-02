@@ -66,7 +66,7 @@ export default async function PropertyPage({ params }) {
           : property.image?.url
             ? [property.image.url]
             : [],
-    videoUrl: property.videoUrl || "",
+    video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
     paymentPlan: property.paymentPlan || null,

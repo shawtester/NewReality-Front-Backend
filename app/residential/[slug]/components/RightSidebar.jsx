@@ -73,6 +73,10 @@ export default function RightSidebar({ property }) {
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
+  console.log("VIDEO RAW 👉", property.video);
+console.log("VIDEO URL 👉", typeof property.video === "object" ? property.video?.url : property.video);
+
+
   return (
     <>
       {/* ================= RIGHT SIDEBAR (MOBILE) ================= */}

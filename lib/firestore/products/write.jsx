@@ -72,7 +72,7 @@ export const createNewProperty = async ({ data }) => {
     mainImage: safeMainImage,
     brochure: safeBrochure,
 
-    timestampCreate: Timestamp.now(),
+    timestampCreate: serverTimestamp(),
     timestampUpdate: null,
   });
 

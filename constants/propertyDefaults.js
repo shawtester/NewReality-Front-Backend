@@ -8,6 +8,8 @@ export const defaultProperty = {
     developer: "",
     areaRange: "",
     priceRange: "",
+
+    isRera: false,
     reraNumber: "",
     lastUpdated: "",
 

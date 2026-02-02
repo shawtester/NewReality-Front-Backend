@@ -36,6 +36,7 @@ export default function PropertyCard({ property = {} }) {
     price = "",
     img = "/images/placeholder.jpg",
     slug = "",
+    isRera = false,
   } = property;
 
   // 🔹 SUBMIT HANDLER
@@ -85,15 +86,18 @@ export default function PropertyCard({ property = {} }) {
                 {title}
               </h3>
 
-              <span className="flex items-center gap-1 rounded-full bg-[#f3f3f3] px-2 py-1 text-[10px] font-medium text-gray-600">
-                RERA
-                <Image
-                  src="/images/newlaunchproject/rera.png"
-                  alt="RERA"
-                  width={12}
-                  height={12}
-                />
-              </span>
+              {isRera && (
+                <span className="flex items-center gap-1 rounded-full bg-[#f3f3f3] px-2 py-1 text-[10px] font-medium text-gray-600">
+                  RERA
+                  <Image
+                    src="/images/newlaunchproject/rera.png"
+                    alt="RERA"
+                    width={12}
+                    height={12}
+                  />
+                </span>
+              )}
+
             </div>
 
             {/* BUILDER */}

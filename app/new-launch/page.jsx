@@ -44,7 +44,8 @@ export default async function NewLaunchPage() {
                   size: p.areaRange,
                   price: p.priceRange,
                   img: p.mainImage?.url || "/images/placeholder.jpg",
-                  slug: p.id,
+                  slug: p.slug || p.id,
+                  isRera: p.isRera,
                 }}
               />
             ))}

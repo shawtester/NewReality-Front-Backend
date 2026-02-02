@@ -55,6 +55,7 @@ export default function TrendingProjects({ properties = [] }) {
 
                 // ✅ TITLE BASED SLUG (SEO FRIENDLY)
                 slug: p.slug || p.id, 
+                isRera: p.isRera,
               }}
             />
           </div>

@@ -169,11 +169,35 @@ export default function BasicDetails({ data, handleData }) {
         placeholder="1139 - 1458"
       />
 
-      <Input
-        label="RERA Number"
-        value={data.reraNumber}
-        onChange={(v) => handleData("reraNumber", v)}
-      />
+      {/* ================= RERA ================= */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-3 text-sm font-medium cursor-pointer">
+          <input
+            type="checkbox"
+            checked={!!data.isRera}
+            onChange={(e) => {
+              const enabled = e.target.checked;
+              handleData("isRera", enabled);
+
+              // ❌ agar disable hua → reraNumber clear
+              if (!enabled) {
+                handleData("reraNumber", "");
+              }
+            }}
+          />
+          RERA Approved Project
+        </label>
+
+        <Input
+          label="RERA Number"
+          value={data.reraNumber}
+          onChange={(v) => handleData("reraNumber", v)}
+          placeholder="RERA-GRG-1234-2024"
+          disabled={!data.isRera}        // 🔥 KEY LINE
+        />
+      </div>
+
+
 
       <Input
         type="date"
@@ -320,7 +344,14 @@ export default function BasicDetails({ data, handleData }) {
 
 /* ===== Helpers ===== */
 
-const Input = ({ label, value, onChange, type = "text", placeholder }) => (
+const Input = ({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  disabled = false,
+}) => (
   <div>
     <label className="text-xs text-gray-500">
       {label}
@@ -328,12 +359,15 @@ const Input = ({ label, value, onChange, type = "text", placeholder }) => (
     <input
       type={type}
       value={value ?? ""}
+      disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full border rounded-lg px-3 py-2 text-sm"
+      className={`w-full border rounded-lg px-3 py-2 text-sm ${disabled ? "bg-gray-100 cursor-not-allowed" : ""
+        }`}
     />
   </div>
 );
+
 
 const Checkbox = ({ label, checked, onChange }) => (
   <label className="flex gap-2 text-sm cursor-pointer">

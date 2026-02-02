@@ -45,7 +45,8 @@ export default async function TrendingProjectsPage() {
                   size: p.areaRange,
                   price: p.priceRange,
                   img: p.mainImage?.url || "/placeholder.png",
-                  slug: p.id,
+                  slug: p.slug || p.id,
+                  isRera: p.isRera,
                 }}
               />
             ))}

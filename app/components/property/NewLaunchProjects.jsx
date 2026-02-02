@@ -53,6 +53,7 @@ export default function NewLaunchProjects({ properties = [] }) {
 
                 // ✅ SLUG FIRST, ELSE ID (NO BREAKING)
                 slug: p.slug || p.id,
+                isRera: p.isRera,
               }}
             />
 

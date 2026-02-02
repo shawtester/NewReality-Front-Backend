@@ -324,7 +324,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 title: item.title, developer: item.developer, location: item.location,
                                 bhk: item.configurations?.join(", "), size: item.areaRange, price: item.priceRange,
                                 img: item.mainImage?.url || "/placeholder.jpg", slug: item.slug || item.id,
-                                isTrending: item.isTrending, isNewLaunch: item.isNewLaunch,
+                                isTrending: item.isTrending, isNewLaunch: item.isNewLaunch, isRera: p.isRera,
                             }} />
                         ))}
                     </div>

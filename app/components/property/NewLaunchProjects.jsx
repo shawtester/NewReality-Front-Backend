@@ -52,7 +52,7 @@ export default function NewLaunchProjects({ properties = [] }) {
                 img: p.mainImage?.url || "/images/placeholder.jpg",
 
                 // ✅ SLUG FIRST, ELSE ID (NO BREAKING)
-                slug: p.id,
+                slug: p.slug || p.id,
               }}
             />
 

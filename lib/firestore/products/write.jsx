@@ -29,6 +29,21 @@ const removeUndefined = (obj) => {
   return obj;
 };
 
+/* ================= SLUG HELPER ================= */
+const generateSlug = (data) => {
+  if (data.slug && data.slug.trim()) {
+    return slugify(data.slug, {
+      lower: true,
+      strict: true,
+    });
+  }
+
+  return slugify(data.title || "", {
+    lower: true,
+    strict: true,
+  });
+};
+
 /* ================= CREATE PROPERTY ================= */
 export const createNewProperty = async ({ data }) => {
   if (!data?.title) throw new Error("Project name is required");
@@ -36,9 +51,7 @@ export const createNewProperty = async ({ data }) => {
 
   const newId = doc(collection(db, "ids")).id;
 
-  const slug =
-    data.slug ||
-    slugify(data.title, { lower: true, strict: true });
+  const slug = generateSlug(data);
 
   const safeMainImage = {
     url: data.mainImage?.url || "",
@@ -55,20 +68,21 @@ export const createNewProperty = async ({ data }) => {
   const payload = removeUndefined({
     ...defaultProperty,
     ...data,
+
     id: newId,
-    slug,
+    slug, // ✅ FINAL SLUG
+
     mainImage: safeMainImage,
     brochure: safeBrochure,
+
     timestampCreate: Timestamp.now(),
     timestampUpdate: null,
   });
 
   // ✅ SAVE PROPERTY
-  await setDoc(doc(db, "properties", newId), payload, {
-    merge: true,
-  });
+  await setDoc(doc(db, "properties", newId), payload);
 
-  // 🔥 AUTO INCREMENT BUILDER TOTAL PROJECTS
+  // 🔥 AUTO INCREMENT BUILDER TOTAL PROJECTS (ONLY ON CREATE)
   if (data.builderId) {
     await updateDoc(doc(db, "builders", data.builderId), {
       totalProjects: increment(1),
@@ -80,9 +94,7 @@ export const createNewProperty = async ({ data }) => {
 export const updateProperty = async ({ data }) => {
   if (!data?.id) throw new Error("Property ID is required");
 
-  const slug =
-    data.slug ||
-    slugify(data.title, { lower: true, strict: true });
+  const slug = generateSlug(data);
 
   const safeMainImage = {
     url: data.mainImage?.url || "",
@@ -99,14 +111,16 @@ export const updateProperty = async ({ data }) => {
   const payload = removeUndefined({
     ...data,
 
+    slug, // ✅ ALWAYS UPDATE SLUG
+
     // 🔥 FORCE INCLUDE FLOOR PLANS
     floorPlans: Array.isArray(data.floorPlans)
       ? data.floorPlans
       : [],
 
-    slug,
     mainImage: safeMainImage,
     brochure: safeBrochure,
+
     timestampUpdate: Timestamp.now(),
   });
 
@@ -116,7 +130,7 @@ export const updateProperty = async ({ data }) => {
     { merge: true }
   );
 
-  // ❌ UPDATE PE totalProjects TOUCH NAHI KARNA
+  // ❌ UPDATE PE totalProjects KO TOUCH NAHI KARNA
 };
 
 /* ================= DELETE PROPERTY ================= */

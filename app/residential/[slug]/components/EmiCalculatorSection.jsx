@@ -2,12 +2,20 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-export default function EmiCalculatorSection() {
+export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   const [loanAmount, setLoanAmount] = useState(2500000);
   const [interestRate, setInterestRate] = useState(10.5);
   const [tenure, setTenure] = useState(30);
   const [showLoanPopup, setShowLoanPopup] = useState(false);
+
+  // form states
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { emi, totalInterest, totalPayment } = useMemo(() => {
     const P = loanAmount;
@@ -36,6 +44,38 @@ export default function EmiCalculatorSection() {
     `₹ ${num.toLocaleString("en-IN", {
       maximumFractionDigits: 2,
     })}`;
+
+  const handleLoanSubmit = async () => {
+    if (!name || !phone) {
+      alert("Name and Phone are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await addDoc(collection(db, "contacts"), {
+        name,
+        phone,
+        email,
+        propertyTitle,
+        source: "EMI Calculator Popup",
+        loanAmount,
+        interestRate,
+        tenure,
+        createdAt: serverTimestamp(),
+      });
+
+      setShowLoanPopup(false);
+      setName("");
+      setPhone("");
+      setEmail("");
+    } catch (error) {
+      console.error("Firebase Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -108,7 +148,6 @@ export default function EmiCalculatorSection() {
               />
             </div>
 
-            {/* RESULTS */}
             <div className="bg-gray-50 rounded-md p-4">
               <p className="text-sm text-gray-600">Monthly EMI</p>
               <p className="text-2xl font-bold text-[#F5A300]">
@@ -151,22 +190,47 @@ export default function EmiCalculatorSection() {
               ✕
             </button>
 
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="text-xl font-semibold mb-1">
               Apply for Loan
             </h3>
+
+            <p className="text-sm text-gray-500 mb-3">
+              Property: <span className="font-medium">{propertyTitle}</span>
+            </p>
 
             <p className="text-sm text-gray-600 mb-4">
               Our loan expert will contact you shortly.
             </p>
 
             <div className="space-y-3">
-              <input placeholder="Full Name" className="w-full px-4 py-2 border rounded-md" />
-              <input placeholder="Phone Number" className="w-full px-4 py-2 border rounded-md" />
-              <input placeholder="Email" className="w-full px-4 py-2 border rounded-md" />
+              <input
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              />
+
+              <input
+                placeholder="Phone Number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              />
+
+              <input
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              />
             </div>
 
-            <button className="w-full mt-5 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold">
-              Submit Request
+            <button
+              onClick={handleLoanSubmit}
+              disabled={loading}
+              className="w-full mt-5 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold disabled:opacity-60"
+            >
+              {loading ? "Submitting..." : "Submit Request"}
             </button>
           </div>
         </div>

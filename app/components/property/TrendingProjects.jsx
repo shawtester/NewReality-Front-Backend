@@ -54,7 +54,7 @@ export default function TrendingProjects({ properties = [] }) {
                 img: p.mainImage?.url || "/placeholder.png",
 
                 // ✅ TITLE BASED SLUG (SEO FRIENDLY)
-                slug: p.id, 
+                slug: p.slug || p.id, 
               }}
             />
           </div>

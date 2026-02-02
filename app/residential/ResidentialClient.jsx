@@ -323,7 +323,7 @@ export default function ResidentialPage({ apartments = [] }) {
                             <PropertyCard key={item.id} property={{
                                 title: item.title, developer: item.developer, location: item.location,
                                 bhk: item.configurations?.join(", "), size: item.areaRange, price: item.priceRange,
-                                img: item.mainImage?.url || "/placeholder.jpg", slug: item.id,
+                                img: item.mainImage?.url || "/placeholder.jpg", slug: item.slug || item.id,
                                 isTrending: item.isTrending, isNewLaunch: item.isNewLaunch,
                             }} />
                         ))}

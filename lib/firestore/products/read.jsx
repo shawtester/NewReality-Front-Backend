@@ -10,7 +10,8 @@ import {
   startAfter,
   where,
   getDocs,
-  getDocsFromCache,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import useSWRSubscription from "swr/subscription";
 
@@ -36,14 +37,13 @@ export function useProperties({ pageLimit = 10, lastSnapDoc = null } = {}) {
         );
       }
 
-      // 🔥 REALTIME (admin only)
       const unsub = onSnapshot(
         q,
         (snapshot) =>
           next(null, {
-            items: snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
+            items: snapshot.docs.map((d) => ({
+              id: d.id,
+              ...d.data(),
             })),
             lastSnapDoc:
               snapshot.docs[snapshot.docs.length - 1] ?? null,
@@ -64,7 +64,7 @@ export function useProperties({ pageLimit = 10, lastSnapDoc = null } = {}) {
 }
 
 /* =====================================================
-   🔹 SERVER SIDE FETCH (HOME PAGE) – FAST
+   🔹 SERVER SIDE – ALL ACTIVE PROPERTIES
 ===================================================== */
 export async function getAllProperties({ pageLimit = 8 } = {}) {
   const q = query(
@@ -74,19 +74,12 @@ export async function getAllProperties({ pageLimit = 8 } = {}) {
     limit(pageLimit)
   );
 
-  try {
-    // ⚡ CACHE FIRST
-    const snap = await getDocsFromCache(q);
-    return mapDocs(snap);
-  } catch {
-    // 🌐 NETWORK FALLBACK
-    const snap = await getDocs(q);
-    return mapDocs(snap);
-  }
+  const snap = await getDocs(q);
+  return mapDocs(snap);
 }
 
 /* =====================================================
-   🔹 SERVER: NEW LAUNCH (FAST)
+   🔹 SERVER – NEW LAUNCH
 ===================================================== */
 export async function getNewLaunchProperties({ pageLimit = 6 } = {}) {
   const q = query(
@@ -97,17 +90,12 @@ export async function getNewLaunchProperties({ pageLimit = 6 } = {}) {
     limit(pageLimit)
   );
 
-  try {
-    const snap = await getDocsFromCache(q);
-    return mapDocs(snap);
-  } catch {
-    const snap = await getDocs(q);
-    return mapDocs(snap);
-  }
+  const snap = await getDocs(q);
+  return mapDocs(snap);
 }
 
 /* =====================================================
-   🔹 SERVER: TRENDING (FAST)
+   🔹 SERVER – TRENDING
 ===================================================== */
 export async function getTrendingProperties({ pageLimit = 6 } = {}) {
   const q = query(
@@ -118,17 +106,41 @@ export async function getTrendingProperties({ pageLimit = 6 } = {}) {
     limit(pageLimit)
   );
 
-  try {
-    const snap = await getDocsFromCache(q);
-    return mapDocs(snap);
-  } catch {
-    const snap = await getDocs(q);
-    return mapDocs(snap);
-  }
+  const snap = await getDocs(q);
+  return mapDocs(snap);
 }
 
 /* =====================================================
-   🔹 HELPER (DRY + FAST)
+   🔥 SERVER – GET PROPERTY BY SLUG OR ID (MOST IMPORTANT)
+===================================================== */
+export async function getPropertyBySlugOrId(slugOrId) {
+  if (!slugOrId) return null;
+
+  // 1️⃣ Try slug
+  const q = query(
+    collection(db, "properties"),
+    where("slug", "==", slugOrId)
+  );
+
+  const snapBySlug = await getDocs(q);
+  if (!snapBySlug.empty) {
+    const d = snapBySlug.docs[0];
+    return { id: d.id, ...d.data() };
+  }
+
+  // 2️⃣ Fallback → ID
+  const ref = doc(db, "properties", slugOrId);
+  const snapById = await getDoc(ref);
+
+  if (snapById.exists()) {
+    return { id: snapById.id, ...snapById.data() };
+  }
+
+  return null;
+}
+
+/* =====================================================
+   🔹 HELPER
 ===================================================== */
 function mapDocs(snap) {
   return snap.docs.map((doc) => ({

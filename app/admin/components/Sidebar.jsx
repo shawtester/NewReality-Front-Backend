@@ -73,6 +73,11 @@ export default function Sidebar() {
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
+      name: "Slug Editor",
+      link: "/admin/footer",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
       name: "Testimonials",
       link: "/admin/testimonials",
       icon: <Star className="h-5 w-5" />,

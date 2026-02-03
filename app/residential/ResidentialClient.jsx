@@ -320,7 +320,7 @@ export default function ResidentialPage({ apartments = [] }) {
                 <div className="max-w-[1240px] mx-auto px-4 lg:px-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {currentApartments.map((item) => (
-                            <PropertyCard key={item.id} property={{
+                            <PropertyCard key={item.id} baseRoute="residential" property={{
                                 title: item.title, developer: item.developer, location: item.location,
                                 bhk: item.configurations?.join(", "), size: item.areaRange, price: item.priceRange,
                                 img: item.mainImage?.url || "/placeholder.jpg", slug: item.slug || item.id,

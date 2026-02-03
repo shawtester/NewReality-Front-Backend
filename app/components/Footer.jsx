@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useRef } from "react";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -25,78 +28,85 @@ export default function Footer() {
   };
 
   // ✅ FIXED: Dynamic BHK links
-  const bhkLinks = [
-    { value: "1-bhk", label: "1 BHK property in Gurgaon" },
-    { value: "1.5-bhk", label: "1.5 BHK property in Gurgaon" },
-    { value: "2-bhk", label: "2 BHK property in Gurgaon" },
-    { value: "2.5-bhk", label: "2.5 BHK property in Gurgaon" },
-    { value: "3-bhk", label: "3 BHK property in Gurgaon" },
-    { value: "4-bhk", label: "4 BHK property in Gurgaon" },
-    { value: "5-bhk", label: "5 BHK property in Gurgaon" },
-    { value: "above-5-bhk", label: "5+ BHK property in Gurgaon" },
-  ];
+  const [bhkLinks, setBhkLinks] = useState([]);
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "projects_by_size")
+      );
+      setBhkLinks(snap.data().links);
+    };
+    fetchLinks();
+  }, []);
+
 
   // ✅ FIXED: Properties by type links - Commercial types redirect to /commercial
-  const propertyTypeLinks = [
-    { value: "residential", label: "Residential property in Gurgaon", href: `${BASE_ROUTE}?type=residential` },
-    { 
-      value: "commercial", 
-      label: "Commercial property in Gurgaon", 
-      href: "/commercial?type=commercial" 
-    },
-    { 
-      value: "luxury-apartment", 
-      label: "Luxury apartment in Gurgaon", 
-      href: `${BASE_ROUTE}?type=luxury-apartment` 
-    },
-    { 
-      value: "builder-floor", 
-      label: "Builder floor in Gurgaon", 
-      href: `${BASE_ROUTE}?type=builder-floor` 
-    },
-    { 
-      value: "retail-shops", 
-      label: "Retail shops in Gurgaon", 
-      href: "/commercial?type=retail-shops" 
-    },
-    { 
-      value: "sco-plots", 
-      label: "SCO plots in Gurgaon", 
-      href: "/commercial?type=sco-plots" 
-    },
-  ];
+  const [propertyTypeLinks, setPropertyTypeLinks] = useState([]);
+  useEffect(() => {
+    const fetchPropertyTypes = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "property_by_type")
+      );
+      if (snap.exists()) {
+        setPropertyTypeLinks(snap.data().links);
+      }
+    };
+
+    fetchPropertyTypes();
+  }, []);
+
 
   // ✅ FIXED: Projects by status links - REMOVED extra space in value
-  const projectStatusLinks = [
-    { value: "new-launch", label: "New launch projects in Gurgaon" },
-    { value: "ready-to-move", label: "Ready to move projects in Gurgaon" },
-    { value: "under-construction", label: "Under construction projects in Gurgaon" },
-    { value: "pre-launch", label: "Pre launch projects in Gurgaon" },
-  ];
+  const [projectStatusLinks, setProjectStatusLinks] = useState([]);
+
+  useEffect(() => {
+    const fetchProjectStatus = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "projects_by_status")
+      );
+      if (snap.exists()) {
+        setProjectStatusLinks(snap.data().links);
+      }
+    };
+
+    fetchProjectStatus();
+  }, []);
+
 
   // ✅ FIXED: Projects by location links - CORRECTED value/label order
-  const locationLinks = [
-    { value: "dwarka-expressway", label: "Projects in Dwarka Expressway" },
-    { value: "golf-course-road", label: "Projects in Golf Course Road" },
-    { value: "golf-course-extension", label: "Projects in Golf Course Extension" },
-    { value: "sohna-road", label: "Projects in Sohna Road" },
-    { value: "new-gurgaon", label: "Projects in New Gurgaon" },
-    { value: "old-gurgaon", label: "Projects in Old Gurgaon" },
-    { value: "spr", label: "Projects in SPR" },
-    { value: "nh8", label: "Projects in NH8" },
-  ];
+  const [projectLocationLinks, setProjectLocationLinks] = useState([]);
+
+  useEffect(() => {
+    const fetchProjectLocations = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "projects_by_location")
+      );
+      if (snap.exists()) {
+        setProjectLocationLinks(snap.data().links);
+      }
+    };
+
+    fetchProjectLocations();
+  }, []);
+
 
   // ✅ FIXED: Projects by budget links - CORRECTED value format
-  const budgetLinks = [
-    { value: "1-2cr", label: "Property between 1 to 2 cr in Gurgaon" },
-    { value: "2-3cr", label: "Property between 2 to 3 cr in Gurgaon" },
-    { value: "3-4cr", label: "Property between 3 to 4 cr in Gurgaon" },
-    { value: "4-5cr", label: "Property between 4 to 5 cr in Gurgaon" },
-    { value: "5-6cr", label: "Property between 5 to 6 cr in Gurgaon" },
-    { value: "6-7cr", label: "Property between 6 to 7 cr in Gurgaon" },
-    { value: "7-8cr", label: "Property between 7 to 8 cr in Gurgaon" },
-    { value: "above-8cr", label: "Property above 8cr in Gurgaon" },
-  ];
+  const [projectBudgetLinks, setProjectBudgetLinks] = useState([]);
+
+  useEffect(() => {
+    const fetchProjectBudgets = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "projects_by_budget")
+      );
+      if (snap.exists()) {
+        setProjectBudgetLinks(snap.data().links);
+      }
+    };
+
+    fetchProjectBudgets();
+  }, []);
+
 
   // ✅ NEW: Social media links configuration
   const socialLinks = [
@@ -112,7 +122,7 @@ export default function Footer() {
       {/* ================= TOP LINKS ================= */}
       <div className="relative bg-[#29192B] border-b border-[#2c1b32]">
         <div className="max-w-[1380px] mx-auto px-6 py-10">
-         <div className="flex items-center gap-4 lg:gap-6">
+          <div className="flex items-center gap-4 lg:gap-6">
             <button
               onClick={scrollLeft}
               className="hidden lg:flex h-12 w-12 items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg"
@@ -129,16 +139,15 @@ export default function Footer() {
                 <h4 className="text-white font-semibold mb-4">
                   Projects by size
                 </h4>
-                <ul className="space-y-2 text-sm text-gray-400">
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
                   {bhkLinks.map((item) => (
-                    <li key={item.value}>
-                      <Link
-                        href={`${BASE_ROUTE}?bhk=${item.value}`}
-                        className="hover:text-white"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
+                    <Link
+                      key={item.id}
+                      href={`${BASE_ROUTE}?bhk=${item.value}`}
+                      className="block leading-6 hover:text-white"
+                    >
+                      {item.label}
+                    </Link>
                   ))}
                 </ul>
               </div>
@@ -146,29 +155,30 @@ export default function Footer() {
               {/* ===== COLUMN 2 - Property Type ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Properties by type</h4>
-                <ul className="space-y-2 text-sm text-gray-400">
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
                   {propertyTypeLinks.map((item) => (
-                    <li key={item.value}>
+                    <li key={item.id}>
                       <Link
-                        href={item.href}
-                        className="hover:text-white"
+                        href={item.value}
+                        className="block leading-6 hover:text-white"
                       >
                         {item.label}
                       </Link>
                     </li>
                   ))}
                 </ul>
+
               </div>
 
               {/* ===== COLUMN 3 - Project Status ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Projects by status</h4>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  {projectStatusLinks.map((item) => (
-                    <li key={item.value}>
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
+                  {projectStatusLinks.map(item => (
+                    <li key={item.id}>
                       <Link
-                        href={`${BASE_ROUTE}?status=${item.value}`}
-                        className="hover:text-white"
+                        href={item.value}
+                        className="block leading-6 hover:text-white"
                       >
                         {item.label}
                       </Link>
@@ -180,12 +190,12 @@ export default function Footer() {
               {/* ===== COLUMN 4 - Location ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Projects by location</h4>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  {locationLinks.map((item) => (
-                    <li key={item.value}>
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
+                  {projectLocationLinks.map(item => (
+                    <li key={item.id}>
                       <Link
-                        href={`${BASE_ROUTE}?location=${item.value}`}
-                        className="hover:text-white"
+                        href={item.value}
+                        className="block leading-6 hover:text-white"
                       >
                         {item.label}
                       </Link>
@@ -197,12 +207,12 @@ export default function Footer() {
               {/* ===== COLUMN 5 - Budget ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Projects by budget</h4>
-                <ul className="space-y-2 text-sm text-gray-400">
-                  {budgetLinks.map((item) => (
-                    <li key={item.value}>
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
+                  {projectBudgetLinks.map(item => (
+                    <li key={item.id}>
                       <Link
-                        href={`${BASE_ROUTE}?budget=${item.value}`}
-                        className="hover:text-white"
+                        href={item.value}
+                        className="block leading-6 hover:text-white"
                       >
                         {item.label}
                       </Link>
@@ -261,7 +271,7 @@ export default function Footer() {
           {/* ✅ UPDATED: Clickable social media icons */}
           <div className="mt-4 flex gap-2">
             {socialLinks.map(({ Icon, href }, i) => (
-              <Link 
+              <Link
                 key={i}
                 href={href}
                 target="_blank"

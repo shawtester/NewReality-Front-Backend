@@ -3,7 +3,6 @@
 import Image from "next/image";
 
 export default function DeveloperSection({ builder }) {
-  // ❌ Agar builder hi nahi hai → section mat dikhao
   if (!builder) return null;
 
   return (
@@ -43,35 +42,22 @@ export default function DeveloperSection({ builder }) {
 
         {/* STATS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-8 text-center">
-          <Stat
-            label="Established"
-            value={builder.establishedYear}
-            icon="🏛️"
-          />
-
-          <Stat
-            label="Total Projects"
-            value={builder.totalProjects}
-            icon="🏗️"
-          />
-
-          <Stat
-            label="Ongoing Projects"
-            value={builder.ongoingProjects}
-            icon="🏢"
-          />
-
-          <Stat
-            label="Cities Present"
-            value={builder.citiesPresent}
-            icon="📍"
-          />
+          <Stat label="Established" value={builder.establishedYear} icon="🏛️" />
+          <Stat label="Total Projects" value={builder.totalProjects} icon="🏗️" />
+          <Stat label="Ongoing Projects" value={builder.ongoingProjects} icon="🏢" />
+          <Stat label="Cities Present" value={builder.citiesPresent} icon="📍" />
         </div>
 
         {/* DESCRIPTION */}
         {builder.description && (
           <div
-            className="text-sm text-gray-600 mt-6 leading-relaxed"
+            className="
+              prose prose-sm max-w-none
+              text-gray-600 mt-6
+              [&_a]:text-[#F5A300]
+              [&_a]:underline
+              [&_a:hover]:text-yellow-600
+            "
             dangerouslySetInnerHTML={{
               __html: builder.description,
             }}

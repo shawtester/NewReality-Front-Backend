@@ -31,9 +31,7 @@ const formats = [
 export default function Overview({ data, handleData }) {
   return (
     <div className="bg-white rounded-xl p-6 space-y-6 shadow-sm">
-      <h2 className="text-lg font-semibold">
-        Overview
-      </h2>
+      <h2 className="text-lg font-semibold">Overview</h2>
 
       {/* TITLE */}
       <input
@@ -69,6 +67,7 @@ export default function Overview({ data, handleData }) {
           }
           modules={modules}
           formats={formats}
+          bounds="body"       
           placeholder="Enter overview description..."
           className="bg-white"
         />

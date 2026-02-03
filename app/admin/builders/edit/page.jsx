@@ -51,7 +51,7 @@ export default function EditBuilderPage() {
         const data = snap.data();
 
         setName(data.name || "");
-        setDescription(data.description || ""); // 🔥 HTML load
+        setDescription(data.description || ""); // 🔥 HTML
         setLogo(data.logo || null);
 
         setEstablishedYear(data.establishedYear || "");
@@ -82,10 +82,9 @@ export default function EditBuilderPage() {
     setUploading(false);
   };
 
-  /* 🔹 REMOVE LOGO */
   const removeLogo = () => setLogo(null);
 
-  /* 🔹 SUBMIT UPDATE */
+  /* 🔹 SUBMIT */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -127,131 +126,141 @@ export default function EditBuilderPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-2xl space-y-6">
-      <h1 className="text-xl font-semibold">Edit Builder</h1>
+    <>
+      {/* 🔥 QUILL LINK FIX – LOCAL ONLY */}
+      <style jsx global>{`
+        .ql-tooltip {
+          z-index: 9999 !important;
+        }
+      `}</style>
 
-      {/* NAME */}
-      <div>
-        <label className="text-xs text-gray-500">
-          Builder Name
-        </label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 text-sm"
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="p-6 max-w-2xl space-y-6">
+        <h1 className="text-xl font-semibold">Edit Builder</h1>
 
-      {/* 🔥 DESCRIPTION (RICH TEXT) */}
-      <div>
-        <label className="text-xs text-gray-500 mb-1 block">
-          Description
-        </label>
+        {/* NAME */}
+        <div>
+          <label className="text-xs text-gray-500">
+            Builder Name
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
 
-        <ReactQuill
-          theme="snow"
-          value={description}
-          onChange={setDescription}
-          modules={modules}
-          formats={formats}
-          className="bg-white"
-        />
-      </div>
+        {/* DESCRIPTION */}
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">
+            Description
+          </label>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <input
-          type="number"
-          placeholder="Established Year"
-          value={establishedYear}
-          onChange={(e) =>
-            setEstablishedYear(e.target.value)
-          }
-          className="border rounded-lg px-3 py-2 text-sm"
-        />
+          <ReactQuill
+            theme="snow"
+            value={description}
+            onChange={setDescription}
+            modules={modules}
+            formats={formats}
+            bounds="body"      
+            className="bg-white"
+          />
+        </div>
 
-        <input
-          type="number"
-          placeholder="Ongoing Projects"
-          value={ongoingProjects}
-          onChange={(e) =>
-            setOngoingProjects(e.target.value)
-          }
-          className="border rounded-lg px-3 py-2 text-sm"
-        />
+        {/* STATS */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <input
+            type="number"
+            placeholder="Established Year"
+            value={establishedYear}
+            onChange={(e) =>
+              setEstablishedYear(e.target.value)
+            }
+            className="border rounded-lg px-3 py-2 text-sm"
+          />
 
-        <input
-          type="number"
-          placeholder="Cities Present"
-          value={citiesPresent}
-          onChange={(e) =>
-            setCitiesPresent(e.target.value)
-          }
-          className="border rounded-lg px-3 py-2 text-sm"
-        />
+          <input
+            type="number"
+            placeholder="Ongoing Projects"
+            value={ongoingProjects}
+            onChange={(e) =>
+              setOngoingProjects(e.target.value)
+            }
+            className="border rounded-lg px-3 py-2 text-sm"
+          />
 
-        <input
-          type="number"
-          value={totalProjects}
-          disabled
-          className="border rounded-lg px-3 py-2 text-sm bg-gray-100"
-        />
-      </div>
+          <input
+            type="number"
+            placeholder="Cities Present"
+            value={citiesPresent}
+            onChange={(e) =>
+              setCitiesPresent(e.target.value)
+            }
+            className="border rounded-lg px-3 py-2 text-sm"
+          />
 
-      {/* LOGO */}
-      <div>
-        <label className="text-xs text-gray-500 mb-1 block">
-          Builder Logo
-        </label>
+          <input
+            type="number"
+            value={totalProjects}
+            disabled
+            className="border rounded-lg px-3 py-2 text-sm bg-gray-100"
+          />
+        </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          disabled={uploading}
-          onChange={(e) =>
-            handleLogoUpload(e.target.files[0])
-          }
-        />
+        {/* LOGO */}
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">
+            Builder Logo
+          </label>
 
-        {logo?.url && (
-          <div className="mt-3 flex items-center gap-4">
-            <Image
-              src={logo.url}
-              alt="Builder Logo"
-              width={96}
-              height={96}
-              className="object-contain"
-            />
-            <button
-              type="button"
-              onClick={removeLogo}
-              className="px-3 py-1 bg-red-500 text-white text-xs rounded"
-            >
-              Remove
-            </button>
-          </div>
-        )}
-      </div>
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={(e) =>
+              handleLogoUpload(e.target.files[0])
+            }
+          />
 
-      {/* ACTIONS */}
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-5 py-2 bg-blue-600 text-white rounded"
-        >
-          {saving ? "Saving..." : "Update Builder"}
-        </button>
+          {logo?.url && (
+            <div className="mt-3 flex items-center gap-4">
+              <Image
+                src={logo.url}
+                alt="Builder Logo"
+                width={96}
+                height={96}
+                className="object-contain"
+              />
+              <button
+                type="button"
+                onClick={removeLogo}
+                className="px-3 py-1 bg-red-500 text-white text-xs rounded"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
 
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-5 py-2 bg-gray-200 rounded"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+        {/* ACTIONS */}
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-5 py-2 bg-blue-600 text-white rounded"
+          >
+            {saving ? "Saving..." : "Update Builder"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-5 py-2 bg-gray-200 rounded"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 

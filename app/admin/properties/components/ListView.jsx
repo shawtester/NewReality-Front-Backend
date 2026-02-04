@@ -73,7 +73,8 @@ export default function ListView() {
 function PropertyCard({ item }) {
   const router = useRouter();
 
-  const mainImage =
+  const mainImage = 
+    item.mainImage?.url || 
     item.images?.[0] ||
     item.gallery?.[0]?.url ||
     "/placeholder.jpg";

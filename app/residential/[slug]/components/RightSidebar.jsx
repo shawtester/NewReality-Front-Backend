@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   FaInstagram,
   FaLinkedinIn,
@@ -15,43 +16,36 @@ import BrandCTA from "./BrandCTA";
 export default function RightSidebar({ property }) {
   if (!property) return null;
 
+  /* ================= AUTO SLIDER ================= */
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  useEffect(() => {
+    if (!property.images || property.images.length <= 2) return;
+
+    const interval = setInterval(() => {
+      setSlideIndex((prev) =>
+        prev + 1 >= property.images.length ? 0 : prev + 1
+      );
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [property.images]);
+
   /* ================= HELPERS ================= */
 
-  // ✅ Safe video URL getter (object | string | null)
   const getVideoUrl = (video) => {
     if (!video) return "";
-
-    if (typeof video === "object" && video.url) {
-      return video.url;
-    }
-
-    if (typeof video === "string") {
-      return video;
-    }
-
+    if (typeof video === "object" && video.url) return video.url;
+    if (typeof video === "string") return video;
     return "";
   };
 
-  // ✅ YouTube ID extractor
   const getYouTubeId = (url = "") => {
     if (!url) return "";
-
-    if (url.includes("youtu.be/")) {
-      return url.split("youtu.be/")[1].split("?")[0];
-    }
-
-    if (url.includes("v=")) {
-      return url.split("v=")[1].split("&")[0];
-    }
-
-    if (url.includes("/embed/")) {
-      return url.split("/embed/")[1].split("?")[0];
-    }
-
-    if (url.includes("/shorts/")) {
-      return url.split("/shorts/")[1].split("?")[0];
-    }
-
+    if (url.includes("youtu.be/")) return url.split("youtu.be/")[1].split("?")[0];
+    if (url.includes("v=")) return url.split("v=")[1].split("&")[0];
+    if (url.includes("/embed/")) return url.split("/embed/")[1].split("?")[0];
+    if (url.includes("/shorts/")) return url.split("/shorts/")[1].split("?")[0];
     return "";
   };
 
@@ -73,13 +67,9 @@ export default function RightSidebar({ property }) {
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
-  console.log("VIDEO RAW 👉", property.video);
-console.log("VIDEO URL 👉", typeof property.video === "object" ? property.video?.url : property.video);
-
-
   return (
     <>
-      {/* ================= RIGHT SIDEBAR (MOBILE) ================= */}
+      {/* ================= MOBILE ================= */}
       <div className="block lg:hidden mt-12 space-y-4">
         <BrandCTA propertyTitle={property.title} />
 
@@ -102,43 +92,55 @@ console.log("VIDEO URL 👉", typeof property.video === "object" ? property.vide
         </div>
       </div>
 
-      {/* ================= RIGHT SIDEBAR (DESKTOP) ================= */}
+      {/* ================= DESKTOP ================= */}
       <div className="w-[340px] hidden lg:block space-y-4">
         {/* IMAGE + VIDEO */}
         <div className="bg-white rounded-xl overflow-hidden">
-          {/* IMAGES */}
+          {/* 🔥 AUTO LOOP IMAGE GRID */}
           <div className="grid grid-cols-2 gap-1 mb-1">
-            <Image
-              src={property.images?.[0] || "/images/s1.png"}
-              alt="Gallery"
-              width={200}
-              height={120}
-              className="object-cover rounded"
-            />
-
-            <div className="relative">
+            {/* IMAGE 1 */}
+            <div className="relative w-full h-[120px] bg-[#f6f6f6] rounded overflow-hidden">
               <Image
-                src={property.images?.[1] || "/images/s2.png"}
+                src={
+                  property.images?.length > 2
+                    ? property.images[slideIndex]
+                    : property.images?.[0] || "/images/s1.png"
+                }
                 alt="Gallery"
-                width={200}
-                height={120}
-                className="object-cover rounded"
+                fill
+                sizes="200px"
+                className="object-contain p-1 transition-all duration-500"
               />
+            </div>
+
+            {/* IMAGE 2 */}
+            <div className="relative w-full h-[120px] bg-[#f6f6f6] rounded overflow-hidden">
+              <Image
+                src={
+                  property.images?.length > 2
+                    ? property.images[
+                        (slideIndex + 1) % property.images.length
+                      ]
+                    : property.images?.[1] || "/images/s2.png"
+                }
+                alt="Gallery"
+                fill
+                sizes="200px"
+                className="object-contain p-1 transition-all duration-500"
+              />
+
               <span className="absolute bottom-2 left-2 bg-white/90 text-xs px-2 py-1 rounded">
                 {property.images?.length || 0}+ Photos
               </span>
             </div>
           </div>
 
-          {/* 🎥 VIDEO PREVIEW (FIXED) */}
+          {/* 🎥 VIDEO */}
           <div className="relative bg-black rounded-lg overflow-hidden">
             {videoUrl ? (
-              videoUrl.includes("youtube") ||
-              videoUrl.includes("youtu.be") ? (
+              videoUrl.includes("youtube") || videoUrl.includes("youtu.be") ? (
                 <iframe
-                  src={`https://www.youtube.com/embed/${getYouTubeId(
-                    videoUrl
-                  )}`}
+                  src={`https://www.youtube.com/embed/${getYouTubeId(videoUrl)}`}
                   className="w-full h-[185px]"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -148,19 +150,11 @@ console.log("VIDEO URL 👉", typeof property.video === "object" ? property.vide
                   src={videoUrl}
                   controls
                   playsInline
+                  preload="metadata"
                   className="w-full h-[185px] object-cover"
-                  poster={property.images?.[0] || "/images/s3.png"}
                 />
               )
-            ) : (
-              <Image
-                src={property.images?.[0] || "/images/s3.png"}
-                alt="Video Preview"
-                width={400}
-                height={200}
-                className="w-full h-[185px] object-cover"
-              />
-            )}
+            ) : null}
           </div>
         </div>
 

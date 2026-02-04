@@ -10,9 +10,6 @@ import StatsBar from "@/app/components/StatsBar";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";
 
-import Testimonial from "./components/Testimonial";
-import { getTestimonials } from "@/lib/firestore/testimonials/read";
-
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
@@ -35,7 +32,7 @@ export default async function Home() {
 
       {/* ⭐ WHY CHOOSE */}
       <WhyChooseNeev />
-      <Testimonial testimonials={testimonials} />
+      
 
 
       {/* 🏗 DEVELOPERS */}

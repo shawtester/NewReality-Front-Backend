@@ -58,14 +58,11 @@ export default async function PropertyPage({ params }) {
 
     brochureUrl: property.brochure?.url || "",
 
-    images:
-      property.gallery?.length > 0
-        ? property.gallery.map((g) => g.url)
-        : property.mainImage?.url
-          ? [property.mainImage.url]
-          : property.image?.url
-            ? [property.image.url]
-            : [],
+    images: [
+      ...(property.mainImage?.url ? [property.mainImage.url] : []),
+      ...(property.gallery?.map((g) => g.url) || []),
+    ],
+
     video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
@@ -140,7 +137,12 @@ export default async function PropertyPage({ params }) {
         </div>
 
         {/* RIGHT */}
-        <RightSidebar property={cleanProperty} />
+        <RightSidebar
+          property={{
+            ...cleanProperty,
+            images: cleanProperty.images.slice(1), // ❌ remove main image
+          }}
+        />
       </section>
 
       <Footer />

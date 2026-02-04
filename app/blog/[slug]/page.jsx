@@ -162,8 +162,8 @@ export default function BlogDetailPage({ params }) {
               </h1>
 
               <p className="text-sm text-gray-500">
-                By <span className="text-blue-700">Silky Malhotra</span> • Nov 12, 2025
-              </p>
+  {blog.excerpt || "No excerpt available"}
+</p>
 
               {imageSrc && (
                 <div className="relative w-full aspect-[16/7] rounded-xl overflow-hidden">

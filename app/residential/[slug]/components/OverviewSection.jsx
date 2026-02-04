@@ -91,7 +91,7 @@ export default function OverviewSection({ overview, propertyTitle }) {
             <div className="max-w-xl mx-auto">
               <ExpandableText
                 html={overview.description}
-                maxLines={1}
+                maxLines={3}
                 className="text-sm md:text-base text-gray-600 font-light"
               />
             </div>

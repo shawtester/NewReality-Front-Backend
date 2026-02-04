@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { uploadBrochureToCloudinary } from "@/lib/cloudinary/uploadBrochure";
 import { useBuilders } from "@/lib/firestore/builders/read";
 import { uploadVideoToCloudinary } from "@/lib/cloudinary/uploadVideo";
@@ -16,6 +16,14 @@ export default function BasicDetails({ data, handleData }) {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const { builders, isLoading } = useBuilders();
+
+  /* 🔥 EDIT MODE FIX — SYNC BUILDER NAME */
+  useEffect(() => {
+    if (data?.developer) {
+      setSearchBuilder(data.developer);
+    }
+  }, [data?.developer]);
+
 
   /* 🔥 FILTERED BUILDERS */
   const filteredBuilders = useMemo(() => {
@@ -155,6 +163,7 @@ export default function BasicDetails({ data, handleData }) {
 
         <input
           value={searchBuilder}
+          onBlur={() => setShowDropdown(false)}
           onChange={(e) => {
             setSearchBuilder(e.target.value);
             setShowDropdown(true);

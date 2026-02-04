@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const properties = await getAllProperties();
   const blogs = await getBlogsForHome();
-  const testimonials = await getTestimonials();
+ 
 
   return (
     <main className="w-screen overflow-x-hidden">

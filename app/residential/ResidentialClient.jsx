@@ -45,7 +45,7 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
             >
                 {text}
             </div>
-            
+
             {isOverflowing && (
                 <button
                     onClick={toggleExpanded}
@@ -53,12 +53,12 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
                 >
                     {isExpanded ? (
                         <>
-                            Read Less 
+                            Read Less
                             <span className="w-3 h-3 border-b-2 border-r-2 rotate-225 -translate-y-[1px] transition-transform duration-200" />
                         </>
                     ) : (
                         <>
-                            Read More 
+                            Read More
                             <span className="w-3 h-3 border-b-2 border-r-2 rotate-45 translate-y-[1px] transition-transform duration-200" />
                         </>
                     )}
@@ -159,9 +159,25 @@ export default function ResidentialPage({ apartments = [] }) {
         setPageTitle(title);
 
         const hasFilters = urlType || urlStatus || urlLocality || urlBudget || urlBhk || urlKeyword;
-        if (!hasFilters) {
+
+        // ✅ SAME AS COMMERCIAL LOGIC
+        if (urlType) {
+            setFilteredApartments(
+                filterByPropertyType(
+                    filterForResidential(apartments),
+                    urlType
+                )
+            );
+            return;
+        }
+
+        if (hasFilters) {
+            // future search api logic
+            setFilteredApartments(filterForResidential(apartments));
+        } else {
             setFilteredApartments(filterForResidential(apartments));
         }
+
     }, [searchParams, apartments]);
 
     const handleFilterChange = useCallback((filterName, value) => {
@@ -211,15 +227,15 @@ export default function ResidentialPage({ apartments = [] }) {
                                 {pageTitle}
                             </h1>
                             {/* ✅ FIXED EXPANDABLE TEXT - SHOWS EXACTLY 2 LINES */}
-                            <ExpandableText 
+                            <ExpandableText
                                 maxLines={2}
                                 className="mt-2 text-sm sm:text-[15px] text-gray-600"
                             >
-                                Booming Micro Residential Apartments Market in Gurgaon – 
-                                luxury apartments offering massive long-term capital gains. 
-                                Explore premium projects with world-class amenities, 
-                                strategic locations along Dwarka Expressway, Golf Course Road, 
-                                and Southern Peripheral Road. Perfect for both end-users and investors 
+                                Booming Micro Residential Apartments Market in Gurgaon –
+                                luxury apartments offering massive long-term capital gains.
+                                Explore premium projects with world-class amenities,
+                                strategic locations along Dwarka Expressway, Golf Course Road,
+                                and Southern Peripheral Road. Perfect for both end-users and investors
                                 seeking high ROI in Gurgaon's thriving real estate market.
                             </ExpandableText>
                         </div>

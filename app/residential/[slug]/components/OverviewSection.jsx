@@ -26,7 +26,7 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
         ref={textRef}
         className={`
           transition-all duration-300 ease-in-out
-          ${isExpanded ? "max-h-none" : "line-clamp-1 pointer-events-auto"}
+          ${isExpanded ? "max-h-none" : `line-clamp-${maxLines}`}
           prose prose-sm max-w-none
           leading-[1.4rem] text-left
 
@@ -91,7 +91,7 @@ export default function OverviewSection({ overview, propertyTitle }) {
             <div className="max-w-xl mx-auto">
               <ExpandableText
                 html={overview.description}
-                maxLines={3}
+                maxLines={3}   // ✅ ab 3 line ke baad Read More aayega
                 className="text-sm md:text-base text-gray-600 font-light"
               />
             </div>

@@ -2,33 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-/* ================= RECENT BLOGS ================= */
-const recentBlogs = [
-  {
-    title: "IGRSUP 2025: Complete Guide to Online Property Registration in UP",
-    logo: "/images/blogsection/logo1.png",
-  },
-  {
-    title: "20 Simple False Ceiling Design for Hall",
-    logo: "/images/blogsection/logo2.png",
-  },
-  {
-    title: "Top Citizenship by Investment Agents in 2026",
-    logo: "/images/blogsection/logo3.jpg",
-  },
-  {
-    title: "Managing AR and AP in Real Estate Projects for Better Cash Flow",
-    logo: "/images/blogsection/logo4.jpg",
-  },
-  {
-    title: "Top 15 Posh Areas in Delhi NCR (2025)",
-    logo: "/images/blogsection/logo5.png",
-  },
-];
-
-/* ================= PAGE ================= */
 export default function BlogPage({ blogs = [] }) {
   const [query, setQuery] = useState("");
 
@@ -39,8 +14,19 @@ export default function BlogPage({ blogs = [] }) {
       .includes(query.toLowerCase())
   );
 
+  /* ================= RECENT BLOGS (AUTO) ================= */
+  const recentBlogs = useMemo(() => {
+    return [...blogs]
+      .sort(
+        (a, b) =>
+          (b.timestampCreate || 0) - (a.timestampCreate || 0)
+      )
+      .slice(0, 5);
+  }, [blogs]);
+
   return (
     <main className="bg-white py-1">
+
       {/* ===== HEADING ===== */}
       <div className="max-w-[1240px] mx-auto px-4 text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold">
@@ -57,7 +43,6 @@ export default function BlogPage({ blogs = [] }) {
 
         {/* ===== LEFT : BLOG CARDS ===== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
           {finalBlogs.length > 0 ? (
             finalBlogs.map((blog) => (
               <Link
@@ -68,7 +53,7 @@ export default function BlogPage({ blogs = [] }) {
                 {/* IMAGE */}
                 <div className="relative h-48 w-full">
                   <Image
-                    src={blog.image || "/images/placeholder.jpg"}
+                    src={blog.image?.url || blog.image || "/images/placeholder.jpg"}
                     alt={blog.title}
                     fill
                     className="object-cover"
@@ -113,7 +98,6 @@ export default function BlogPage({ blogs = [] }) {
               </p>
             )
           )}
-
         </div>
 
         {/* ===== RIGHT : SIDEBAR ===== */}
@@ -122,7 +106,6 @@ export default function BlogPage({ blogs = [] }) {
           {/* SEARCH */}
           <div className="bg-white border rounded-xl p-5 shadow-sm">
             <h3 className="font-semibold mb-3">Search Blogs</h3>
-
             <div className="flex items-center border rounded-full px-4 py-2">
               <input
                 type="text"
@@ -134,32 +117,47 @@ export default function BlogPage({ blogs = [] }) {
             </div>
           </div>
 
-          {/* RECENT BLOGS */}
+          {/* RECENT BLOGS (DYNAMIC + EXCERPT) */}
           <div className="bg-white border rounded-xl p-5 shadow-sm">
             <h3 className="font-semibold mb-4 border-b pb-2">
               Recent Blogs
             </h3>
 
-            <ul className="space-y-4">
-              {recentBlogs.map((blog, i) => (
-                <li key={i} className="flex gap-3 items-start">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={blog.logo}
-                      alt={blog.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+            <ul className="space-y-5">
+              {recentBlogs.map((blog) => (
+                <li key={blog.id}>
+                  <Link
+                    href={`/blog/${blog.id}`}
+                    className="flex gap-3 items-start group"
+                  >
+                    {/* IMAGE */}
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                      <Image
+                        src={blog.image?.url || blog.image || "/images/placeholder.jpg"}
+                        alt={blog.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
 
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 line-clamp-2">
-                      {blog.title}
-                    </p>
-                    <span className="text-xs font-semibold text-black">
-                      Read More →
-                    </span>
-                  </div>
+                    {/* CONTENT */}
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-black">
+                        {blog.title}
+                      </p>
+
+                      {/* EXCERPT */}
+                      {blog.excerpt && (
+                        <p className="mt-1 text-xs text-gray-500 line-clamp-2">
+                          {blog.excerpt}
+                        </p>
+                      )}
+
+                      <span className="inline-block mt-1 text-xs font-semibold text-black">
+                        Read More →
+                      </span>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>

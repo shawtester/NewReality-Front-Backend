@@ -123,7 +123,7 @@ export default function AdminTestimonialsPage() {
           required
         />
 
-        <textarea
+        <input
           placeholder="Quote"
           value={form.quote}
           onChange={(e) =>

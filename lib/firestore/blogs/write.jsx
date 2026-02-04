@@ -9,19 +9,16 @@ import {
 
 /* ================= CREATE BLOG ================= */
 export const createBlog = async ({ data }) => {
-  // ✅ Support BOTH: mainTitle (new) & title (old)
   const title = data.mainTitle || data.title;
 
   if (!title?.trim()) throw new Error("Title required");
   if (!data?.slug?.trim()) throw new Error("Slug required");
 
-  // ✅ Proper ID generation
   const newId = doc(collection(db, "blogs")).id;
 
   await setDoc(doc(db, "blogs", newId), {
     id: newId,
 
-    // ✅ Store in consistent way
     title: title.trim(),
     mainTitle: title.trim(),
     detailHeading: data.detailHeading?.trim() || "",
@@ -30,6 +27,9 @@ export const createBlog = async ({ data }) => {
     excerpt: data.excerpt?.trim() || "",
     image: data.image || null,
     sections: data.sections || [],
+
+    // ✅ ADD THIS
+    faqs: data.faqs || [],
 
     isActive: true,
     timestampCreate: Timestamp.now(),
@@ -43,7 +43,6 @@ export const createBlog = async ({ data }) => {
 export const updateBlog = async ({ data }) => {
   if (!data?.id) throw new Error("Blog ID missing");
 
-  // ✅ Again support both fields
   const title = data.mainTitle || data.title;
 
   if (!title?.trim()) throw new Error("Title required");
@@ -60,6 +59,9 @@ export const updateBlog = async ({ data }) => {
       excerpt: data.excerpt?.trim() || "",
       image: data.image || null,
       sections: data.sections || [],
+
+      // ✅ ADD THIS
+      faqs: data.faqs || [],
 
       timestampUpdate: Timestamp.now(),
     },

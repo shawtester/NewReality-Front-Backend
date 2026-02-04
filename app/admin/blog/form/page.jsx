@@ -4,10 +4,39 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@nextui-org/react";
+import dynamic from "next/dynamic";
 
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadImage";
 import { createBlog, updateBlog } from "@/lib/firestore/blogs/write";
 import { getBlogById } from "@/lib/firestore/blogs/read";
+
+import "react-quill/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
+/* ================= QUILL TOOLBAR ================= */
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ color: [] }, { background: [] }],
+    ["link"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "color",
+  "background",
+  "list",
+  "bullet",
+  "link",
+];
 
 export default function BlogForm() {
   const router = useRouter();
@@ -25,18 +54,18 @@ export default function BlogForm() {
     slug: "",
     excerpt: "",
     image: null,
-    sections: [{ heading: "", description: "" }],
+    sections: [""],
+    faqs: [{ question: "", answer: "" }],
   });
 
   const [data, setData] = useState(dataRef.current);
 
-  /* ================= SYNC REF + STATE ================= */
   const updateField = useCallback((key, value) => {
     dataRef.current[key] = value;
     setData((p) => ({ ...p, [key]: value }));
   }, []);
 
-  /* ================= FETCH BLOG (EDIT MODE) ================= */
+  /* ================= FETCH BLOG ================= */
   useEffect(() => {
     if (!id) return;
 
@@ -51,20 +80,18 @@ export default function BlogForm() {
 
         const filledData = {
           id: res.id,
-          mainTitle: res.mainTitle || res.title || "",
+          mainTitle: res.mainTitle || "",
           detailHeading: res.detailHeading || "",
           slug: res.slug || "",
           excerpt: res.excerpt || "",
           image: res.image || null,
-          sections:
-            res.sections?.length > 0
-              ? res.sections
-              : [{ heading: "", description: "" }],
+          sections: res.sections?.length ? res.sections : [""],
+          faqs: res.faqs?.length ? res.faqs : [{ question: "", answer: "" }],
         };
 
         dataRef.current = filledData;
         setData(filledData);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load blog");
       }
     };
@@ -72,24 +99,40 @@ export default function BlogForm() {
     fetchBlog();
   }, [id, router]);
 
-  /* ================= SECTION HANDLERS ================= */
+  /* ================= SECTIONS ================= */
   const addSection = () => {
-    const sections = [
-      ...dataRef.current.sections,
-      { heading: "", description: "" },
-    ];
-    updateField("sections", sections);
+    updateField("sections", [...dataRef.current.sections, ""]);
   };
 
-  const updateSection = (index, key, value) => {
+  const updateSection = (i, val) => {
     const sections = [...dataRef.current.sections];
-    sections[index][key] = value;
+    sections[i] = val;
     updateField("sections", sections);
   };
 
-  const removeSection = (index) => {
-    const sections = dataRef.current.sections.filter((_, i) => i !== index);
-    updateField("sections", sections);
+  const removeSection = (i) => {
+    updateField(
+      "sections",
+      dataRef.current.sections.filter((_, idx) => idx !== i)
+    );
+  };
+
+  /* ================= FAQ ================= */
+  const addFaq = () => {
+    updateField("faqs", [...dataRef.current.faqs, { question: "", answer: "" }]);
+  };
+
+  const updateFaq = (i, key, value) => {
+    const faqs = [...dataRef.current.faqs];
+    faqs[i] = { ...faqs[i], [key]: value };
+    updateField("faqs", faqs);
+  };
+
+  const removeFaq = (i) => {
+    updateField(
+      "faqs",
+      dataRef.current.faqs.filter((_, idx) => idx !== i)
+    );
   };
 
   /* ================= IMAGE ================= */
@@ -111,18 +154,19 @@ export default function BlogForm() {
   const submit = async () => {
     const current = dataRef.current;
 
-    if (!current.mainTitle.trim())
-      return toast.error("Main title required");
-
-    if (!current.slug.trim())
-      return toast.error("Slug required");
+    if (!current.mainTitle.trim()) return toast.error("Main title required");
+    if (!current.slug.trim()) return toast.error("Slug required");
 
     const validSections = current.sections.filter(
-      (s) => s.heading.trim() && s.description.trim()
+      (s) => s && s.replace(/<(.|\n)*?>/g, "").trim()
     );
 
     if (!validSections.length)
       return toast.error("Add at least one section");
+
+    const validFaqs = current.faqs.filter(
+      (f) => f.question.trim() && f.answer.trim()
+    );
 
     setLoading(true);
 
@@ -134,16 +178,14 @@ export default function BlogForm() {
         excerpt: current.excerpt.trim(),
         image: current.image,
         sections: validSections,
+        faqs: validFaqs,
       };
 
-      if (id) {
-        await updateBlog({ data: { ...payload, id } });
-        toast.success("Blog updated");
-      } else {
-        await createBlog({ data: payload });
-        toast.success("Blog created");
-      }
+      id
+        ? await updateBlog({ data: { ...payload, id } })
+        : await createBlog({ data: payload });
 
+      toast.success(id ? "Blog updated" : "Blog created");
       router.push("/admin/blog");
       router.refresh();
     } catch (err) {
@@ -189,40 +231,23 @@ export default function BlogForm() {
         onChange={(e) => updateField("excerpt", e.target.value)}
       />
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => handleImage(e.target.files?.[0])}
-      />
-
+      <input type="file" accept="image/*" onChange={(e) => handleImage(e.target.files?.[0])} />
       {imgLoading && <p className="text-sm">Uploading...</p>}
-
       {data.image?.url && (
         <img src={data.image.url} className="h-32 rounded border" />
       )}
 
       <h3 className="font-semibold mt-6">Sections</h3>
 
-      {data.sections.map((sec, i) => (
-        <div key={i} className="border p-4 rounded mb-3">
-          <input
-            className="border p-2 w-full mb-2"
-            placeholder="Section Heading"
-            value={sec.heading}
-            onChange={(e) =>
-              updateSection(i, "heading", e.target.value)
-            }
+      {data.sections.map((content, i) => (
+        <div key={i} className="border p-4 rounded mb-4">
+          <ReactQuill
+            theme="snow"
+            value={content}
+            onChange={(val) => updateSection(i, val)}
+            modules={quillModules}
+            formats={quillFormats}
           />
-          <textarea
-            rows={4}
-            className="border p-2 w-full"
-            placeholder="Section Description"
-            value={sec.description}
-            onChange={(e) =>
-              updateSection(i, "description", e.target.value)
-            }
-          />
-
           {data.sections.length > 1 && (
             <button
               className="text-red-500 text-sm mt-2"
@@ -238,11 +263,39 @@ export default function BlogForm() {
         + Add Section
       </Button>
 
-      <Button
-        isLoading={loading}
-        onClick={submit}
-        className="bg-[#DBA40D]"
-      >
+      <h3 className="font-semibold mt-8">FAQs</h3>
+
+      {data.faqs.map((faq, i) => (
+        <div key={i} className="border p-4 rounded space-y-3">
+          <input
+            className="border p-2 rounded w-full"
+            placeholder="Question"
+            value={faq.question}
+            onChange={(e) => updateFaq(i, "question", e.target.value)}
+          />
+          <textarea
+            className="border p-2 rounded w-full"
+            placeholder="Answer"
+            rows={3}
+            value={faq.answer}
+            onChange={(e) => updateFaq(i, "answer", e.target.value)}
+          />
+          {data.faqs.length > 1 && (
+            <button
+              className="text-red-500 text-sm"
+              onClick={() => removeFaq(i)}
+            >
+              Remove FAQ
+            </button>
+          )}
+        </div>
+      ))}
+
+      <Button variant="light" onClick={addFaq}>
+        + Add FAQ
+      </Button>
+
+      <Button isLoading={loading} onClick={submit} className="bg-[#DBA40D]">
         {id ? "Update Blog" : "Create Blog"}
       </Button>
     </div>

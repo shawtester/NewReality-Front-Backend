@@ -3,18 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FiMapPin, FiSearch } from "react-icons/fi";
-import { CiGlobe } from "react-icons/ci";
 import { useRouter } from "next/navigation";
 
 import { getHero } from "@/lib/firestore/hero/read";
-
-const filterByType = (list = [], type) => {
-  return list.filter((item) => {
-    if (!item.propertyType) return true; // old data safe
-    return item.propertyType === type;
-  });
-};
-
 
 const TAGS = [
   "Sohna Road",
@@ -35,10 +26,9 @@ export default function SearchCard() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showVideo, setShowVideo] = useState(true);
-  const [playMobileVideo, setPlayMobileVideo] = useState(false);
 
   const [hero, setHero] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   /* ================= FETCH HERO ================= */
   useEffect(() => {
@@ -49,12 +39,24 @@ export default function SearchCard() {
     fetchHero();
   }, []);
 
-  const heroImage = hero?.image?.url || "/images/heroimg.png";
+  /* ================= AUTO SLIDER ================= */
+  useEffect(() => {
+    if (!hero?.images?.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === hero.images.length - 1 ? 0 : prev + 1
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [hero?.images?.length]);
+
   const videoUrl = hero?.videoUrl
     ? `${hero.videoUrl}?autoplay=1&mute=1`
     : DEFAULT_VIDEO;
 
-  /* ================= ALGOLIA SEARCH ================= */
+  /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
     if (!text.trim()) {
       setResults([]);
@@ -64,12 +66,12 @@ export default function SearchCard() {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/search?q=${text}&propertyType=${propertyType}`);
+        `/api/search?q=${text}&propertyType=${propertyType}`
+      );
       const data = await res.json();
-
       setResults(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Search API error ❌", err);
+      console.error("Search error", err);
     } finally {
       setLoading(false);
     }
@@ -79,80 +81,52 @@ export default function SearchCard() {
     <section className="relative w-full">
       {/* ================= HERO ================= */}
       <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden">
-        {/* BACKGROUND IMAGE */}
-        <Image
-          src={heroImage}
-          alt="Hero"
-          fill
-          priority
-          className="object-cover"
-        />
-
-        {/* ================= DESKTOP FLOATING VIDEO ================= */}
-        {showVideo && (
-          <div className="absolute inset-0 z-20 hidden md:flex items-center justify-end pr-10">
-            <div className="absolute right-10 bottom-8 -translate-y-1/4 w-[280px] h-[300px]">
-              {/* CLOSE */}
-              <button
-                onClick={() => setShowVideo(false)}
-                className="absolute -top-3 -right-3 z-30 h-9 w-9 rounded-full bg-black text-white"
-              >
-                ✕
-              </button>
-
-              {/* VIDEO */}
-              <iframe
-                className="w-full h-full rounded-2xl shadow-2xl"
-                src={videoUrl}
-                allow="autoplay; encrypted-media"
-                allowFullScreen
+        {/* BACKGROUND SLIDER */}
+        {hero?.images?.length ? (
+          hero.images.map((img, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0"
+              }`}
+            >
+              <Image
+                src={img}
+                alt={`Hero ${index + 1}`}
+                fill
+                className="object-cover"
+                priority={index === 0}
               />
             </div>
-          </div>
+          ))
+        ) : (
+          <Image
+            src="/images/heroimg.png"
+            alt="Hero"
+            fill
+            className="object-cover"
+          />
         )}
 
-        {/* ================= MOBILE PLAY ICON ================= */}
-        {!playMobileVideo && (
-          <div className="md:hidden absolute right-3 bottom-40 z-30">
-            <button
-              onClick={() => setPlayMobileVideo(true)}
-              className="h-11 w-11 rounded-full bg-white shadow-lg flex items-center justify-center"
-            >
-              ▶
-            </button>
-          </div>
-        )}
-
-        {/* ================= MOBILE VIDEO POPUP ================= */}
-        {playMobileVideo && (
-          <div className="md:hidden absolute inset-0 z-40 bg-black/60 flex items-center justify-center px-4">
-            {/* CLOSE */}
-            <button
-              onClick={() => setPlayMobileVideo(false)}
-              className="absolute top-4 right-4 z-50 h-9 w-9 rounded-full bg-black text-white"
-            >
-              ✕
-            </button>
-
-            {/* VIDEO */}
-            <div className="w-[90vw] max-w-[250px] h-[300px] rounded-2xl overflow-hidden shadow-2xl bg-black">
-              <iframe
-                className="w-full h-full"
-                src={videoUrl}
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-              />
-            </div>
+        {/* ================= DESKTOP VIDEO ================= */}
+        {hero?.videoUrl && (
+          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
+            <iframe
+              className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
+              src={videoUrl}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
           </div>
         )}
       </div>
 
-
-
-      {/* ================= SEARCH WRAPPER ================= */}
+      {/* ================= SEARCH CARD ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-20">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
-          {/* HEADER */}
+          {/* HEADER + PROPERTY TYPE */}
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">
               Find your perfect home with{" "}
@@ -160,25 +134,24 @@ export default function SearchCard() {
             </h2>
 
             <div className="flex rounded-full bg-gray-100">
-              {[
-                { label: "Residential", value: "residential" },
-                { label: "Commercial", value: "commercial" },
-              ].map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => {
-                    setPropertyType(tab.value);
-                    setResults([]);
-                  }}
-                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
-                    ? "bg-white shadow text-gray-900"
-                    : "text-gray-500"
+              {[{ label: "Residential", value: "residential" }, { label: "Commercial", value: "commercial" }].map(
+                (tab) => (
+                  <button
+                    key={tab.value}
+                    onClick={() => {
+                      setPropertyType(tab.value);
+                      setResults([]);
+                    }}
+                    className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${
+                      propertyType === tab.value
+                        ? "bg-white shadow text-gray-900"
+                        : "text-gray-500"
                     }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-
+                  >
+                    {tab.label}
+                  </button>
+                )
+              )}
             </div>
           </div>
 
@@ -211,8 +184,6 @@ export default function SearchCard() {
           {/* SEARCH RESULTS */}
           {results.length > 0 && (
             <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-lg p-4 z-50">
-              <p className="text-xs text-gray-500 mb-2">Search Results</p>
-
               <ul className="space-y-2 max-h-[260px] overflow-y-auto">
                 {results.map((item) => (
                   <li

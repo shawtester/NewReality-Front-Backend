@@ -11,82 +11,113 @@ import { updateHero } from "@/lib/firestore/hero/write";
 
 export default function HeroAdminPage() {
   const [data, setData] = useState({
-    image: null,
+    images: [], // store string URLs
     videoUrl: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
 
-  /* FETCH EXISTING */
+  /* ================= FETCH EXISTING HERO ================= */
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       const res = await getHero();
-      if (res) setData(res);
+      if (res) {
+        setData({
+          images: res.images || [],
+          videoUrl: res.videoUrl || "",
+        });
+      }
     };
-    fetch();
+    fetchData();
   }, []);
 
-  /* IMAGE UPLOAD */
+  /* ================= IMAGE UPLOAD ================= */
   const handleImage = async (file) => {
     if (!file) return;
-    setImgLoading(true);
-    try {
-      const res = await uploadToCloudinary(file);
-      setData((p) => ({ ...p, image: res }));
-      toast.success("Hero image updated");
-    } catch (e) {
-      toast.error(e.message);
+
+    if (data.images.length >= 4) {
+      toast.error("Maximum 4 images allowed");
+      return;
     }
-    setImgLoading(false);
+
+    try {
+      setImgLoading(true);
+      const imageUrl = await uploadToCloudinary(file); // returns string URL
+      setData((prev) => ({
+        ...prev,
+        images: [...prev.images, imageUrl],
+      }));
+      toast.success("Image uploaded successfully!");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setImgLoading(false);
+    }
   };
 
-  /* SUBMIT */
+  /* ================= REMOVE IMAGE ================= */
+  const removeImage = (index) => {
+    setData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  /* ================= SUBMIT ================= */
   const submit = async () => {
     setLoading(true);
     try {
       await updateHero({ data });
-      toast.success("Hero section updated");
-    } catch (e) {
-      toast.error(e.message);
+      toast.success("Hero section updated!");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="p-6 max-w-xl space-y-4">
+    <div className="p-6 max-w-xl space-y-5">
       <h1 className="text-xl font-semibold">Hero Section</h1>
 
-      {/* IMAGE */}
+      {/* ================= IMAGES ================= */}
       <div>
-        <label className="text-sm">Hero Background Image</label>
+        <label className="text-sm">Hero Images (Max 4)</label>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => handleImage(e.target.files[0])}
         />
-
         {imgLoading && <p className="text-xs">Uploading…</p>}
 
-        {data.image?.url && (
-          <div className="relative mt-3 w-full h-40 rounded overflow-hidden">
-            <Image
-              src={data.image.url}
-              alt="Hero"
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          {data.images.map((img, index) => (
+            <div key={index} className="relative h-32 rounded overflow-hidden">
+              <Image
+                src={img}
+                alt={`Hero ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+              <button
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* VIDEO */}
+      {/* ================= VIDEO ================= */}
       <div>
         <label className="text-sm">YouTube Embed URL</label>
         <input
           value={data.videoUrl}
           onChange={(e) =>
-            setData((p) => ({ ...p, videoUrl: e.target.value }))
+            setData((prev) => ({ ...prev, videoUrl: e.target.value }))
           }
           placeholder="https://www.youtube.com/embed/xxxx"
           className="border p-2 w-full rounded"

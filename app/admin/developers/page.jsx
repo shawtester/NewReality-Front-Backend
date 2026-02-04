@@ -11,67 +11,99 @@ export default function Page() {
   const { data, isLoading, error } = useDevelopers();
   const router = useRouter();
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (isLoading)
+    return (
+      <main className="p-6">
+        <p className="text-sm text-gray-500">Loading developers...</p>
+      </main>
+    );
+
+  if (error)
+    return (
+      <main className="p-6">
+        <p className="text-red-500">{error}</p>
+      </main>
+    );
 
   return (
     <main className="p-6 space-y-6">
+      {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Developers</h1>
 
         <Link href="/admin/developers/form">
-          <Button className="bg-[#DBA40D]" >Add Developer</Button>
+          <Button className="bg-[#DBA40D] text-black">
+            Add Developer
+          </Button>
         </Link>
       </div>
 
+      {/* EMPTY STATE */}
       {data?.length === 0 && (
-        <p className="text-gray-500">No developers found</p>
+        <div className="text-center text-gray-500 py-10">
+          No developers found
+        </div>
       )}
 
+      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {data?.map((dev) => (
-          <div
-            key={dev.id}
-            className="bg-white rounded-xl shadow p-4 flex flex-col gap-3"
-          >
-            {/* LOGO */}
-            <div className="relative w-20 h-20 mx-auto">
-              <Image
-                src={dev.logo?.url || "/placeholder.png"}
-                alt={dev.title}
-                fill
-                className="object-contain"
-              />
-            </div>
+        {data?.map((dev) => {
+          const logoSrc =
+            dev?.logo?.url && dev.logo.url !== ""
+              ? dev.logo.url
+              : "/placeholder.png";
 
-            {/* TITLE */}
-            <h3 className="text-center font-semibold">
-              {dev.title}
-            </h3>
-
-            {/* PROJECT COUNT */}
-            <p className="text-center text-sm text-gray-500">
-              {dev.totalProjects} Projects
-            </p>
-
-            {/* STATUS */}
-            <span className="text-xs text-center">
-              {dev.isActive ? "Active" : "Inactive"}
-            </span>
-
-            {/* EDIT BUTTON */}
-            <Button
-              isIconOnly
-              size="sm"
-              onClick={() =>
-                router.push(`/admin/developers/form?id=${dev.id}`)
-              }
-              className="self-end bg-[#DBA40D]"
+          return (
+            <div
+              key={dev.id}
+              className="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex flex-col gap-3"
             >
-              <Edit2 size={14} />
-            </Button>
-          </div>
-        ))}
+              {/* LOGO */}
+              <div className="relative w-20 h-20 mx-auto border rounded-lg overflow-hidden">
+                <Image
+                  src={logoSrc}
+                  alt={dev.title || "Developer"}
+                  fill
+                  sizes="80px"
+                  className="object-contain"
+                />
+              </div>
+
+              {/* TITLE */}
+              <h3 className="text-center font-semibold">
+                {dev.title}
+              </h3>
+
+              {/* PROJECT COUNT */}
+              <p className="text-center text-sm text-gray-500">
+                {dev.totalProjects || 0} Projects
+              </p>
+
+              {/* STATUS BADGE */}
+              <span
+                className={`text-xs text-center px-2 py-1 rounded-full ${
+                  dev.isActive
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                {dev.isActive ? "Active" : "Inactive"}
+              </span>
+
+              {/* EDIT BUTTON */}
+              <Button
+                isIconOnly
+                size="sm"
+                className="self-end bg-[#DBA40D]"
+                onClick={() =>
+                  router.push(`/admin/developers/form?id=${dev.id}`)
+                }
+              >
+                <Edit2 size={14} />
+              </Button>
+            </div>
+          );
+        })}
       </div>
     </main>
   );

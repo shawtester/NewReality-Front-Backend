@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { uploadToCloudinary } from "@/lib/cloudinary/uploadImage";
-
+import { uploadToCloudinary } from "@/lib/cloudinary/uploadDevloperLogo";
 
 import {
   createDeveloper,
@@ -14,12 +13,10 @@ import {
 } from "@/lib/firestore/developers/write";
 import { useDeveloper } from "@/lib/firestore/developers/read";
 
-// import { uploadImage } from "@/lib/upload"; // 🔥 property wala uploader
-
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get("id"); // 👈 EDIT MODE CHECK
+  const id = searchParams.get("id");
 
   const { data: devData, isLoading } = useDeveloper({ id });
 
@@ -33,7 +30,7 @@ export default function Page() {
     logo: { url: "" },
   });
 
-  /* 🔁 EDIT MODE: existing data load */
+  /* ================= EDIT MODE ================= */
   useEffect(() => {
     if (devData) {
       setData({
@@ -49,7 +46,7 @@ export default function Page() {
     setData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /* 🔥 LOGO UPLOAD */
+  /* ================= LOGO UPLOAD ================= */
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -57,34 +54,35 @@ export default function Page() {
     try {
       setUploading(true);
 
-      // ✅ REAL UPLOAD (PERMANENT)
       const res = await uploadToCloudinary(file);
 
+      // ⭐⭐⭐ MOST IMPORTANT FIX ⭐⭐⭐
       setData((prev) => ({
         ...prev,
         logo: {
-          url: res.url,
-          publicId: res.publicId,
+          url: res.secure_url,
+          publicId: res.public_id,
         },
       }));
 
       toast.success("Logo uploaded");
     } catch (err) {
+      console.error(err);
       toast.error("Logo upload failed");
     }
 
     setUploading(false);
   };
 
-
-  /* 🚀 SUBMIT (CREATE / UPDATE) */
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       if (!data.title) throw new Error("Developer name required");
       if (!data.totalProjects) throw new Error("Total projects required");
-      if (!data.logo.url) throw new Error("Developer logo required");
+      if (uploading) throw new Error("Logo is uploading...");
+      if (!data.logo?.url) throw new Error("Developer logo required");
 
       setLoading(true);
 
@@ -96,11 +94,9 @@ export default function Page() {
       };
 
       if (id) {
-        // 🔁 UPDATE
         await updateDeveloper({ id, data: payload });
         toast.success("Developer updated");
       } else {
-        // ➕ CREATE
         await createDeveloper({ data: payload });
         toast.success("Developer created");
       }
@@ -138,15 +134,17 @@ export default function Page() {
           type="number"
           className="w-full border px-3 py-2 rounded"
           value={data.totalProjects}
-          onChange={(e) => handleChange("totalProjects", e.target.value)}
+          onChange={(e) =>
+            handleChange("totalProjects", e.target.value)
+          }
         />
       </div>
 
-      {/* 🔥 LOGO UPLOAD */}
+      {/* ================= LOGO UPLOAD ================= */}
       <div className="space-y-2">
         <label className="text-sm">Developer Logo</label>
 
-        {data.logo.url && (
+        {data.logo?.url && (
           <div className="relative w-24 h-24 border rounded">
             <Image
               src={data.logo.url}
@@ -157,10 +155,16 @@ export default function Page() {
           </div>
         )}
 
-        <input type="file" accept="image/*" onChange={handleLogoUpload} />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleLogoUpload}
+        />
 
         {uploading && (
-          <p className="text-xs text-gray-500">Uploading logo…</p>
+          <p className="text-xs text-gray-500">
+            Uploading logo...
+          </p>
         )}
       </div>
 
@@ -169,13 +173,25 @@ export default function Page() {
         <input
           type="checkbox"
           checked={data.isActive}
-          onChange={(e) => handleChange("isActive", e.target.checked)}
+          onChange={(e) =>
+            handleChange("isActive", e.target.checked)
+          }
         />
         Active
       </label>
 
-      <Button className="bg-[#DBA40D]" type="submit" isLoading={loading}>
-        {id ? "Update Developer" : "Save Developer"}
+      {/* Submit */}
+      <Button
+        className="bg-[#DBA40D]"
+        type="submit"
+        isLoading={loading}
+        isDisabled={uploading}
+      >
+        {uploading
+          ? "Uploading Logo..."
+          : id
+          ? "Update Developer"
+          : "Save Developer"}
       </Button>
     </form>
   );

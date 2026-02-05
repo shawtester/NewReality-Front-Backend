@@ -161,12 +161,12 @@ export default function BlogDetailPage({ params }) {
                 {blog.detailHeading || blog.mainTitle}
               </h1>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 relative bottom-6">
   {blog.excerpt || "No excerpt available"}
 </p>
 
               {imageSrc && (
-                <div className="relative w-full aspect-[16/7] rounded-xl overflow-hidden">
+                <div className="relative w-full  aspect-[16/7] rounded-xl overflow-hidden">
                   <Image
                     src={imageSrc}
                     alt={blog.mainTitle}
@@ -192,7 +192,7 @@ export default function BlogDetailPage({ params }) {
 
               {/* FAQ — YOUR EXACT LAYOUT */}
               {blog.faqs?.length > 0 && (
-                <section className="bg-white rounded-xl p-8 shadow-sm">
+                <section className="bg-white rounded-xl relative bottom-3 p-8 shadow-sm">
                   <h2 className="text-xl font-semibold mb-6">
                     Frequently Asked Questions
                   </h2>
@@ -255,7 +255,7 @@ export default function BlogDetailPage({ params }) {
                 )}
 
                 {/* LATEST BLOGS — YOUR EXACT LAYOUT */}
-                <section className="bg-white rounded-lg px-4 py-4 shadow-sm w-[350px]">
+                <section className="bg-white rounded-lg px-4 py-4  relative bottom-3 shadow-sm w-[350px]">
                   <h3 className="font-semibold mb-2">Latest Blogs</h3>
 
                   <ul className="space-y-4">

@@ -12,7 +12,10 @@ export default function DevelopersSection() {
 
   if (isLoading || !developers?.length) return null;
 
-  /* ================= SCROLL BUTTONS ================= */
+  // ✅ only active developers
+  const activeDevelopers = developers.filter((d) => d.isActive);
+
+  /* ================= MOBILE SCROLL BUTTONS ================= */
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -280, behavior: "smooth" });
   };
@@ -21,7 +24,7 @@ export default function DevelopersSection() {
     scrollRef.current?.scrollBy({ left: 280, behavior: "smooth" });
   };
 
-  /* ================= SWIPE (MOBILE) ================= */
+  /* ================= MOBILE SWIPE ================= */
   const onTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -40,9 +43,6 @@ export default function DevelopersSection() {
 
     touchStartX.current = null;
   };
-
-  // ✅ sirf active developers
-  const activeDevelopers = developers.filter((d) => d.isActive);
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
@@ -79,7 +79,7 @@ export default function DevelopersSection() {
           {activeDevelopers.map((dev) => (
             <div
               key={dev.id}
-              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow transition"
+              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow"
             >
               <div className="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-white border shadow">
                 <Image
@@ -103,32 +103,39 @@ export default function DevelopersSection() {
         </div>
       </div>
 
-      {/* ===== DESKTOP GRID ===== */}
-      <div className="hidden lg:grid mx-auto mt-12 max-w-[1240px] grid-cols-5 gap-8 px-6">
-        {activeDevelopers.map((dev) => (
-          <div
-            key={dev.id}
-            className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow transition"
-          >
-            <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
-              <Image
-                src={dev.logo?.url || "/placeholder.png"}
-                alt={dev.title}
-                width={48}
-                height={48}
-                className="object-contain"
-              />
+      {/* ===== DESKTOP: 2 ROWS × 7 ITEMS WITH HORIZONTAL SCROLL ===== */}
+      <div className="hidden lg:block mx-auto mt-4 max-w-[1240px] px-6">
+        <div
+          className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6"
+          style={{
+            gridAutoColumns: "160px",
+          }}
+        >
+          {activeDevelopers.map((dev) => (
+            <div
+              key={dev.id}
+              className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow"
+            >
+              <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
+                <Image
+                  src={dev.logo?.url || "/placeholder.png"}
+                  alt={dev.title}
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
+                {dev.title}
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                {dev.totalProjects}+ Projects
+              </p>
             </div>
-
-            <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
-              {dev.title}
-            </p>
-
-            <p className="mt-1 text-xs text-gray-500">
-              {dev.totalProjects}+ Projects
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

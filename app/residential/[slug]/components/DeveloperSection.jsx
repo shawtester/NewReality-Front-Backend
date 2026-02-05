@@ -1,8 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
 export default function DeveloperSection({ builder }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (!builder) return null;
 
   return (
@@ -28,9 +31,7 @@ export default function DeveloperSection({ builder }) {
                 className="object-contain"
               />
             ) : (
-              <span className="text-xs text-gray-400">
-                N/A
-              </span>
+              <span className="text-xs text-gray-400">N/A</span>
             )}
           </div>
 
@@ -50,18 +51,28 @@ export default function DeveloperSection({ builder }) {
 
         {/* DESCRIPTION */}
         {builder.description && (
-          <div
-            className="
-              prose prose-sm max-w-none
-              text-gray-600 mt-6
-              [&_a]:text-[#F5A300]
-              [&_a]:underline
-              [&_a:hover]:text-yellow-600
-            "
-            dangerouslySetInnerHTML={{
-              __html: builder.description,
-            }}
-          />
+          <div className="mt-6">
+            <div
+              className={`
+                prose prose-sm max-w-none text-gray-600
+                [&_a]:text-[#F5A300]
+                [&_a]:underline
+                [&_a:hover]:text-yellow-600
+                ${expanded ? "" : "line-clamp-2"}
+              `}
+              dangerouslySetInnerHTML={{
+                __html: builder.description,
+              }}
+            />
+
+            {/* READ MORE / LESS */}
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="mt-2 text-sm font-semibold text-[#F5A300] hover:text-yellow-600"
+            >
+              {expanded ? "Read Less" : "Read More"}
+            </button>
+          </div>
         )}
       </div>
     </section>
@@ -75,12 +86,8 @@ function Stat({ label, value, icon }) {
       <div className="w-10 h-10 bg-[#F5A300] text-white rounded-full flex items-center justify-center">
         {icon}
       </div>
-      <p className="text-sm text-gray-500">
-        {label}
-      </p>
-      <p className="font-semibold">
-        {value ?? "—"}
-      </p>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="font-semibold">{value ?? "—"}</p>
     </div>
   );
 }

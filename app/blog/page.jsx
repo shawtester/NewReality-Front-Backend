@@ -22,6 +22,14 @@ export default function Blog() {
     fetchBlogs();
   }, []);
 
+  /* ================= SCROLL TO TOP ON PAGE CHANGE ================= */
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [page]);
+
   const start = (page - 1) * blogsPerPage;
   const visibleBlogs = blogs.slice(start, start + blogsPerPage);
 

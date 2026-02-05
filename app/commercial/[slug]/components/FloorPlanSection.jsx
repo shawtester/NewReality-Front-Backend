@@ -76,7 +76,7 @@ export default function FloorPlanSection({ floorPlans = [] }) {
                   : "bg-gray-100 text-gray-600"
               }`}
             >
-              {t} Apartment
+              {t} 
             </button>
           ))}
         </div>

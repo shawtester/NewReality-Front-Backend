@@ -163,7 +163,9 @@ export default function BasicDetails({ data, handleData }) {
 
         <input
           value={searchBuilder}
-          onBlur={() => setShowDropdown(false)}
+          onBlur={() => {
+            setTimeout(() => setShowDropdown(false), 200);
+          }}
           onChange={(e) => {
             setSearchBuilder(e.target.value);
             setShowDropdown(true);

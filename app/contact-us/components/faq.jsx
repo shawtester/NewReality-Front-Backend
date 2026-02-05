@@ -17,7 +17,7 @@ export default function Faq() {
   if (!faqs.length) return null;
 
   return (
-    <section className="bg-white px-4 py-10">
+    <section className="bg-white px-4 py-16">
       <div className="mx-auto max-w-4xl rounded-xl border p-6 shadow-sm">
         <h3 className="mb-6 text-lg font-semibold">FAQs</h3>
 

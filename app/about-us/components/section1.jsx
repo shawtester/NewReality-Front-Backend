@@ -306,49 +306,54 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= MEET THE TEAM ================= */}
-      <section className="w-full lg:w-[1330px] mr-2 mx-auto mb-14 min-h-[350px] lg:h-[256px] bg-white flex flex-col lg:flex-row overflow-hidden px-4 lg:px-0">
-        {/* Right decorative border */}
-        <div className="absolute top-0 right-0 w-12 h-full bg-gradient-to-b from-transparent via-red-500/20 to-transparent lg:block lg:w-20 hidden sm:block" />
+     {/* ================= MEET THE TEAM ================= */}
+<section className="relative w-full max-w-[1330px] mx-auto mb-14 min-h-[350px] lg:h-[256px] bg-white flex flex-col lg:flex-row overflow-hidden px-4 lg:px-0">
+  
+  {/* Right decorative border */}
+  <div className="absolute top-0 right-0 h-full w-12 lg:w-20 bg-gradient-to-b from-transparent via-red-500/20 to-transparent hidden lg:block" />
 
-        {/* Left Sidebar */}
-        <div className="w-full lg:w-1/3 flex flex-col justify-center items-start p-4 sm:p-6 lg:p-12 bg-gradient-to-br from-gray-50 to-white border-r lg:border-r border-red-500/30 min-h-[200px] sm:min-h-[250px] lg:min-h-auto">
-          <div className="flex flex-col items-start space-y-3 sm:space-y-4 lg:space-y-6 w-full lg:w-[440px]">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-2 sm:w-3 h-6 sm:h-8 lg:h-10 bg-red-600 flex-shrink-0" />
-              <span className="text-xs sm:text-sm lg:text-sm font-medium text-[#B71F37] uppercase tracking-wider">
-                Our Brokers & Agents
-              </span>
-            </div>
-            
-            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-thin bg-[#B71F37] bg-clip-text text-transparent leading-tight w-full lg:w-[440px] break-words">
-              MEET
-              <br />
-              <span className="text-2xl sm:text-4xl lg:text-6xl bg-gradient-to-r font-bold from-[#B71F37] to-[#340000] text-transparent bg-clip-text">
-                THE TEAM
-              </span>
-            </h2>
-          </div>
-        </div>
+  {/* Left Sidebar */}
+  <div className="w-full lg:w-1/3 flex flex-col justify-center items-start p-4 sm:p-6 lg:p-12 bg-gradient-to-br from-gray-50 to-white border-r border-red-500/30 min-h-[200px] sm:min-h-[250px]">
+    <div className="flex flex-col items-start space-y-3 sm:space-y-4 lg:space-y-6 w-full max-w-[440px]">
+      
+      <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="w-2 sm:w-3 h-6 sm:h-8 lg:h-10 bg-red-600 flex-shrink-0" />
+        <span className="text-xs sm:text-sm font-medium text-[#B71F37] uppercase tracking-wider">
+          Our Brokers & Agents
+        </span>
+      </div>
 
-        {/* Right Content Area */}
-        <div className="w-full lg:w-[718px] p-4 sm:p-6 lg:p-12 flex flex-col justify-center gap-3 sm:gap-4 lg:gap-6 lg:min-h-[256px]">
-          <p className="font-[15px] text-gray-700 w-full lg:w-[718px] text-sm sm:text-base lg:text-[15px] leading-relaxed text-left">
-            The Oppenheimer Group, led Founder and Jason Oppenheimer, dominant force
-            <br className="hidden sm:block lg:block" />
-            Southern California luxury real estate market offices Hollywood, Newport Beach,
-            <br className="hidden sm:block lg:block" />
-            San Diego, Calo Luces.
-          </p>
-          
-          <Link 
-            href="" 
-            className="w-fit px-4 py-2 sm:px-6 sm:py-3 bg-yellow-400 hover:bg-yellow-500 font-semibold text-sm sm:text-base lg:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-yellow-500 self-start"
-          >
-            Explore
-          </Link>
-        </div>
-      </section>
+      <h2 className="text-2xl sm:text-3xl lg:text-5xl font-thin leading-tight break-words">
+        <span className="bg-[#B71F37] bg-clip-text text-transparent">
+          MEET
+        </span>
+        <br />
+        <span className="text-2xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-[#B71F37] to-[#340000] text-transparent bg-clip-text">
+          THE TEAM
+        </span>
+      </h2>
+    </div>
+  </div>
+
+  {/* Right Content Area */}
+  <div className="w-full lg:w-2/3 p-4 sm:p-6 lg:p-12 flex flex-col justify-center gap-3 sm:gap-4 lg:gap-6">
+    <p className="text-gray-700 text-sm sm:text-base lg:text-[15px] leading-relaxed max-w-[718px]">
+      The Oppenheimer Group, led Founder and Jason Oppenheimer, dominant force
+      <br className="hidden sm:block" />
+      Southern California luxury real estate market offices Hollywood, Newport Beach,
+      <br className="hidden sm:block" />
+      San Diego, Calo Luces.
+    </p>
+
+    <Link
+      href=""
+      className="w-fit px-4 py-2 sm:px-6 sm:py-3 bg-yellow-400 hover:bg-yellow-500 font-semibold text-sm sm:text-base lg:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-yellow-500"
+    >
+      Explore
+    </Link>
+  </div>
+</section>
+
     </main>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -17,6 +16,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ================= EMI CALC ================= */
   const { emi, totalInterest, totalPayment } = useMemo(() => {
     const P = loanAmount;
     const r = interestRate / 12 / 100;
@@ -45,6 +45,19 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       maximumFractionDigits: 2,
     })}`;
 
+  /* ================= DONUT CHART DATA ================= */
+  const interestPercent =
+    totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0;
+
+  const principalPercent = 100 - interestPercent;
+
+  const radius = 70;
+  const circumference = 2 * Math.PI * radius;
+
+  const interestStroke = (interestPercent / 100) * circumference;
+  const principalStroke = circumference - interestStroke;
+
+  /* ================= SUBMIT ================= */
   const handleLoanSubmit = async () => {
     if (!name || !phone) {
       alert("Name and Phone are required");
@@ -70,8 +83,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       setName("");
       setPhone("");
       setEmail("");
-    } catch (error) {
-      console.error("Firebase Error:", error);
     } finally {
       setLoading(false);
     }
@@ -85,29 +96,48 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-[#F6FAFF] p-6 rounded-xl">
 
-          {/* RIGHT */}
+          {/* RIGHT – REAL TIME GRAPH */}
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold mb-4 text-center">
               Break-up of Total Payment
             </h3>
 
-            <Image
-              src="/images/emi-chart.png"
-              alt="EMI Breakup Chart"
-              width={360}
-              height={260}
-              className="object-contain"
-            />
+            {/* DONUT */}
+            <svg width="200" height="200" viewBox="0 0 200 200">
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke="#F1D2A2"
+                strokeWidth="20"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke="#9C6A1E"
+                strokeWidth="20"
+                strokeDasharray={`${interestStroke} ${principalStroke}`}
+                strokeDashoffset="0"
+                transform="rotate(-90 100 100)"
+              />
+            </svg>
 
             <div className="flex gap-8 mt-6 text-sm">
               <span className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#9C6A1E]" />
-                <span>Total interest</span>
+                <span>
+                  Interest ({interestPercent.toFixed(1)}%)
+                </span>
               </span>
 
               <span className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#F1D2A2]" />
-                <span>Principal loan amount</span>
+                <span>
+                  Principal ({principalPercent.toFixed(1)}%)
+                </span>
               </span>
             </div>
           </div>
@@ -120,7 +150,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
                 type="number"
                 value={loanAmount}
                 onChange={(e) => setLoanAmount(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md outline-none"
+                className="w-full mt-1 px-4 py-2 border rounded-md"
               />
             </div>
 
@@ -132,7 +162,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
                 type="number"
                 value={interestRate}
                 onChange={(e) => setInterestRate(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md outline-none"
+                className="w-full mt-1 px-4 py-2 border rounded-md"
               />
             </div>
 
@@ -144,7 +174,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
                 type="number"
                 value={tenure}
                 onChange={(e) => setTenure(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md outline-none"
+                className="w-full mt-1 px-4 py-2 border rounded-md"
               />
             </div>
 
@@ -171,7 +201,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
             <button
               onClick={() => setShowLoanPopup(true)}
-              className="w-full mt-4 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold hover:bg-[#e29500]"
+              className="w-full mt-4 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold"
             >
               Get Loan
             </button>
@@ -194,12 +224,8 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
               Apply for Loan
             </h3>
 
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-gray-500 mb-4">
               Property: <span className="font-medium">{propertyTitle}</span>
-            </p>
-
-            <p className="text-sm text-gray-600 mb-4">
-              Our loan expert will contact you shortly.
             </p>
 
             <div className="space-y-3">
@@ -209,14 +235,12 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md"
               />
-
               <input
                 placeholder="Phone Number"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md"
               />
-
               <input
                 placeholder="Email"
                 value={email}
@@ -228,7 +252,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
             <button
               onClick={handleLoanSubmit}
               disabled={loading}
-              className="w-full mt-5 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold disabled:opacity-60"
+              className="w-full mt-5 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold"
             >
               {loading ? "Submitting..." : "Submit Request"}
             </button>

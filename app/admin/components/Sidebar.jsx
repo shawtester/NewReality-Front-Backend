@@ -78,6 +78,11 @@ export default function Sidebar() {
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
+      name: "Banner Manager",
+      link: "/admin/banner-manager",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
       name: "Testimonials",
       link: "/admin/testimonials",
       icon: <Star className="h-5 w-5" />,

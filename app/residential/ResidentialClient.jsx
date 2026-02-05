@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Header from "../components/Header";
+import { getBanner } from "@/lib/firestore/banners/read";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
@@ -26,6 +27,9 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
+
+
+
 
     return (
         <div className={`space-y-1 ${className}`}>
@@ -68,6 +72,8 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
     );
 };
 
+
+
 // YOUR EXISTING FUNCTIONS - UNCHANGED
 const PROPERTY_TYPE_MAP = {
     apartment: "isApartment",
@@ -87,8 +93,12 @@ const filterApartments = (list = []) => {
 };
 
 export default function ResidentialPage({ apartments = [] }) {
+    const [banner, setBanner] = useState(null);
     const BASE_ROUTE = "/residential";
     const router = useRouter();
+    const pathname =
+        typeof window !== "undefined" ? window.location.pathname : "";
+
     const searchParams = useSearchParams();
 
     // YOUR EXISTING STATE - UNCHANGED
@@ -180,6 +190,25 @@ export default function ResidentialPage({ apartments = [] }) {
 
     }, [searchParams, apartments]);
 
+    useEffect(() => {
+        let category = "residential";
+
+        const urlType = searchParams.get("type");
+
+        if (urlType === "apartment") category = "apartment";
+        else if (urlType === "builder-floor") category = "builder-floor";
+        else if (urlType === "commercial") category = "commercial";
+        else if (urlType === "retail") category = "retail";
+        else if (urlType === "sco") category = "sco";
+
+        getBanner(category).then((data) => {
+            setBanner(data);
+        });
+
+    }, [searchParams]);
+
+
+
     const handleFilterChange = useCallback((filterName, value) => {
         const params = new URLSearchParams(searchParams.toString());
 
@@ -252,9 +281,15 @@ export default function ResidentialPage({ apartments = [] }) {
                     <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    <div className="w-full h-24 md:h-38 md:w-[90%] md:mx-auto md:text-center md:text-2xl md:bg-blue-100 md:rounded-lg bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                        Banner
+                    <div className="relative w-full h-24 md:h-38 md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
+                        <Image
+                            src={banner?.image || "/default-banner.jpg"}
+                            alt="Trending Banner"
+                            fill
+                            className="object-cover"
+                        />
                     </div>
+
                 </div>
             </section>
 
@@ -308,7 +343,7 @@ export default function ResidentialPage({ apartments = [] }) {
 
                     {/* ✅ DESKTOP SEARCH - EXACT POSITIONING */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-<div className="
+                        <div className="
   bg-white relative
   lg:left-[44%]
   xl:left-[12%]

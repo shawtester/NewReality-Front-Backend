@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Header from "../components/Header";
+import { getBanner } from "@/lib/firestore/banners/read";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
@@ -44,7 +45,7 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
             >
                 {text}
             </div>
-            
+
             {isOverflowing && (
                 <button
                     onClick={toggleExpanded}
@@ -52,12 +53,12 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
                 >
                     {isExpanded ? (
                         <>
-                            Read Less 
+                            Read Less
                             <span className="w-3 h-3 border-b-2 border-r-2 rotate-225 -translate-y-[1px] transition-transform duration-200" />
                         </>
                     ) : (
                         <>
-                            Read More 
+                            Read More
                             <span className="w-3 h-3 border-b-2 border-r-2 rotate-45 translate-y-[1px] transition-transform duration-200" />
                         </>
                     )}
@@ -92,6 +93,7 @@ const filterCommercialByType = (list = [], type) => {
 
 /* ================= PAGE COMPONENT ================= */
 export default function CommercialPage({ apartments = [] }) {
+    const [banner, setBanner] = useState(null);
     const BASE_ROUTE = "/commercial";
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -155,6 +157,22 @@ export default function CommercialPage({ apartments = [] }) {
             setFilteredApartments(filterForCommercial(apartments));
         }
     }, [searchParams, apartments]);
+
+    useEffect(() => {
+        let category = "commercial";
+
+        const urlType = searchParams.get("type");
+
+        if (urlType === "retail-shops") category = "retail";
+        else if (urlType === "sco-plots") category = "sco";
+
+        getBanner(category).then((data) => {
+            console.log("🔥 Banner Data:", data); // debug
+            setBanner(data);
+        });
+
+    }, [searchParams]);
+
 
     const handleSearch = useCallback(async () => {
         // YOUR EXISTING SEARCH LOGIC - UNCHANGED
@@ -234,12 +252,12 @@ export default function CommercialPage({ apartments = [] }) {
                                 {pageTitle}
                             </h1>
                             {/* ✅ EXPANDABLE TEXT - REPLACED p TAG */}
-                            <ExpandableText 
+                            <ExpandableText
                                 maxLines={2}
                                 className="mt-2 text-sm sm:text-[15px] text-gray-600"
                             >
-                                Strategic commercial properties in prime Gurgaon locations with excellent ROI potential. 
-                                Explore high-demand retail shops and SCO plots along Dwarka Expressway, Golf Course Road, 
+                                Strategic commercial properties in prime Gurgaon locations with excellent ROI potential.
+                                Explore high-demand retail shops and SCO plots along Dwarka Expressway, Golf Course Road,
                                 and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real estate market.
                             </ExpandableText>
                         </div>
@@ -256,9 +274,15 @@ export default function CommercialPage({ apartments = [] }) {
                     <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    <div className="w-full h-24 md:h-38 md:w-[90%] md:mx-auto md:text-center md:text-2xl md:bg-blue-100 md:rounded-lg bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                        Banner
+                    <div className="relative w-full h-24 md:h-38 md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
+                        <Image
+                            src={banner?.image || "/default-banner.jpg"}
+                            alt="Trending Banner"
+                            fill
+                            className="object-cover"
+                        />
                     </div>
+
                 </div>
             </section>
 
@@ -312,7 +336,7 @@ export default function CommercialPage({ apartments = [] }) {
 
                     {/* ✅ DESKTOP SEARCH - EXACT POSITIONING */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-<div className="
+                        <div className="
   bg-white relative
   lg:left-[44%]
   xl:left-[12%]

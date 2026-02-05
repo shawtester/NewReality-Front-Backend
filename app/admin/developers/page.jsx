@@ -1,8 +1,9 @@
 "use client";
 
 import { useDevelopers } from "@/lib/firestore/developers/read";
+import { deleteDeveloper } from "@/lib/firestore/developers/write"; // ✅ DELETE FUNCTION
 import { Button } from "@nextui-org/react";
-import { Edit2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +11,21 @@ import Link from "next/link";
 export default function Page() {
   const { data, isLoading, error } = useDevelopers();
   const router = useRouter();
+
+  /* ================= DELETE HANDLER ================= */
+  const handleDelete = async (id) => {
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this developer?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDeveloper(id);
+      alert("Developer deleted successfully");
+    } catch (err) {
+      alert(err.message || "Delete failed");
+    }
+  };
 
   if (isLoading)
     return (
@@ -90,17 +106,30 @@ export default function Page() {
                 {dev.isActive ? "Active" : "Inactive"}
               </span>
 
-              {/* EDIT BUTTON */}
-              <Button
-                isIconOnly
-                size="sm"
-                className="self-end bg-[#DBA40D]"
-                onClick={() =>
-                  router.push(`/admin/developers/form?id=${dev.id}`)
-                }
-              >
-                <Edit2 size={14} />
-              </Button>
+              {/* ACTION BUTTONS */}
+              <div className="flex justify-between mt-2">
+                {/* EDIT LEFT */}
+                <Button
+                  isIconOnly
+                  size="sm"
+                  className="bg-[#DBA40D]"
+                  onClick={() =>
+                    router.push(`/admin/developers/form?id=${dev.id}`)
+                  }
+                >
+                  <Edit2 size={14} />
+                </Button>
+
+                {/* DELETE RIGHT */}
+                <Button
+                  isIconOnly
+                  size="sm"
+                  className="bg-red-500 text-white"
+                  onClick={() => handleDelete(dev.id)}
+                >
+                  <Trash2 size={14} />
+                </Button>
+              </div>
             </div>
           );
         })}

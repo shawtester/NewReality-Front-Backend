@@ -6,6 +6,7 @@ import { getJobs } from "@/lib/firestore/jobs/read";
 
 export default function Career() {
   const [jobs, setJobs] = useState([]);
+  const [openId, setOpenId] = useState(null); // ⭐ track open card
 
   useEffect(() => {
     getJobs().then(setJobs);
@@ -19,13 +20,14 @@ export default function Career() {
           <div className="text-center lg:text-left">
             <h1 className="text-4xl font-bold">
               Reshape the{" "}
-              <span className="text-[#DBA40D]">Real Estate</span>{" "}
-              Industry With Us
+              <span className="text-[#DBA40D]">Real Estate</span> Industry With Us
             </h1>
 
             <button
               onClick={() =>
-                document.getElementById("jobs").scrollIntoView({ behavior: "smooth" })
+                document.getElementById("jobs").scrollIntoView({
+                  behavior: "smooth",
+                })
               }
               className="mt-8 rounded-lg bg-[#DBA40D] px-8 py-3 text-white"
             >
@@ -52,23 +54,38 @@ export default function Career() {
         </h2>
 
         {jobs.length === 0 && (
-          <p className="text-center text-gray-500">
-            No openings right now
-          </p>
+          <p className="text-center text-gray-500">No openings right now</p>
         )}
 
         <div className="grid md:grid-cols-2 gap-6">
-          {jobs.map(job => (
-            <div key={job.id} className="border rounded-lg p-5">
-              <h3 className="text-xl font-semibold">{job.title}</h3>
-              <p className="text-sm text-gray-600">
-                {job.location} • {job.type}
-              </p>
-              <p className="text-sm mt-2">
-                Experience: {job.experience}
-              </p>
-            </div>
-          ))}
+          {jobs.map((job) => {
+            const isOpen = openId === job.id;
+
+            return (
+              <div
+                key={job.id}
+                onClick={() => setOpenId(isOpen ? null : job.id)}
+                className="border rounded-lg p-5 cursor-pointer hover:shadow-md transition-all duration-300"
+              >
+                <h3 className="text-xl font-semibold">{job.title}</h3>
+
+                <p className="text-sm text-gray-600">
+                  {job.location} • {job.type}
+                </p>
+
+                <p className="text-sm mt-2">
+                  Experience: {job.experience}
+                </p>
+
+                {/* ⭐ DESCRIPTION EXPAND */}
+                {isOpen && (
+                  <div className="mt-4 pt-4 border-t text-sm text-gray-700">
+                    {job.description || "No description available"}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
     </>

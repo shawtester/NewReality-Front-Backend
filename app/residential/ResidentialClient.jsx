@@ -276,9 +276,9 @@ export default function ResidentialPage({ apartments = [] }) {
                                 Our Priority.
                             </h1>
                         </div>
-                        <div className="flex-1 flex justify-center self-end relative z-10">
-                            <div className="relative w-[240px] h-[240px] sm:w-[310px] sm:h-[310px] md:w-[370px] md:h-[370px] lg:w-[450px] lg:h-[420px] rounded-[40px] lg:rounded-[60px] overflow-hidden shadow-xl">
-                                <Image src="/images/residental.jpg" alt="Property collage" fill className="object-cover" priority />
+                        <div className="flex-1 flex justify-center self-end p-4 relative z-10">
+                            <div className="relative w-[240px]  h-[240px] sm:w-[310px] sm:h-[310px] md:w-[370px] md:h-[370px] lg:w-[450px] lg:h-[420px] rounded-[40px] lg:rounded-[60px] overflow-hidden shadow-xl">
+                                <Image src="/images/residental.jpg" alt="Property collage" fill className="object-cover " priority />
                             </div>
                         </div>
                     </div>
@@ -308,8 +308,16 @@ export default function ResidentialPage({ apartments = [] }) {
 
                     {/* ✅ DESKTOP SEARCH - EXACT POSITIONING */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-                        <div className="bg-white relative left-20 shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
-                            <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
+<div className="
+  bg-white relative
+  lg:left-[44%]
+  xl:left-[12%]
+  2xl:left-[18%]
+  shadow-2xl px-5 py-3
+  flex items-center gap-3
+  rounded-full
+  border border-yellow-400
+">                              <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option><option value="residential">Residential Property</option><option value="commercial">Commercial Property</option><option value="luxury-apartment">Luxury Apartment</option><option value="builder-floor">Builder Floor</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>
                             </select>

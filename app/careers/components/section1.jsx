@@ -14,7 +14,7 @@ export default function Career() {
   return (
     <>
       {/* HERO */}
-      <section className="w-full bg-[#F8FBFF] py-16">
+      <section className="w-full bg-[#F8FBFF] ">
         <div className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 items-center gap-10">
           <div className="text-center lg:text-left">
             <h1 className="text-4xl font-bold">

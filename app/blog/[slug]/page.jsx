@@ -155,16 +155,16 @@ export default function BlogDetailPage({ params }) {
           <div className="grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-10">
 
             {/* LEFT CONTENT — YOUR EXACT LAYOUT */}
-            <div className="space-y-12 max-w-[1080px]">
+            <div className="space-y-6 max-w-[1080px]">
 
               <h1 className="text-2xl md:text-3xl font-semibold">
                 {blog.detailHeading || blog.mainTitle}
               </h1>
 
-              <p className="text-sm text-gray-500 relative bottom-6">
+              <p className="text-sm text-gray-500 relative bottom-4 ">
   {blog.excerpt || "No excerpt available"}
 </p>
-
+                 
               {imageSrc && (
                 <div className="relative w-full  aspect-[16/7] rounded-xl overflow-hidden">
                   <Image
@@ -225,8 +225,8 @@ export default function BlogDetailPage({ params }) {
             </div>
 
             {/* RIGHT SIDEBAR — YOUR EXACT LAYOUT + STICKY */}
-            <aside className="hidden lg:block justify-self-end">
-              <div className="sticky top-[110px] mt-[150px] space-y-6">
+            <aside className="hidden lg:block justify-self-end  relative bottom-12">
+              <div className="sticky top-[110px] mt-[150px] space-y-12">
 
                 {/* TOC */}
                 {tocItems.length > 0 && (
@@ -255,7 +255,7 @@ export default function BlogDetailPage({ params }) {
                 )}
 
                 {/* LATEST BLOGS — YOUR EXACT LAYOUT */}
-                <section className="bg-white rounded-lg px-4 py-4  relative bottom-3 shadow-sm w-[350px]">
+                <section className="bg-white rounded-lg px-4 py-4  relative bottom-8 shadow-sm w-[350px]">
                   <h3 className="font-semibold mb-2">Latest Blogs</h3>
 
                   <ul className="space-y-4">

@@ -11,30 +11,31 @@ export default function StickyIcons() {
   const [showEnquiryPopup, setShowEnquiryPopup] = useState(false);
   const pathname = usePathname();
 
-  // 🔥🔥🔥 MAIN FIX
-  // ❌ ADMIN ROUTES PE KUCH BHI RENDER NAHI HOGA
+  // ❌ Hide completely on admin routes
   if (pathname.startsWith("/admin")) return null;
 
-  // ❌ Hide Enquire on residential slug pages
+  // ❌ Hide enquire button on residential slug pages
   const isSlugPage = pathname.startsWith("/residential/");
 
   return (
     <>
-      {/* ================= STICKY BAR ================= */}
-      <div className="fixed bottom-0 left-0 z-50 w-full">
+      {/* ================= STICKY BAR (CLICK-THROUGH FIXED) ================= */}
+      <div className="fixed bottom-0 left-0 z-50 w-full pointer-events-none">
 
-        {/* ========= MOBILE VERSION ========= */}
-        <div className="sm:hidden w-full bg-white py-2 shadow-lg">
+        {/* ========= MOBILE ========= */}
+        <div className="sm:hidden w-full bg-white py-2 shadow-lg pointer-events-auto">
           <div className="flex justify-center gap-2 max-w-md mx-auto px-4">
 
             {/* WhatsApp */}
-            <button
-              type="button"
+            <a
+              href="https://wa.me/919876543210?text=Hello%20I%20am%20interested"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center border border-green-500 text-green-600 px-4 py-3 rounded-2xl font-medium gap-2 shadow-md hover:shadow-lg transition-all"
             >
               <IoLogoWhatsapp size={24} />
               Whatsapp
-            </button>
+            </a>
 
             {/* Enquire */}
             <button
@@ -53,15 +54,17 @@ export default function StickyIcons() {
         <div className="hidden sm:flex mx-auto max-w-5xl items-center justify-between px-4 py-2 h-20 md:h-24">
 
           {/* Phone */}
-          <div className="group absolute left-4 md:left-16">
-            <div className="border-2 border-[#DBA40D]/50 bg-white/80 backdrop-blur-sm rounded-2xl p-3 shadow-lg hover:scale-110 hover:border-[#DBA40D] transition-all">
-              <FaPhoneAlt size={20} />
-            </div>
+          <div className="group absolute left-4 md:left-16 pointer-events-auto">
+            <a href="tel:+919876543210">
+              <div className="border-2 border-[#DBA40D]/50 bg-white/80 backdrop-blur-sm rounded-2xl p-3 shadow-lg hover:scale-110 hover:border-[#DBA40D] transition-all cursor-pointer">
+                <FaPhoneAlt size={20} />
+              </div>
+            </a>
           </div>
 
-          {/* Enquire Now — hide on slug pages */}
+          {/* Enquire Now (hidden on slug pages) */}
           {!isSlugPage && (
-            <div className="absolute right-1 -translate-x-1/2 bottom-6">
+            <div className="absolute right-1 -translate-x-1/2 bottom-6 pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setShowEnquiryPopup(true)}
@@ -74,7 +77,7 @@ export default function StickyIcons() {
           )}
 
           {/* WhatsApp */}
-          <div className="group absolute right-4 md:right-6">
+          <div className="group absolute right-4 md:right-6 pointer-events-auto">
             <a
               href="https://wa.me/919876543210?text=Hello%20I%20am%20interested"
               target="_blank"
@@ -85,7 +88,6 @@ export default function StickyIcons() {
               </div>
             </a>
           </div>
-
 
         </div>
       </div>

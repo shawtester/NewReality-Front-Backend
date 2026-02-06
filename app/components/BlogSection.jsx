@@ -2,12 +2,88 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRef, useCallback, useEffect } from "react";
 
 export default function BlogSection({ blogs = [] }) {
+  const scrollRef = useRef(null);
+  const touchStartX = useRef(null);
+  const autoScrollIntervalRef = useRef(null);
+  const isAutoScrolling = useRef(true);
+  const cardWidth = 320; // 300px card + 20px gap
+
   if (!blogs.length) return null;
 
+  /* ================= SCROLL FUNCTIONS ================= */
+  const scrollLeft = useCallback(() => {
+    scrollRef.current?.scrollBy({ left: -cardWidth, behavior: "smooth" });
+  }, []);
+
+  const scrollRight = useCallback(() => {
+    scrollRef.current?.scrollBy({ left: cardWidth, behavior: "smooth" });
+  }, []);
+
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+    }
+
+    autoScrollIntervalRef.current = setInterval(() => {
+      if (isAutoScrolling.current && scrollRef.current) {
+        const scrollLeftPos = scrollRef.current.scrollLeft;
+        const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+        
+        // ✅ Infinite loop: jump back to start at end
+        if (scrollLeftPos >= maxScroll - 10) {
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+        }
+      }
+    }, 3500); // 3.5s interval
+  }, []);
+
+  /* ================= TOUCH HANDLERS ================= */
+  const onTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+    isAutoScrolling.current = false;
+  }, []);
+
+  const onTouchEnd = useCallback((e) => {
+    if (!touchStartX.current || !scrollRef.current) return;
+
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+
+    if (Math.abs(diff) > 50) {
+      scrollRef.current.scrollBy({
+        left: diff > 0 ? cardWidth : -cardWidth,
+        behavior: "smooth",
+      });
+    }
+
+    touchStartX.current = null;
+    setTimeout(() => {
+      isAutoScrolling.current = true;
+    }, 2000);
+  }, []);
+
+  /* ================= EFFECTS ================= */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startAutoScroll();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [startAutoScroll]);
+
+  useEffect(() => {
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section className="max-w-[1240px] mx-auto px-4 mt-16">
+    <section className="max-w-[1240px] mx-auto px-4 mt-16 relative">
       {/* HEADER */}
       <div className="relative mb-8">
         {/* CENTER TITLE */}
@@ -34,23 +110,43 @@ export default function BlogSection({ blogs = [] }) {
         </div>
       </div>
 
-      {/* BLOG CARDS */}
-      <div className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6">
+      {/* SCROLL BUTTONS - MOBILE */}
+      <div className="lg:hidden relative mb-4">
+        <button
+          onClick={scrollLeft}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow-lg border flex items-center justify-center hover:bg-white transition-all"
+        >
+          ←
+        </button>
+        <button
+          onClick={scrollRight}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow-lg border flex items-center justify-center hover:bg-white transition-all"
+        >
+          →
+        </button>
+      </div>
+
+      {/* BLOG CARDS - AUTO SCROLL CONTAINER */}
+      <div
+        ref={scrollRef}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6 snap-x snap-mandatory px-4 lg:px-0 py-8"
+      >
         {blogs.map((blog) => (
           <Link
             key={blog.id}
             href={`/blog/${blog.id}`}
-            className="min-w-[300px] max-w-[300px] flex-shrink-0"
+            className="min-w-[300px] flex-shrink-0 snap-center hover:scale-[1.02] transition-all"
           >
-            <article
-              className="group h-full flex flex-col overflow-hidden rounded-2xl
-                bg-white shadow-sm hover:shadow-lg transition-all duration-300
-                hover:-translate-y-1"
+            <article className="group h-full flex flex-col overflow-hidden rounded-2xl
+              bg-white shadow-sm hover:shadow-lg transition-all duration-300
+              hover:-translate-y-1"
             >
               {/* IMAGE */}
               <div className="relative w-full h-[200px]">
                 <Image
-                  src={blog.image || "/images/blog/placeholder.jpg"}  // ✅ FIXED
+                  src={blog.image || "/images/blog/placeholder.jpg"}
                   alt={blog.title}
                   fill
                   className="object-cover"

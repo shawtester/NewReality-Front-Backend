@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useBuilders } from "@/lib/firestore/builders/read"; // ✅ CHANGE
 
 export default function DevelopersSection() {
   const scrollRef = useRef(null);
   const touchStartX = useRef(null);
+  const autoScrollIntervalRef = useRef(null);
+  const isAutoScrolling = useRef(true);
+  const cardWidth = 280; // Matches scroll distance (mobile: 240px + gap 36px + padding)
 
   // ✅ FETCH BUILDERS INSTEAD OF DEVELOPERS
   const { builders, isLoading } = useBuilders();
@@ -16,34 +19,71 @@ export default function DevelopersSection() {
   // ✅ only active builders
   const activeBuilders = builders.filter((b) => b.isActive);
 
-  /* ================= MOBILE SCROLL BUTTONS ================= */
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -280, behavior: "smooth" });
-  };
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+    }
 
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 280, behavior: "smooth" });
-  };
+    autoScrollIntervalRef.current = setInterval(() => {
+      if (isAutoScrolling.current && scrollRef.current) {
+        const scrollLeftPos = scrollRef.current.scrollLeft;
+        const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+        
+        // ✅ Loop back to start when reaching end
+        if (scrollLeftPos >= maxScroll - 10) { // 10px threshold
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+        }
+      }
+    }, 3000);
+  }, []);
 
-  /* ================= MOBILE SWIPE ================= */
-  const onTouchStart = (e) => {
+  /* ================= TOUCH HANDLERS ================= */
+  const onTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX;
-  };
+    isAutoScrolling.current = false;
+  }, []);
 
-  const onTouchEnd = (e) => {
+  const onTouchEnd = useCallback((e) => {
     if (!touchStartX.current || !scrollRef.current) return;
 
     const diff = touchStartX.current - e.changedTouches[0].clientX;
 
     if (Math.abs(diff) > 50) {
       scrollRef.current.scrollBy({
-        left: diff > 0 ? 280 : -280,
+        left: diff > 0 ? cardWidth : -cardWidth,
         behavior: "smooth",
       });
     }
 
     touchStartX.current = null;
-  };
+    setTimeout(() => {
+      isAutoScrolling.current = true;
+    }, 2000);
+  }, []);
+
+  /* ================= EFFECTS ================= */
+  useEffect(() => {
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (developers?.length > 0) {
+      const timer = setTimeout(() => {
+        startAutoScroll();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [developers?.length, startAutoScroll]);
+
+  if (isLoading || !developers?.length) return null;
+
+  const activeDevelopers = developers.filter((d) => d.isActive);
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
@@ -59,14 +99,14 @@ export default function DevelopersSection() {
       <div className="lg:hidden relative">
         <button
           onClick={scrollLeft}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
         >
           ←
         </button>
 
         <button
           onClick={scrollRight}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
         >
           →
         </button>
@@ -91,11 +131,9 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
-
               <p className="mt-6 text-base font-semibold text-gray-900 text-center">
                 {b.name}
               </p>
-
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
                 {b.totalProjects}+ Projects
               </p>
@@ -107,10 +145,11 @@ export default function DevelopersSection() {
       {/* ===== DESKTOP GRID ===== */}
       <div className="hidden lg:block mx-auto mt-4 max-w-[1240px] px-6">
         <div
-          className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6"
-          style={{
-            gridAutoColumns: "160px",
-          }}
+          ref={scrollRef}
+          className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6 snap-x snap-mandatory"
+          style={{ gridAutoColumns: "160px" }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
           {activeBuilders.map((b) => (
             <div
@@ -126,11 +165,9 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
-
               <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
                 {b.name}
               </p>
-
               <p className="mt-1 text-xs text-gray-500">
                 {b.totalProjects}+ Projects
               </p>

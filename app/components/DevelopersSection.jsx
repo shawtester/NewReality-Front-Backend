@@ -2,23 +2,18 @@
 
 import React, { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useBuilders } from "@/lib/firestore/builders/read"; // ✅ CHANGE
+import { useBuilders } from "@/lib/firestore/builders/read";
 
 export default function DevelopersSection() {
   const scrollRef = useRef(null);
   const touchStartX = useRef(null);
   const autoScrollIntervalRef = useRef(null);
   const isAutoScrolling = useRef(true);
-  const cardWidth = 280; // Matches scroll distance (mobile: 240px + gap 36px + padding)
+  const cardWidth = 280;
 
-  // ✅ FETCH BUILDERS INSTEAD OF DEVELOPERS
   const { builders, isLoading } = useBuilders();
 
-  if (isLoading || !builders?.length) return null;
-
-  // ✅ only active builders
-  const activeBuilders = builders.filter((b) => b.isActive);
-
+  /* ================= AUTO SCROLL ================= */
   const startAutoScroll = useCallback(() => {
     if (autoScrollIntervalRef.current) {
       clearInterval(autoScrollIntervalRef.current);
@@ -27,10 +22,10 @@ export default function DevelopersSection() {
     autoScrollIntervalRef.current = setInterval(() => {
       if (isAutoScrolling.current && scrollRef.current) {
         const scrollLeftPos = scrollRef.current.scrollLeft;
-        const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-        
-        // ✅ Loop back to start when reaching end
-        if (scrollLeftPos >= maxScroll - 10) { // 10px threshold
+        const maxScroll =
+          scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+
+        if (scrollLeftPos >= maxScroll - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
           scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
@@ -39,7 +34,28 @@ export default function DevelopersSection() {
     }, 3000);
   }, []);
 
-  /* ================= TOUCH HANDLERS ================= */
+  /* ================= BUTTON SCROLL ================= */
+  const scrollLeft = useCallback(() => {
+    if (!scrollRef.current) return;
+    isAutoScrolling.current = false;
+    scrollRef.current.scrollBy({ left: -cardWidth, behavior: "smooth" });
+
+    setTimeout(() => {
+      isAutoScrolling.current = true;
+    }, 2000);
+  }, []);
+
+  const scrollRight = useCallback(() => {
+    if (!scrollRef.current) return;
+    isAutoScrolling.current = false;
+    scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+
+    setTimeout(() => {
+      isAutoScrolling.current = true;
+    }, 2000);
+  }, []);
+
+  /* ================= TOUCH ================= */
   const onTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX;
     isAutoScrolling.current = false;
@@ -58,6 +74,7 @@ export default function DevelopersSection() {
     }
 
     touchStartX.current = null;
+
     setTimeout(() => {
       isAutoScrolling.current = true;
     }, 2000);
@@ -73,21 +90,21 @@ export default function DevelopersSection() {
   }, []);
 
   useEffect(() => {
-    if (developers?.length > 0) {
+    if (builders?.length > 0) {
       const timer = setTimeout(() => {
         startAutoScroll();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [developers?.length, startAutoScroll]);
+  }, [builders?.length, startAutoScroll]);
 
-  if (isLoading || !developers?.length) return null;
+  /* ================= LOADING GUARD ================= */
+  if (isLoading || !builders?.length) return null;
 
-  const activeDevelopers = developers.filter((d) => d.isActive);
+  const activeBuilders = builders.filter((b) => b.isActive);
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
-      {/* ===== Heading ===== */}
       <div className="mx-auto max-w-5xl text-center px-6">
         <h2 className="text-3xl font-semibold text-gray-900">
           Top Real Estate Builders in{" "}
@@ -95,18 +112,18 @@ export default function DevelopersSection() {
         </h2>
       </div>
 
-      {/* ===== MOBILE / TABLET SLIDER ===== */}
+      {/* ===== MOBILE SLIDER ===== */}
       <div className="lg:hidden relative">
         <button
           onClick={scrollLeft}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
         >
           ←
         </button>
 
         <button
           onClick={scrollRight}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
         >
           →
         </button>
@@ -131,9 +148,11 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
+
               <p className="mt-6 text-base font-semibold text-gray-900 text-center">
                 {b.name}
               </p>
+
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
                 {b.totalProjects}+ Projects
               </p>
@@ -148,8 +167,6 @@ export default function DevelopersSection() {
           ref={scrollRef}
           className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6 snap-x snap-mandatory"
           style={{ gridAutoColumns: "160px" }}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
         >
           {activeBuilders.map((b) => (
             <div
@@ -165,9 +182,11 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
+
               <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
                 {b.name}
               </p>
+
               <p className="mt-1 text-xs text-gray-500">
                 {b.totalProjects}+ Projects
               </p>

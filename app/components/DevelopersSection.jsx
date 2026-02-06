@@ -2,18 +2,19 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { useDevelopers } from "@/lib/firestore/developers/read";
+import { useBuilders } from "@/lib/firestore/builders/read"; // ✅ CHANGE
 
 export default function DevelopersSection() {
   const scrollRef = useRef(null);
   const touchStartX = useRef(null);
 
-  const { data: developers, isLoading } = useDevelopers();
+  // ✅ FETCH BUILDERS INSTEAD OF DEVELOPERS
+  const { builders, isLoading } = useBuilders();
 
-  if (isLoading || !developers?.length) return null;
+  if (isLoading || !builders?.length) return null;
 
-  // ✅ only active developers
-  const activeDevelopers = developers.filter((d) => d.isActive);
+  // ✅ only active builders
+  const activeBuilders = builders.filter((b) => b.isActive);
 
   /* ================= MOBILE SCROLL BUTTONS ================= */
   const scrollLeft = () => {
@@ -49,7 +50,7 @@ export default function DevelopersSection() {
       {/* ===== Heading ===== */}
       <div className="mx-auto max-w-5xl text-center px-6">
         <h2 className="text-3xl font-semibold text-gray-900">
-          Top Real Estate Developers in{" "}
+          Top Real Estate Builders in{" "}
           <span className="text-[#DBA40D]">Gurgaon</span>
         </h2>
       </div>
@@ -76,15 +77,15 @@ export default function DevelopersSection() {
           onTouchEnd={onTouchEnd}
           className="flex gap-6 overflow-x-auto scrollbar-hide px-20 py-12 snap-x snap-mandatory"
         >
-          {activeDevelopers.map((dev) => (
+          {activeBuilders.map((b) => (
             <div
-              key={dev.id}
+              key={b.id}
               className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow"
             >
               <div className="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-white border shadow">
                 <Image
-                  src={dev.logo?.url || "/placeholder.png"}
-                  alt={dev.title}
+                  src={b.logo?.url || "/placeholder.png"}
+                  alt={b.name}
                   width={56}
                   height={56}
                   className="object-contain"
@@ -92,18 +93,18 @@ export default function DevelopersSection() {
               </div>
 
               <p className="mt-6 text-base font-semibold text-gray-900 text-center">
-                {dev.title}
+                {b.name}
               </p>
 
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
-                {dev.totalProjects}+ Projects
+                {b.totalProjects}+ Projects
               </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ===== DESKTOP: 2 ROWS × 7 ITEMS WITH HORIZONTAL SCROLL ===== */}
+      {/* ===== DESKTOP GRID ===== */}
       <div className="hidden lg:block mx-auto mt-4 max-w-[1240px] px-6">
         <div
           className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6"
@@ -111,15 +112,15 @@ export default function DevelopersSection() {
             gridAutoColumns: "160px",
           }}
         >
-          {activeDevelopers.map((dev) => (
+          {activeBuilders.map((b) => (
             <div
-              key={dev.id}
+              key={b.id}
               className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow"
             >
               <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
                 <Image
-                  src={dev.logo?.url || "/placeholder.png"}
-                  alt={dev.title}
+                  src={b.logo?.url || "/placeholder.png"}
+                  alt={b.name}
                   width={48}
                   height={48}
                   className="object-contain"
@@ -127,11 +128,11 @@ export default function DevelopersSection() {
               </div>
 
               <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
-                {dev.title}
+                {b.name}
               </p>
 
               <p className="mt-1 text-xs text-gray-500">
-                {dev.totalProjects}+ Projects
+                {b.totalProjects}+ Projects
               </p>
             </div>
           ))}

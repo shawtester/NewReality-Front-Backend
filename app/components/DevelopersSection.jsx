@@ -1,48 +1,92 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useDevelopers } from "@/lib/firestore/developers/read";
 
 export default function DevelopersSection() {
   const scrollRef = useRef(null);
   const touchStartX = useRef(null);
+  const autoScrollIntervalRef = useRef(null);
+  const isAutoScrolling = useRef(true);
+  const cardWidth = 280; // Matches scroll distance (mobile: 240px + gap 36px + padding)
 
   const { data: developers, isLoading } = useDevelopers();
 
-  if (isLoading || !developers?.length) return null;
+  /* ================= SCROLL FUNCTIONS ================= */
+  const scrollLeft = useCallback(() => {
+    scrollRef.current?.scrollBy({ left: -cardWidth, behavior: "smooth" });
+  }, []);
 
-  // ✅ only active developers
-  const activeDevelopers = developers.filter((d) => d.isActive);
+  const scrollRight = useCallback(() => {
+    scrollRef.current?.scrollBy({ left: cardWidth, behavior: "smooth" });
+  }, []);
 
-  /* ================= MOBILE SCROLL BUTTONS ================= */
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -280, behavior: "smooth" });
-  };
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+    }
 
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 280, behavior: "smooth" });
-  };
+    autoScrollIntervalRef.current = setInterval(() => {
+      if (isAutoScrolling.current && scrollRef.current) {
+        const scrollLeftPos = scrollRef.current.scrollLeft;
+        const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+        
+        // ✅ Loop back to start when reaching end
+        if (scrollLeftPos >= maxScroll - 10) { // 10px threshold
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+        }
+      }
+    }, 3000);
+  }, []);
 
-  /* ================= MOBILE SWIPE ================= */
-  const onTouchStart = (e) => {
+  /* ================= TOUCH HANDLERS ================= */
+  const onTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX;
-  };
+    isAutoScrolling.current = false;
+  }, []);
 
-  const onTouchEnd = (e) => {
+  const onTouchEnd = useCallback((e) => {
     if (!touchStartX.current || !scrollRef.current) return;
 
     const diff = touchStartX.current - e.changedTouches[0].clientX;
 
     if (Math.abs(diff) > 50) {
       scrollRef.current.scrollBy({
-        left: diff > 0 ? 280 : -280,
+        left: diff > 0 ? cardWidth : -cardWidth,
         behavior: "smooth",
       });
     }
 
     touchStartX.current = null;
-  };
+    setTimeout(() => {
+      isAutoScrolling.current = true;
+    }, 2000);
+  }, []);
+
+  /* ================= EFFECTS ================= */
+  useEffect(() => {
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (developers?.length > 0) {
+      const timer = setTimeout(() => {
+        startAutoScroll();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [developers?.length, startAutoScroll]);
+
+  if (isLoading || !developers?.length) return null;
+
+  const activeDevelopers = developers.filter((d) => d.isActive);
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
@@ -58,14 +102,14 @@ export default function DevelopersSection() {
       <div className="lg:hidden relative">
         <button
           onClick={scrollLeft}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
         >
           ←
         </button>
 
         <button
           onClick={scrollRight}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
         >
           →
         </button>
@@ -79,7 +123,7 @@ export default function DevelopersSection() {
           {activeDevelopers.map((dev) => (
             <div
               key={dev.id}
-              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow"
+              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow hover:shadow-lg transition-all"
             >
               <div className="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-white border shadow">
                 <Image
@@ -90,11 +134,9 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
-
               <p className="mt-6 text-base font-semibold text-gray-900 text-center">
                 {dev.title}
               </p>
-
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
                 {dev.totalProjects}+ Projects
               </p>
@@ -103,18 +145,19 @@ export default function DevelopersSection() {
         </div>
       </div>
 
-      {/* ===== DESKTOP: 2 ROWS × 7 ITEMS WITH HORIZONTAL SCROLL ===== */}
+      {/* ===== DESKTOP: 2x7 GRID WITH LOOPING SCROLL ===== */}
       <div className="hidden lg:block mx-auto mt-4 max-w-[1240px] px-6">
         <div
-          className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6"
-          style={{
-            gridAutoColumns: "160px",
-          }}
+          ref={scrollRef}
+          className="grid grid-rows-2 grid-flow-col gap-8 overflow-x-auto scrollbar-hide pt-14 pb-6 snap-x snap-mandatory"
+          style={{ gridAutoColumns: "160px" }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
           {activeDevelopers.map((dev) => (
             <div
               key={dev.id}
-              className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow"
+              className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow hover:shadow-lg transition-all snap-center"
             >
               <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
                 <Image
@@ -125,11 +168,9 @@ export default function DevelopersSection() {
                   className="object-contain"
                 />
               </div>
-
               <p className="mt-4 text-sm font-semibold text-gray-900 text-center">
                 {dev.title}
               </p>
-
               <p className="mt-1 text-xs text-gray-500">
                 {dev.totalProjects}+ Projects
               </p>

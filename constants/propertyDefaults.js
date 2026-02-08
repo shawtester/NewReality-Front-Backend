@@ -51,6 +51,12 @@ export const defaultProperty = {
     description: "",
     disclaimer: "",
 
+    // ✅ NEW QUICK FACT FIELDS
+    projectArea: "",
+    projectType: "",
+    projectStatus: "",
+    projectElevation: "",
+    possession: "",
 
 
     // 🔹 ARRAYS
@@ -60,12 +66,18 @@ export const defaultProperty = {
     locationPoints: [],
     faq: [],
 
-    // 🔹 PAYMENT PLAN
-    paymentPlan: {
-        installment1: "",
-        installment2: "",
-        installment3: "",
+    //Payment PLan
+    paymentPlan: [
+        { title: "", percent: "", note: "" }
+    ],
+
+
+    // 🔹 LOCATION IMAGE (NEW)
+    locationImage: {
+        url: "",
+        publicId: "",
     },
+
 
     // 🔹 META
     timestampCreate: Timestamp.now(),

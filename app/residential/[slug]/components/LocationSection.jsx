@@ -1,8 +1,19 @@
 "use client";
 
-export default function LocationSection({ mapQuery, locationPoints = [] }) {
-  // Agar map + points dono hi nahi hain → section mat dikhao
-  if (!mapQuery && (!locationPoints || locationPoints.length === 0)) return null;
+import Image from "next/image";
+
+export default function LocationSection({
+  mapQuery,
+  locationImage,
+  locationPoints = [],
+}) {
+  // Agar map + image + points kuch bhi nahi hai → hide section
+  if (
+    !mapQuery &&
+    !locationImage &&
+    (!locationPoints || locationPoints.length === 0)
+  )
+    return null;
 
   return (
     <section id="location" className="max-w-[1240px] mx-auto px-4 mt-16">
@@ -11,8 +22,8 @@ export default function LocationSection({ mapQuery, locationPoints = [] }) {
       {/* WRAPPER */}
       <div className="flex flex-col md:flex-row items-start gap-6 lg:gap-10">
 
-        {/* LEFT : MAP CARD */}
-        {mapQuery && (
+        {/* ================= LEFT CARD ================= */}
+        {(mapQuery || locationImage) && (
           <div
             className="
               w-full md:w-[45%]
@@ -22,20 +33,31 @@ export default function LocationSection({ mapQuery, locationPoints = [] }) {
               rounded-2xl
               overflow-hidden
               flex-shrink-0
+              relative
             "
           >
-            <iframe
-              src={`https://www.google.com/maps?q=${encodeURIComponent(
-                mapQuery
-              )}&output=embed`}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full border-0"
-            />
+            {/* ✅ PRIORITY → LOCATION IMAGE */}
+            {locationImage ? (
+              <Image
+                src={locationImage}
+                alt="Location"
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <iframe
+                src={`https://www.google.com/maps?q=${encodeURIComponent(
+                  mapQuery
+                )}&output=embed`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full border-0"
+              />
+            )}
           </div>
         )}
 
-        {/* RIGHT : DISTANCE LIST CARD */}
+        {/* ================= RIGHT DISTANCE CARD ================= */}
         {Array.isArray(locationPoints) && locationPoints.length > 0 && (
           <div
             className="

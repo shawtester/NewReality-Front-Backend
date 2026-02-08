@@ -318,50 +318,128 @@ export default function BasicDetails({ data, handleData }) {
         onChange={(v) => handleData("priceRange", v)}
       />
 
-      {/* ================= PAYMENT PLAN ================= */}
+      {/* ================= PAYMENT PLAN (DYNAMIC) ================= */}
       <div>
         <h3 className="text-sm font-semibold mb-3">
-          Payment Plan (Percentage)
+          Payment Plan (Dynamic)
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-3">
+          {Array.isArray(data.paymentPlan)
+            ? data.paymentPlan.map((plan, index) => (
+              <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Input
+                  label="Title"
+                  value={plan.title}
+                  onChange={(v) => {
+                    const updated = [...(data.paymentPlan || [])];
+                    updated[index].title = v;
+                    handleData("paymentPlan", updated);
+                  }}
+                  placeholder="Installment 1"
+                />
+
+                <Input
+                  label="Percent"
+                  value={plan.percent}
+                  onChange={(v) => {
+                    const updated = [...(data.paymentPlan || [])];
+                    updated[index].percent = v;
+                    handleData("paymentPlan", updated);
+                  }}
+                  placeholder="10%"
+                />
+
+                <Input
+                  label="Note"
+                  value={plan.note}
+                  onChange={(v) => {
+                    const updated = [...(data.paymentPlan || [])];
+                    updated[index].note = v;
+                    handleData("paymentPlan", updated);
+                  }}
+                  placeholder="Down Payment"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = (data.paymentPlan || []).filter((_, i) => i !== index);
+                    handleData("paymentPlan", updated);
+                  }}
+                  className="text-red-500 text-sm"
+                >
+                  Remove
+                </button>
+              </div>
+            ))
+            : null}
+
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            handleData(
+              "paymentPlan",
+              [
+                ...(Array.isArray(data.paymentPlan) ? data.paymentPlan : []),
+                { title: "", percent: "", note: "" },
+              ]
+            )
+
+          }
+          className="mt-3 bg-black text-white px-4 py-2 rounded"
+        >
+          + Add Installment
+        </button>
+      </div>
+
+
+      {/* ================= PROJECT QUICK FACTS ================= */}
+      <div>
+        <h3 className="text-sm font-semibold mb-3">
+          Project Quick Facts
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Installment 1 (%)"
-            placeholder="10%"
-            value={data.paymentPlan?.installment1 || ""}
-            onChange={(v) =>
-              handleData("paymentPlan", {
-                ...data.paymentPlan,
-                installment1: v,
-              })
-            }
+            label="Project Area"
+            value={data.projectArea}
+            onChange={(v) => handleData("projectArea", v)}
+            placeholder="10 Acres"
           />
 
           <Input
-            label="Installment 2 (%)"
-            placeholder="80%"
-            value={data.paymentPlan?.installment2 || ""}
-            onChange={(v) =>
-              handleData("paymentPlan", {
-                ...data.paymentPlan,
-                installment2: v,
-              })
-            }
+            label="Project Type"
+            value={data.projectType}
+            onChange={(v) => handleData("projectType", v)}
+            placeholder="Luxury Residential"
           />
 
           <Input
-            label="Installment 3 (%)"
-            placeholder="10%"
-            value={data.paymentPlan?.installment3 || ""}
-            onChange={(v) =>
-              handleData("paymentPlan", {
-                ...data.paymentPlan,
-                installment3: v,
-              })
-            }
+            label="Project Status"
+            value={data.projectStatus}
+            onChange={(v) => handleData("projectStatus", v)}
+            placeholder="Under Construction"
+          />
+
+          <Input
+            label="Project Elevation / Tower"
+            value={data.projectElevation}
+            onChange={(v) => handleData("projectElevation", v)}
+            placeholder="G+25 Floors"
+          />
+
+          <Input
+            label="Possession"
+            value={data.possession}
+            onChange={(v) => handleData("possession", v)}
+            placeholder="Dec 2027"
           />
         </div>
       </div>
+
 
 
       {/* BROCHURE */}

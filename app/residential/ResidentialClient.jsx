@@ -281,7 +281,7 @@ export default function ResidentialPage({ apartments = [] }) {
                     <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    <div className="relative w-full h-24 md:h-38 md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
+                    <div className="relative w-full h-[230px] md:h-[300px] md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
                         <Image
                             src={banner?.image || "/default-banner.jpg"}
                             alt="Trending Banner"

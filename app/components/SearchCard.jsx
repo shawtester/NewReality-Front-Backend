@@ -39,6 +39,20 @@ export default function SearchCard() {
     fetchHero();
   }, []);
 
+  /* ================= INSTAGRAM EMBED LOAD ================= */
+  useEffect(() => {
+    if (hero?.mediaType === "instagram") {
+      if (window?.instgrm) {
+        window.instgrm.Embeds.process();
+      } else {
+        const script = document.createElement("script");
+        script.src = "https://www.instagram.com/embed.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }
+    }
+  }, [hero]);
+
   /* ================= AUTO SLIDER ================= */
   useEffect(() => {
     if (!hero?.images?.length) return;
@@ -52,9 +66,16 @@ export default function SearchCard() {
     return () => clearInterval(interval);
   }, [hero?.images?.length]);
 
-  const videoUrl = hero?.videoUrl
-    ? `${hero.videoUrl}?autoplay=1&mute=1`
-    : DEFAULT_VIDEO;
+  /* ================= MEDIA URL ================= */
+  let videoUrl = DEFAULT_VIDEO;
+
+  if (hero?.videoUrl) {
+    if (hero?.mediaType === "instagram") {
+      videoUrl = hero.videoUrl;
+    } else {
+      videoUrl = `${hero.videoUrl}?autoplay=1&mute=1`;
+    }
+  }
 
   /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
@@ -86,11 +107,10 @@ export default function SearchCard() {
           hero.images.map((img, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === currentSlide
-                  ? "opacity-100 z-10"
-                  : "opacity-0 z-0"
-              }`}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0"
+                }`}
             >
               <Image
                 src={img}
@@ -111,16 +131,28 @@ export default function SearchCard() {
         )}
 
         {/* ================= DESKTOP VIDEO ================= */}
-        {hero?.videoUrl && (
+        {hero?.videoUrl && hero?.mediaType === "youtube" && (
           <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
             <iframe
               className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
-              src={videoUrl}
-              allow="autoplay; encrypted-media"
+              src={`${hero.videoUrl}?autoplay=1&mute=1`}
+              allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
             />
           </div>
         )}
+
+        {hero?.videoUrl && hero?.mediaType === "instagram" && (
+          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
+            <blockquote
+              className="instagram-media rounded-2xl overflow-hidden"
+              data-instgrm-permalink={hero.videoUrl}
+              data-instgrm-version="14"
+              style={{ width: "150px", minWidth: "150px", height: "300px" }}
+            ></blockquote>
+          </div>
+        )}
+
       </div>
 
       {/* ================= SEARCH CARD ================= */}
@@ -142,11 +174,10 @@ export default function SearchCard() {
                       setPropertyType(tab.value);
                       setResults([]);
                     }}
-                    className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${
-                      propertyType === tab.value
-                        ? "bg-white shadow text-gray-900"
-                        : "text-gray-500"
-                    }`}
+                    className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
+                      ? "bg-white shadow text-gray-900"
+                      : "text-gray-500"
+                      }`}
                   >
                     {tab.label}
                   </button>

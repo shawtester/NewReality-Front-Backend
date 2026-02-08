@@ -82,6 +82,14 @@ const PROPERTY_TYPE_MAP = {
     plot: "isPlot",
 };
 
+const STATUS_FLAG_MAP = {
+    "ready-to-move": "isReadyToMove",
+    "under-construction": "isUnderConstruction",
+    "pre-launch": "isPreLaunch",
+    "new-launch": "isNewLaunch",
+};
+
+
 const filterByPropertyType = (list = [], type) => {
     const field = PROPERTY_TYPE_MAP[type];
     if (!field) return list;
@@ -91,6 +99,13 @@ const filterByPropertyType = (list = [], type) => {
 const filterApartments = (list = []) => {
     return list.filter((item) => item.isApartment === true);
 };
+
+const filterByStatus = (list = [], status) => {
+    const field = STATUS_FLAG_MAP[status];
+    if (!field) return list;
+    return list.filter((item) => item[field] === true);
+};
+
 
 export default function ResidentialPage({ apartments = [] }) {
     const [banner, setBanner] = useState(null);
@@ -180,6 +195,18 @@ export default function ResidentialPage({ apartments = [] }) {
             );
             return;
         }
+
+        // ✅ STATUS FILTER ADD KAR
+        if (urlStatus) {
+            setFilteredApartments(
+                filterByStatus(
+                    filterForResidential(apartments),
+                    urlStatus
+                )
+            );
+            return;
+        }
+
 
         if (hasFilters) {
             // future search api logic

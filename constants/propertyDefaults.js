@@ -22,6 +22,10 @@ export const defaultProperty = {
 
     isNewLaunch: false,
     isTrending: false,
+    isReadyToMove: false,
+    isUnderConstruction: false,
+    isPreLaunch: false,
+
     isActive: true,
 
     // 🔹 MEDIA

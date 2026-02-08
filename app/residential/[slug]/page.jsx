@@ -47,10 +47,11 @@ export default async function PropertyPage({ params }) {
     slug: property.slug,
     title: property.title,
     location: property.location,
-
+    
     builderId: property.builderId || null,
     builderName: property.developer || "",
-
+    configurations: property.configurations || [],
+    bhk: (property.configurations || []).join(", "),
     price: property.priceRange,
     size: property.areaRange,
     rera: property.reraNumber,

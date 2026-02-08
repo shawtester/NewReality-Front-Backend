@@ -273,6 +273,24 @@ export default function BasicDetails({ data, handleData }) {
       <div className="flex gap-6 flex-wrap">
         <Checkbox label="New Launch Project" checked={data.isNewLaunch} onChange={(v) => handleData("isNewLaunch", v)} />
         <Checkbox label="Trending Project" checked={data.isTrending} onChange={(v) => handleData("isTrending", v)} />
+        <Checkbox
+          label="Ready to Move"
+          checked={data.isReadyToMove}
+          onChange={(v) => handleData("isReadyToMove", v)}
+        />
+
+        <Checkbox
+          label="Under Construction"
+          checked={data.isUnderConstruction}
+          onChange={(v) => handleData("isUnderConstruction", v)}
+        />
+
+        <Checkbox
+          label="Pre Launch"
+          checked={data.isPreLaunch}
+          onChange={(v) => handleData("isPreLaunch", v)}
+        />
+
         <Checkbox label="Apartment" checked={data.isApartment} onChange={(v) => handleData("isApartment", v)} />
         <Checkbox label="Builder Floor" checked={data.isBuilderFloor} onChange={(v) => handleData("isBuilderFloor", v)} />
         <Checkbox label="Retail Property" checked={data.isRetail} onChange={(v) => handleData("isRetail", v)} />

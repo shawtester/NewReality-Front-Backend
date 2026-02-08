@@ -12,7 +12,7 @@ export default function BrandCTA({ propertyTitle }) {
     <>
       <div className="bg-white rounded-xl p-5 text-center shadow-sm">
         <Image
-          src="/images/logo.png"
+          src="/images/neevlogo.png"
           alt="Neev Realty"
           width={70}
           height={70}

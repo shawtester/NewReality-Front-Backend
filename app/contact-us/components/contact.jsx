@@ -56,7 +56,7 @@ export default function ContactPage() {
   return (
     <main className="bg-white">
       {/* HEADER */}
-      <section className="bg-[#F8FBFF] py-12 px-4">
+      <section className="bg-[#F8FBFF] py-6 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl font-bold">
             Contact <span className="text-[#DBA40D]">Us</span>
@@ -68,7 +68,7 @@ export default function ContactPage() {
       </section>
 
       {/* MAIN CARD */}
-      <section className="px-4 py-16">
+      <section className="px-4 py-8">
         <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl shadow-[0_18px_45px_rgba(0,0,0,0.06)] flex flex-col md:flex-row">
           {/* LEFT INFO */}
           <aside className="md:w-5/12 bg-[#D79D26] text-white px-8 py-12 flex flex-col justify-between">

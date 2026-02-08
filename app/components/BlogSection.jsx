@@ -110,22 +110,6 @@ export default function BlogSection({ blogs = [] }) {
         </div>
       </div>
 
-      {/* SCROLL BUTTONS - MOBILE */}
-      <div className="lg:hidden relative mb-4">
-        <button
-          onClick={scrollLeft}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow-lg border flex items-center justify-center hover:bg-white transition-all"
-        >
-          ←
-        </button>
-        <button
-          onClick={scrollRight}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow-lg border flex items-center justify-center hover:bg-white transition-all"
-        >
-          →
-        </button>
-      </div>
-
       {/* BLOG CARDS - AUTO SCROLL CONTAINER */}
       <div
         ref={scrollRef}

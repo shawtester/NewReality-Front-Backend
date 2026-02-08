@@ -112,6 +112,10 @@ export default function DevelopersSection() {
         </h2>
       </div>
 
+<<<<<<< HEAD
+      {/* ===== MOBILE / TABLET SLIDER ===== */}
+      <div className="lg:hidden">
+=======
       {/* ===== MOBILE SLIDER ===== */}
       <div className="lg:hidden relative">
         <button
@@ -128,6 +132,7 @@ export default function DevelopersSection() {
           →
         </button>
 
+>>>>>>> ba119b215fc075e5eee717124adadaad508bb6d4
         <div
           ref={scrollRef}
           onTouchStart={onTouchStart}

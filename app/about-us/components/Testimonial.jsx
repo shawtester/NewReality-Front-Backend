@@ -10,7 +10,7 @@ export default function Testimonial({ testimonials = [] }) {
 
   return (
     <section className="bg-[#F7F9FC] sm:py-10 -mt-8 sm:-mt-10 lg:-mt-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 p-4">
 
         {/* Heading */}
         <div className="text-center mb-12">

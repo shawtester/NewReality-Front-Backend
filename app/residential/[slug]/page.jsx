@@ -47,10 +47,11 @@ export default async function PropertyPage({ params }) {
     slug: property.slug,
     title: property.title,
     location: property.location,
-
+    
     builderId: property.builderId || null,
     builderName: property.developer || "",
-
+    configurations: property.configurations || [],
+    bhk: (property.configurations || []).join(", "),
     price: property.priceRange,
     size: property.areaRange,
     rera: property.reraNumber,
@@ -66,9 +67,10 @@ export default async function PropertyPage({ params }) {
     video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
-    paymentPlan: property.paymentPlan || null,
+    paymentPlan: property.paymentPlan || [],
     amenities: amenitiesData,
 
+    locationImage: property.locationImage?.url || "",
     mapQuery: property.mapQuery || property.location || "",
     locationPoints: property.locationPoints || [],
 
@@ -80,6 +82,13 @@ export default async function PropertyPage({ params }) {
     builder: builder && typeof builder === "object" ? builder : null,
 
     disclaimer: property.disclaimer || "",
+
+    /* ================= QUICK FACTS ADD KAR (🔥 MAIN FIX) ================= */
+    projectArea: property.projectArea || "",
+    projectType: property.projectType || "",
+    projectStatus: property.projectStatus || "",
+    projectElevation: property.projectElevation || "",
+    possession: property.possession || "",
   };
 
   return (
@@ -116,6 +125,7 @@ export default async function PropertyPage({ params }) {
 
           <LocationSection
             mapQuery={cleanProperty.mapQuery}
+            locationImage={cleanProperty.locationImage}
             locationPoints={cleanProperty.locationPoints}
           />
 

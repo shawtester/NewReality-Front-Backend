@@ -143,7 +143,7 @@ export default function Footer() {
                   {bhkLinks.map((item) => (
                     <Link
                       key={item.id}
-                      href={`${BASE_ROUTE}?bhk=${item.value}`}
+                      href={`/${item.value}`}
                       className="block leading-6 hover:text-white"
                     >
                       {item.label}
@@ -159,7 +159,7 @@ export default function Footer() {
                   {propertyTypeLinks.map((item) => (
                     <li key={item.id}>
                       <Link
-                        href={item.value}
+                        href={`/${item.value}`}
                         className="block leading-6 hover:text-white"
                       >
                         {item.label}
@@ -177,7 +177,7 @@ export default function Footer() {
                   {projectStatusLinks.map(item => (
                     <li key={item.id}>
                       <Link
-                        href={item.value}
+                        href={`/${item.value}`}
                         className="block leading-6 hover:text-white"
                       >
                         {item.label}
@@ -194,7 +194,7 @@ export default function Footer() {
                   {projectLocationLinks.map(item => (
                     <li key={item.id}>
                       <Link
-                        href={item.value}
+                        href={`/${item.value}`}
                         className="block leading-6 hover:text-white"
                       >
                         {item.label}
@@ -211,7 +211,7 @@ export default function Footer() {
                   {projectBudgetLinks.map(item => (
                     <li key={item.id}>
                       <Link
-                        href={item.value}
+                        href={`/${item.value}`}
                         className="block leading-6 hover:text-white"
                       >
                         {item.label}

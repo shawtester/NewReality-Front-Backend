@@ -82,6 +82,14 @@ const PROPERTY_TYPE_MAP = {
     plot: "isPlot",
 };
 
+const STATUS_FLAG_MAP = {
+    "ready-to-move": "isReadyToMove",
+    "under-construction": "isUnderConstruction",
+    "pre-launch": "isPreLaunch",
+    "new-launch": "isNewLaunch",
+};
+
+
 const filterByPropertyType = (list = [], type) => {
     const field = PROPERTY_TYPE_MAP[type];
     if (!field) return list;
@@ -91,6 +99,13 @@ const filterByPropertyType = (list = [], type) => {
 const filterApartments = (list = []) => {
     return list.filter((item) => item.isApartment === true);
 };
+
+const filterByStatus = (list = [], status) => {
+    const field = STATUS_FLAG_MAP[status];
+    if (!field) return list;
+    return list.filter((item) => item[field] === true);
+};
+
 
 export default function ResidentialPage({ apartments = [] }) {
     const [banner, setBanner] = useState(null);
@@ -180,6 +195,18 @@ export default function ResidentialPage({ apartments = [] }) {
             );
             return;
         }
+
+        // ✅ STATUS FILTER ADD KAR
+        if (urlStatus) {
+            setFilteredApartments(
+                filterByStatus(
+                    filterForResidential(apartments),
+                    urlStatus
+                )
+            );
+            return;
+        }
+
 
         if (hasFilters) {
             // future search api logic
@@ -281,7 +308,7 @@ export default function ResidentialPage({ apartments = [] }) {
                     <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    <div className="relative w-full h-24 md:h-38 md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
+                    <div className="relative w-full h-[230px] md:h-[300px] md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
                         <Image
                             src={banner?.image || "/default-banner.jpg"}
                             alt="Trending Banner"

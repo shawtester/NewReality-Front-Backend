@@ -43,15 +43,15 @@ export default function Overview({ data, handleData }) {
         className="w-full border rounded-lg px-3 py-2 text-sm"
       />
 
-      {/* SUBTITLE */}
-      <input
-        placeholder="Overview Subtitle"
-        value={data.overview?.subtitle || ""}
-        onChange={(e) =>
-          handleData("overview.subtitle", e.target.value)
-        }
-        className="w-full border rounded-lg px-3 py-2 text-sm"
-      />
+      {/* TITLE 
+<div className="text-center mb-8">
+  {overview.title && (
+    <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
+      {overview.title}
+    </h3>
+  )}
+</div>*/}
+
 
       {/* 🔥 RICH TEXT DESCRIPTION */}
       <div>
@@ -67,7 +67,7 @@ export default function Overview({ data, handleData }) {
           }
           modules={modules}
           formats={formats}
-          bounds="body"       
+          bounds="body"
           placeholder="Enter overview description..."
           className="bg-white"
         />

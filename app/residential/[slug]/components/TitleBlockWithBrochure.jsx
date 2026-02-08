@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase"; // tumhara firebase config path
 
 
 export default function TitleBlockWithBrochure({ property }) {
+
   const [lead, setLead] = useState({
     name: "",
     email: "",
@@ -54,8 +55,9 @@ export default function TitleBlockWithBrochure({ property }) {
   }
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
+  console.log("CONFIG DEBUG", property);
 
-  if (!property) return null;
+  if (!property || typeof property !== "object") return null;
 
   return (
     <>
@@ -76,7 +78,7 @@ export default function TitleBlockWithBrochure({ property }) {
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
 
               {/* BUILDER */}
-              {typeof property.builderName ==='string' && (
+              {typeof property.builderName === 'string' && (
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs">
                     🏢
@@ -128,11 +130,7 @@ export default function TitleBlockWithBrochure({ property }) {
 
           {/* ================= RIGHT SIDE ================= */}
           <div className="flex flex-col items-start lg:items-end justify-between gap-3">
-            {property.bhk && (
-              <p className="text-sm text-gray-500">
-                {property.bhk}
-              </p>
-            )}
+
 
             {property.price && (
               <p className="text-[18px] font-semibold text-gray-900">
@@ -140,6 +138,13 @@ export default function TitleBlockWithBrochure({ property }) {
               </p>
             )}
 
+            {typeof property.bhk === "string" &&
+              property.bhk.trim().length > 0 && (
+
+                <p className="text-sm text-gray-500">
+                  {property.bhk}
+                </p>
+              )}
 
             <button
               onClick={() => setShowBrochurePopup(true)}

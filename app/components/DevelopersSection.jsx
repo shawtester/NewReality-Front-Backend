@@ -99,21 +99,7 @@ export default function DevelopersSection() {
       </div>
 
       {/* ===== MOBILE / TABLET SLIDER ===== */}
-      <div className="lg:hidden relative">
-        <button
-          onClick={scrollLeft}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
-        >
-          ←
-        </button>
-
-        <button
-          onClick={scrollRight}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-white/90 shadow border flex items-center justify-center hover:bg-white transition-all"
-        >
-          →
-        </button>
-
+      <div className="lg:hidden">
         <div
           ref={scrollRef}
           onTouchStart={onTouchStart}

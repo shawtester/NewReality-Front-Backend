@@ -56,7 +56,7 @@ export default function BlogDetailPage({ params }) {
     fetchLatestBlogs();
   }, [blogId]);
 
-  /* ================= BUILD TOC (YOUR WORKING LOGIC) ================= */
+  /* ================= BUILD TOC ================= */
   useEffect(() => {
     if (!blog) return;
 
@@ -88,13 +88,12 @@ export default function BlogDetailPage({ params }) {
     return () => clearTimeout(timer);
   }, [blog]);
 
-  /* ================= SCROLL TRACK (YOUR WORKING LOGIC) ================= */
+  /* ================= SCROLL TRACK ================= */
   useEffect(() => {
     if (!tocItems.length) return;
 
     const onScroll = () => {
       const scrollPos = window.scrollY + 150;
-
       let current = tocItems[0]?.id;
 
       for (let i = 0; i < tocItems.length; i++) {
@@ -114,17 +113,16 @@ export default function BlogDetailPage({ params }) {
 
   const scrollToHeading = (id) => {
     const element = document.getElementById(id);
-    if (element) {
-      // ✅ FIXED: Account for fixed header height (110px from your sticky top)
-      const headerOffset = 110;
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - headerOffset;
+    if (!element) return;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
+    const headerOffset = 110;
+    const elementPosition =
+      element.getBoundingClientRect().top + window.scrollY;
+
+    window.scrollTo({
+      top: elementPosition - headerOffset,
+      behavior: "smooth",
+    });
   };
 
   if (!blog) {
@@ -142,7 +140,7 @@ export default function BlogDetailPage({ params }) {
       <Header />
 
       <main className="bg-[#f6f6f6] w-full">
-        <div className="max-w-[1400px] mx-auto px-10">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 xl:px-12">
 
           {/* BREADCRUMB */}
           <div className="py-4 text-sm text-gray-500">
@@ -152,21 +150,35 @@ export default function BlogDetailPage({ params }) {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-8 lg:gap-10">
 
-            {/* LEFT CONTENT — YOUR EXACT LAYOUT */}
-            <div className="space-y-6 max-w-[1080px]">
-
-              <h1 className="text-2xl md:text-3xl font-semibold">
+            {/* LEFT CONTENT */}
+            <div
+              className="
+                space-y-6
+                max-w-full
+                lg:max-w-[900px]
+                xl:max-w-[1080px]
+              "
+            >
+              <h1
+                className="
+                  text-xl
+                  md:text-2xl
+                  lg:text-[26px]
+                  xl:text-3xl
+                  font-semibold
+                "
+              >
                 {blog.detailHeading || blog.mainTitle}
               </h1>
 
-              <p className="text-sm text-gray-500 relative bottom-4 ">
-  {blog.excerpt || "No excerpt available"}
-</p>
-                 
+              <p className="text-sm text-gray-500 relative bottom-2">
+                {blog.excerpt || "No excerpt available"}
+              </p>
+
               {imageSrc && (
-                <div className="relative w-full  aspect-[16/7] rounded-xl overflow-hidden">
+                <div className="relative w-full aspect-[16/7] rounded-xl overflow-hidden">
                   <Image
                     src={imageSrc}
                     alt={blog.mainTitle}
@@ -181,7 +193,7 @@ export default function BlogDetailPage({ params }) {
               {blog.sections?.map((html, i) => (
                 <section
                   key={i}
-                  className="bg-white rounded-xl p-8 shadow-sm"
+                  className="bg-white rounded-xl p-6 lg:p-7 xl:p-8 shadow-sm"
                 >
                   <div
                     className="blog-content text-gray-700 leading-[1.9] text-[15px]"
@@ -190,9 +202,9 @@ export default function BlogDetailPage({ params }) {
                 </section>
               ))}
 
-              {/* FAQ — YOUR EXACT LAYOUT */}
+              {/* FAQ */}
               {blog.faqs?.length > 0 && (
-                <section className="bg-white rounded-xl relative bottom-3 p-8 shadow-sm">
+                <section className="bg-white rounded-xl p-6 lg:p-7 relative bottom-4 xl:p-8 shadow-sm">
                   <h2 className="text-xl font-semibold mb-6">
                     Frequently Asked Questions
                   </h2>
@@ -224,13 +236,31 @@ export default function BlogDetailPage({ params }) {
               )}
             </div>
 
-            {/* RIGHT SIDEBAR — YOUR EXACT LAYOUT + STICKY */}
-            <aside className="hidden lg:block justify-self-end  relative bottom-12">
-              <div className="sticky top-[110px] mt-[150px] space-y-12">
-
+            {/* RIGHT SIDEBAR */}
+            <aside className="hidden lg:block justify-self-end">
+              <div
+                className="
+                  sticky
+                  top-[90px]
+                  lg:top-[110px]
+                  xl:top-[130px]
+                  mt-[120px]
+                  lg:mt-[130px]
+                  xl:mt-[108px]
+                  space-y-8
+                "
+              >
                 {/* TOC */}
                 {tocItems.length > 0 && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm w-[350px]">
+                  <div
+                    className="
+                      bg-white rounded-xl p-6 shadow-sm
+                      w-[280px]
+                      lg:w-[320px]
+                      xl:w-[350px]
+                      
+                    "
+                  >
                     <h3 className="text-lg font-semibold mb-4">
                       Table of Contents
                     </h3>
@@ -254,9 +284,16 @@ export default function BlogDetailPage({ params }) {
                   </div>
                 )}
 
-                {/* LATEST BLOGS — YOUR EXACT LAYOUT */}
-                <section className="bg-white rounded-lg px-4 py-4  relative bottom-8 shadow-sm w-[350px]">
-                  <h3 className="font-semibold mb-2">Latest Blogs</h3>
+                {/* LATEST BLOGS */}
+                <section
+                  className="
+                    bg-white rounded-lg px-4 py-4 relative bottom-4 shadow-sm
+                    w-[280px]
+                    lg:w-[320px]
+                    xl:w-[350px]
+                  "
+                >
+                  <h3 className="font-semibold mb-3">Latest Blogs</h3>
 
                   <ul className="space-y-4">
                     {latestBlogs.map((item) => (

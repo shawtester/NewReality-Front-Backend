@@ -99,7 +99,7 @@ export default function StatsBar({ stats }) {
 
       <div className="mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-12">
         {/* ================= MOBILE ================= */}
-        <div className="flex gap-4 md:hidden overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+        <div className="flex gap-4 md:hidden overflow-x-auto pb-4 relative bottom-5 snap-x snap-mandatory scrollbar-hide">
           {useStats.map((item, index) => (
             <div
               key={item.label}

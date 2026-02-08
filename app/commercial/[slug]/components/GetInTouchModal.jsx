@@ -40,7 +40,7 @@ export default function GetInTouchModal({
         {/* HEADER */}
         <div className="flex items-center gap-2">
           <Image
-            src="/images/logo.png"
+            src="/images/neevlogo.png"
             alt="Neev Realty"
             width={38}
             height={38}

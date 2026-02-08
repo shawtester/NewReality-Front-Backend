@@ -346,8 +346,8 @@ export default function ResidentialPage({ apartments = [] }) {
                         <div className="
   bg-white relative
   lg:left-[44%]
-  xl:left-[12%]
-  2xl:left-[18%]
+  xl:left-[10%]
+  2xl:right-[28%]
   shadow-2xl px-5 py-3
   flex items-center gap-3
   rounded-full

@@ -249,7 +249,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-400">
             <Link href="/">Home</Link>
             <Link href="/about-us">About</Link>
-            <Link href="/our-service">Services</Link>
+            <Link href="/our-services">Services</Link>
             <Link href={BASE_ROUTE}>Residential</Link>
             <Link href="/commercial">Commercial</Link>
             <Link href="/careers">Careers</Link>

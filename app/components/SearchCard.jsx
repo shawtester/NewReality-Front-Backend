@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { FiMapPin, FiSearch } from "react-icons/fi";
+import { FiMapPin, FiSearch, FiPlay } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 
 import { getHero } from "@/lib/firestore/hero/read";
@@ -30,6 +30,9 @@ export default function SearchCard() {
   const [hero, setHero] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // ✅ ADDED STATE (VIDEO POPUP)
+  const [showVideo, setShowVideo] = useState(false);
+
   /* ================= FETCH HERO ================= */
   useEffect(() => {
     const fetchHero = async () => {
@@ -51,7 +54,7 @@ export default function SearchCard() {
         document.body.appendChild(script);
       }
     }
-  }, [hero]);
+  }, [hero, showVideo]);
 
   /* ================= AUTO SLIDER ================= */
   useEffect(() => {
@@ -73,9 +76,20 @@ export default function SearchCard() {
     if (hero?.mediaType === "instagram") {
       videoUrl = hero.videoUrl;
     } else {
-      videoUrl = `${hero.videoUrl}?autoplay=1&mute=1`;
+      // 🔥 AUTO CONVERT YOUTUBE LINK TO EMBED FORMAT
+      const idMatch =
+        hero.videoUrl.match(/embed\/([^?]+)/) ||
+        hero.videoUrl.match(/v=([^&]+)/) ||
+        hero.videoUrl.match(/youtu\.be\/([^?]+)/);
+
+      const videoId = idMatch?.[1];
+
+      videoUrl = videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : hero.videoUrl;
     }
   }
+
 
   /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
@@ -108,8 +122,8 @@ export default function SearchCard() {
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide
-                ? "opacity-100 z-10"
-                : "opacity-0 z-0"
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0"
                 }`}
             >
               <Image
@@ -128,6 +142,51 @@ export default function SearchCard() {
             fill
             className="object-cover"
           />
+        )}
+
+        {/* ================= MOBILE VIDEO BUTTON (UPDATED) ================= */}
+        {hero?.videoUrl && (
+          <button
+            onClick={() => setShowVideo(true)}
+            className="absolute md:hidden left-4 bottom-4 z-30 flex items-center gap-2 bg-black/70 backdrop-blur text-white px-4 py-2 rounded-full shadow-lg"
+          >
+            <FiPlay className="text-lg" />
+            <span className="text-xs font-medium">
+              Watch Video
+            </span>
+          </button>
+        )}
+
+        {/* ================= MOBILE VIDEO POPUP (NEW) ================= */}
+        {showVideo && hero?.videoUrl && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4 md:hidden">
+            <div className="relative w-full max-w-[320px] rounded-2xl overflow-hidden bg-black">
+              <button
+                onClick={() => setShowVideo(false)}
+                className="absolute right-2 top-2 z-20 text-white text-xl"
+              >
+                ✕
+              </button>
+
+              {hero.mediaType === "youtube" && (
+                <iframe
+                  className="w-full h-[360px]"
+                  src={`${videoUrl}?autoplay=1&mute=0`}
+                  allow="autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
+
+              {hero.mediaType === "instagram" && (
+                <blockquote
+                  className="instagram-media"
+                  data-instgrm-permalink={hero.videoUrl}
+                  data-instgrm-version="14"
+                  style={{ width: "100%" }}
+                ></blockquote>
+              )}
+            </div>
+          </div>
         )}
 
         {/* ================= DESKTOP VIDEO ================= */}
@@ -152,13 +211,11 @@ export default function SearchCard() {
             ></blockquote>
           </div>
         )}
-
       </div>
 
       {/* ================= SEARCH CARD ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-20">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
-          {/* HEADER + PROPERTY TYPE */}
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">
               Find your perfect home with{" "}
@@ -175,8 +232,8 @@ export default function SearchCard() {
                       setResults([]);
                     }}
                     className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
-                      ? "bg-white shadow text-gray-900"
-                      : "text-gray-500"
+                        ? "bg-white shadow text-gray-900"
+                        : "text-gray-500"
                       }`}
                   >
                     {tab.label}
@@ -186,7 +243,6 @@ export default function SearchCard() {
             </div>
           </div>
 
-          {/* SEARCH BAR */}
           <div className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 relative">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600">
               <FiMapPin />
@@ -212,7 +268,6 @@ export default function SearchCard() {
             </button>
           </div>
 
-          {/* SEARCH RESULTS */}
           {results.length > 0 && (
             <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-lg p-4 z-50">
               <ul className="space-y-2 max-h-[260px] overflow-y-auto">
@@ -235,7 +290,6 @@ export default function SearchCard() {
           )}
         </div>
 
-        {/* TAGS */}
         <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
           {TAGS.map((tag) => (
             <button

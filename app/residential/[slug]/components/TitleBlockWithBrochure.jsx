@@ -3,17 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase"; // tumhara firebase config path
-
-
+import { db } from "@/lib/firebase";
 
 export default function TitleBlockWithBrochure({ property }) {
-
   const [lead, setLead] = useState({
     name: "",
     email: "",
     phone: "",
   });
+
+  const [showBrochurePopup, setShowBrochurePopup] = useState(false);
+
   async function handleSubmit() {
     if (!lead.name || !lead.email || !lead.phone) {
       alert("All fields required");
@@ -21,6 +21,7 @@ export default function TitleBlockWithBrochure({ property }) {
     }
 
     try {
+      // ✅ Save Lead First
       await addDoc(collection(db, "brochureLeads"), {
         ...lead,
         propertySlug: property.slug,
@@ -28,23 +29,25 @@ export default function TitleBlockWithBrochure({ property }) {
         createdAt: serverTimestamp(),
       });
 
-      alert("Brochure downloading...");
-
-
-      // download brochure
-      if (property.brochureUrl) {
+      // ✅ DIRECT DOWNLOAD (NO URL MODIFY)
+      if (property?.brochure?.url) {
         const link = document.createElement("a");
-        link.href = property.brochureUrl;
-        link.target = "_blank";
+
+        // 🔥 ORIGINAL CLOUDINARY URL USE KARO
+        link.href = property.brochure.url;
+
+        // 🔥 browser ko force download bolte hain
+        link.setAttribute(
+          "download",
+          property.brochure.name || "brochure.pdf"
+        );
 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+      } else {
+        alert("Brochure not available");
       }
-
-
-
-
 
       setShowBrochurePopup(false);
       setLead({ name: "", email: "", phone: "" });
@@ -54,9 +57,6 @@ export default function TitleBlockWithBrochure({ property }) {
     }
   }
 
-  const [showBrochurePopup, setShowBrochurePopup] = useState(false);
-  console.log("CONFIG DEBUG", property);
-
   if (!property || typeof property !== "object") return null;
 
   return (
@@ -64,32 +64,29 @@ export default function TitleBlockWithBrochure({ property }) {
       {/* ================= TITLE BLOCK ================= */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:justify-between gap-6">
-
-          {/* ================= LEFT SIDE ================= */}
+          {/* LEFT */}
           <div className="flex flex-col gap-3">
             <h1 className="text-[22px] font-semibold text-gray-900 leading-snug">
               {property.title}
             </h1>
 
-            <p className="text-sm text-pink-600">
-              {property.location}
-            </p>
+            <p className="text-sm text-pink-600">{property.location}</p>
 
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
-
-              {/* BUILDER */}
-              {typeof property.builderName === 'string' && (
+              {typeof property.builderName === "string" && (
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs">
                     🏢
                   </span>
                   <span>
-                    By <span className="text-pink-600">{property.builderName}</span>
+                    By{" "}
+                    <span className="text-pink-600">
+                      {property.builderName}
+                    </span>
                   </span>
                 </div>
               )}
 
-              {/* SIZE */}
               {property.size && (
                 <div className="flex items-center gap-2">
                   <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs">
@@ -99,7 +96,6 @@ export default function TitleBlockWithBrochure({ property }) {
                 </div>
               )}
 
-              {/* RERA */}
               {property.rera && (
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1 rounded-full bg-[#f3f3f3] px-2 py-1 text-[10px] font-medium text-gray-600">
@@ -114,24 +110,19 @@ export default function TitleBlockWithBrochure({ property }) {
                 </div>
               )}
 
-              {/* UPDATED DATE */}
               {property.updatedAt && (
                 <div className="flex items-center gap-2 text-gray-400">
                   <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-xs">
                     ⏱
                   </span>
-                  <span>
-                    Last Updated Date {property.updatedAt}
-                  </span>
+                  <span>Last Updated Date {property.updatedAt}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* ================= RIGHT SIDE ================= */}
+          {/* RIGHT */}
           <div className="flex flex-col items-start lg:items-end justify-between gap-3">
-
-
             {property.price && (
               <p className="text-[18px] font-semibold text-gray-900">
                 {property.price}
@@ -140,30 +131,15 @@ export default function TitleBlockWithBrochure({ property }) {
 
             {typeof property.bhk === "string" &&
               property.bhk.trim().length > 0 && (
-
-                <p className="text-sm text-gray-500">
-                  {property.bhk}
-                </p>
+                <p className="text-sm text-gray-500">{property.bhk}</p>
               )}
 
             <button
               onClick={() => setShowBrochurePopup(true)}
-              className="
-    inline-flex items-center gap-2
-    px-4 py-2
-    bg-[#F5A300]
-    hover:bg-[#e49a00]
-    text-white
-    rounded-md
-    text-sm
-    font-medium
-    transition
-  "
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A300] hover:bg-[#e49a00] text-white rounded-md text-sm font-medium transition"
             >
               ⬇ Download Brochure
             </button>
-
-
           </div>
         </div>
       </div>
@@ -172,7 +148,6 @@ export default function TitleBlockWithBrochure({ property }) {
       {showBrochurePopup && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
           <div className="relative w-full max-w-md bg-white rounded-xl p-6">
-
             <button
               onClick={() => setShowBrochurePopup(false)}
               className="absolute top-3 right-3 text-gray-400 hover:text-black text-xl"
@@ -225,7 +200,6 @@ export default function TitleBlockWithBrochure({ property }) {
                 }
                 className="w-full border rounded-md px-4 py-2 text-sm"
               />
-
             </div>
 
             <button
@@ -234,7 +208,6 @@ export default function TitleBlockWithBrochure({ property }) {
             >
               Download Brochure
             </button>
-
           </div>
         </div>
       )}

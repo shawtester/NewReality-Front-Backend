@@ -39,12 +39,13 @@ export default function BasicDetails({ data, handleData }) {
     if (!file) return;
 
     try {
-      const url = await uploadBrochureToCloudinary(file);
+      const result = await uploadBrochureToCloudinary(file);
 
       handleData("brochure", {
-        url,
+        url: result.url,
         name: file.name,
       });
+
 
       alert("Brochure uploaded successfully!");
     } catch (err) {
@@ -114,6 +115,39 @@ export default function BasicDetails({ data, handleData }) {
           </span>
         </p>
       </div>
+
+      {/* ================= SEO SETTINGS ================= */}
+      <div>
+        <h3 className="text-sm font-semibold mb-3">
+          SEO Settings
+        </h3>
+
+        <div className="space-y-4">
+
+          <Input
+            label="Meta Title"
+            value={data.metaTitle}
+            onChange={(v) => handleData("metaTitle", v)}
+            placeholder="SEO Title for Google"
+          />
+
+          <Input
+            label="Meta Description"
+            value={data.metaDescription}
+            onChange={(v) => handleData("metaDescription", v)}
+            placeholder="Short description for search results"
+          />
+
+          <Input
+            label="Meta Keywords"
+            value={data.metaKeywords}
+            onChange={(v) => handleData("metaKeywords", v)}
+            placeholder="luxury apartment, gurgaon property..."
+          />
+
+        </div>
+      </div>
+
 
       {/* ================= VIDEO UPLOAD ================= */}
       <div>

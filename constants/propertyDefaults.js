@@ -1,6 +1,11 @@
 import { Timestamp } from "firebase/firestore";
 
 export const defaultProperty = {
+
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: "",
+
     // 🔹 BASIC
     title: "",
     slug: "",

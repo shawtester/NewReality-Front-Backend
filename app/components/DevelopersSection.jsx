@@ -118,7 +118,7 @@ export default function DevelopersSection() {
           ref={scrollRef}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
-          className="flex gap-6 overflow-x-auto scrollbar-hide px-20 py-12 snap-x snap-mandatory"
+          className="flex gap-6 overflow-x-auto scrollbar-hide px-20 py-6 snap-x snap-mandatory"
         >
           {activeBuilders.map((b) => (
             <div

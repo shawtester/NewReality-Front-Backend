@@ -83,7 +83,7 @@ export default function BlogSection({ blogs = [] }) {
   }, []);
 
   return (
-    <section className="max-w-[1240px] mx-auto px-4 mt-16 relative">
+    <section className="max-w-[1240px] mx-auto px-4 mt-8 relative">
       {/* HEADER */}
       <div className="relative mb-8">
         {/* CENTER TITLE */}
@@ -115,7 +115,7 @@ export default function BlogSection({ blogs = [] }) {
         ref={scrollRef}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6 snap-x snap-mandatory px-4 lg:px-0 py-8"
+        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6 snap-x snap-mandatory px-4 lg:px-0 py-4"
       >
         {blogs.map((blog) => (
           <Link

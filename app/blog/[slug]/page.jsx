@@ -25,6 +25,9 @@ export default function BlogDetailPage({ params }) {
   const [activeId, setActiveId] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
 
+  // ✅ ONLY for mobile TOC
+  const [isTocOpen, setIsTocOpen] = useState(false);
+
   /* ================= FETCH CURRENT BLOG ================= */
   useEffect(() => {
     const fetchBlog = async () => {
@@ -72,7 +75,7 @@ export default function BlogDetailPage({ params }) {
         if (text.length < 2) return;
 
         const id = `toc-${index}`;
-        if (el.id !== id) el.id = id;
+        el.id = id;
 
         items.push({
           id,
@@ -112,15 +115,14 @@ export default function BlogDetailPage({ params }) {
   }, [tocItems]);
 
   const scrollToHeading = (id) => {
-    const element = document.getElementById(id);
-    if (!element) return;
+    const el = document.getElementById(id);
+    if (!el) return;
 
-    const headerOffset = 110;
-    const elementPosition =
-      element.getBoundingClientRect().top + window.scrollY;
+    const offset = 110;
+    const pos = el.getBoundingClientRect().top + window.scrollY;
 
     window.scrollTo({
-      top: elementPosition - headerOffset,
+      top: pos - offset,
       behavior: "smooth",
     });
   };
@@ -153,23 +155,8 @@ export default function BlogDetailPage({ params }) {
           <div className="grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-8 lg:gap-10">
 
             {/* LEFT CONTENT */}
-            <div
-              className="
-                space-y-6
-                max-w-full
-                lg:max-w-[900px]
-                xl:max-w-[1080px]
-              "
-            >
-              <h1
-                className="
-                  text-xl
-                  md:text-2xl
-                  lg:text-[26px]
-                  xl:text-3xl
-                  font-semibold
-                "
-              >
+            <div className="space-y-6 max-w-full lg:max-w-[900px] xl:max-w-[1080px]">
+              <h1 className="text-xl md:text-2xl lg:text-[26px] xl:text-3xl font-semibold">
                 {blog.detailHeading || blog.mainTitle}
               </h1>
 
@@ -189,6 +176,43 @@ export default function BlogDetailPage({ params }) {
                 </div>
               )}
 
+              {/* ================= MOBILE / TAB TOC (NEW) ================= */}
+              {tocItems.length > 0 && (
+                <div className="lg:hidden bg-white rounded-xl p-4 shadow-sm">
+                  <button
+                    onClick={() => setIsTocOpen(!isTocOpen)}
+                    className="w-full flex justify-between items-center font-semibold text-sm"
+                  >
+                    Table of Contents
+                    <span className="text-lg">
+                      {isTocOpen ? "−" : "+"}
+                    </span>
+                  </button>
+
+                  {isTocOpen && (
+                    <ul className="mt-4 space-y-2">
+                      {tocItems.map((item) => (
+                        <li key={item.id}>
+                          <button
+                            onClick={() => {
+                              scrollToHeading(item.id);
+                              setIsTocOpen(false);
+                            }}
+                            className={`w-full text-left pl-3 py-1 border-l-2 text-sm ${
+                              activeId === item.id
+                                ? "border-[#8B2C6F] text-[#D4A017] font-semibold"
+                                : "border-transparent text-gray-500"
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
               {/* BLOG SECTIONS */}
               {blog.sections?.map((html, i) => (
                 <section
@@ -204,7 +228,7 @@ export default function BlogDetailPage({ params }) {
 
               {/* FAQ */}
               {blog.faqs?.length > 0 && (
-                <section className="bg-white rounded-xl p-6 lg:p-7 relative bottom-4 xl:p-8 shadow-sm">
+                <section className="bg-white rounded-xl p-6 lg:p-7 xl:p-8 shadow-sm relative bottom-4">
                   <h2 className="text-xl font-semibold mb-6">
                     Frequently Asked Questions
                   </h2>
@@ -225,7 +249,7 @@ export default function BlogDetailPage({ params }) {
                         </button>
 
                         {openFaq === i && (
-                          <div className="px-4 pb-4 text-gray-600 text-sm leading-relaxed">
+                          <div className="px-4 pb-4 text-gray-600 text-sm">
                             {faq.answer}
                           </div>
                         )}
@@ -234,66 +258,11 @@ export default function BlogDetailPage({ params }) {
                   </div>
                 </section>
               )}
-            </div>
 
-            {/* RIGHT SIDEBAR */}
-            <aside className="hidden lg:block justify-self-end">
-              <div
-                className="
-                  sticky
-                  top-[90px]
-                  lg:top-[110px]
-                  xl:top-[130px]
-                  mt-[120px]
-                  lg:mt-[130px]
-                  xl:mt-[108px]
-                  space-y-8
-                "
-              >
-                {/* TOC */}
-                {tocItems.length > 0 && (
-                  <div
-                    className="
-                      bg-white rounded-xl p-6 shadow-sm
-                      w-[280px]
-                      lg:w-[320px]
-                      xl:w-[350px]
-                      
-                    "
-                  >
-                    <h3 className="text-lg font-semibold mb-4">
-                      Table of Contents
-                    </h3>
-
-                    <ul className="space-y-2">
-                      {tocItems.map((item) => (
-                        <li key={item.id}>
-                          <button
-                            onClick={() => scrollToHeading(item.id)}
-                            className={`w-full text-left pl-4 py-1 border-l-2 text-[14px] ${
-                              activeId === item.id
-                                ? "border-[#8B2C6F] text-[#D4A017] font-semibold"
-                                : "border-transparent text-gray-500 hover:text-gray-800"
-                            }`}
-                          >
-                            {item.label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* LATEST BLOGS */}
-                <section
-                  className="
-                    bg-white rounded-lg px-4 py-4 relative bottom-4 shadow-sm
-                    w-[280px]
-                    lg:w-[320px]
-                    xl:w-[350px]
-                  "
-                >
-                  <h3 className="font-semibold mb-3">Latest Blogs</h3>
+              {/* ================= MOBILE / TAB LATEST BLOGS (NEW) ================= */}
+              {latestBlogs.length > 0 && (
+                <section className="lg:hidden bg-white rounded-xl p-5 shadow-sm">
+                  <h3 className="font-semibold mb-4">Latest Blogs</h3>
 
                   <ul className="space-y-4">
                     {latestBlogs.map((item) => (
@@ -333,8 +302,108 @@ export default function BlogDetailPage({ params }) {
                     </Link>
                   </div>
                 </section>
-              </div>
-            </aside>
+              )}
+            </div>
+
+            {/* ================= DESKTOP SIDEBAR (UNCHANGED) ================= */}
+           <aside className="hidden lg:block justify-self-end">
+  <div
+    className="
+      sticky
+      lg:top-[110px]
+      xl:top-[120px]
+      mt-[130px]
+      xl:mt-[150px]
+      space-y-8
+    "
+  >
+
+    {/* ===== TOC ===== */}
+    {tocItems.length > 0 && (
+      <div
+        className="
+          bg-white rounded-xl p-6 shadow-sm
+          w-[300px] lg:w-[320px] xl:w-[340px] xl:relative xl:bottom-10
+
+          
+          lg:max-h-[280px]
+          xl:max-h-[360px]
+          2xl:max-h-[420px]
+        "
+      >
+        <h3 className="text-lg font-semibold mb-4">
+          Table of Contents
+        </h3>
+
+        <ul className="space-y-2">
+          {tocItems.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => scrollToHeading(item.id)}
+                className={`w-full text-left pl-4 py-1 border-l-2 text-sm transition ${
+                  activeId === item.id
+                    ? "border-[#8B2C6F] text-[#D4A017] font-semibold"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {item.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {/* ===== LATEST BLOGS ===== */}
+    <section
+      className="
+        bg-white rounded-lg px-4 relative bottom-4 py-4 shadow-sm
+        w-[300px] lg:w-[320px] xl:w-[340px]
+      "
+    >
+      <h3 className="font-semibold mb-3">Latest Blogs</h3>
+
+      <ul className="space-y-4">
+        {latestBlogs.map((item) => (
+          <li key={item.id} className="flex gap-3">
+            <Image
+              src={
+                item.image?.url ||
+                item.image ||
+                "/images/placeholder.jpg"
+              }
+              alt={item.mainTitle}
+              width={44}
+              height={44}
+              className="rounded-full object-cover"
+            />
+            <div>
+              <p className="text-sm font-medium line-clamp-2">
+                {item.mainTitle}
+              </p>
+              <Link
+                href={`/blog/${item.id}`}
+                className="text-xs text-[#993F7F] font-semibold"
+              >
+                Read More
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex justify-center mt-4">
+        <Link
+          href="/blog"
+          className="bg-[#DBA40D] text-white px-4 py-2 rounded-lg text-sm font-semibold"
+        >
+          View more
+        </Link>
+      </div>
+    </section>
+
+  </div>
+</aside>
 
           </div>
         </div>

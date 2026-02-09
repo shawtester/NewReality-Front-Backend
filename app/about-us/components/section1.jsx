@@ -228,7 +228,7 @@ export default function Home() {
       </section>
 
       {/* ================= 5 STEPS ================= */}
-      <section className="max-w-7xl mx-auto relative px-6 py-10 bottom-5 ">
+      <section className="max-w-7xl mx-auto relative px-6 py-8 ">
         <h2 className="text-center text-3xl sm:text-4xl lg:text-5xl mb-6 ">
           <span className="text-[#DBA40D] font-semibold">5 Steps</span> to Your Dream Home
         </h2>
@@ -260,7 +260,7 @@ export default function Home() {
           {steps.map((step) => (
             <div
               key={step.title}
-              className="rounded-lg p-6 text-center hover:scale-105 transition shadow-sm bg-white"
+              className="rounded-lg p-6 text-center hover:scale-105 transition shadow-sm bg-white border-1"
             >
               <Image src={step.logo} alt={step.title} width={40} height={40} className="mx-auto mb-4" />
               <h3 className="font-semibold">{step.title}</h3>

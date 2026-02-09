@@ -33,7 +33,7 @@ export default function BigServices() {
   if (bigServices.length < 3) return null;
 
   return (
-    <section className="py-16 relative bg-white overflow-visible">
+    <section className="py-6 relative bg-white overflow-visible">
       <div className="max-w-[1180px] mx-auto px-4 overflow-visible">
 
         {/* TOP 2 */}

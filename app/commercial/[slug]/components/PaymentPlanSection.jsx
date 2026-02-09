@@ -1,43 +1,14 @@
 "use client";
 
 export default function PaymentPlanSection({ paymentPlan }) {
-  const defaultPlans = [
-    {
-      title: "Installment 1",
-      percent: "10%",
-      note: "Down Payment",
-    },
-    {
-      title: "Installment 2",
-      percent: "80%",
-      note: "During Construction",
-    },
-    {
-      title: "Installment 3",
-      percent: "10%",
-      note: "Handover",
-    },
-  ];
 
-  const plans = paymentPlan?.installment1
-    ? [
-        {
-          title: "Installment 1",
-          percent: paymentPlan.installment1,
-          note: "Down Payment",
-        },
-        {
-          title: "Installment 2",
-          percent: paymentPlan.installment2,
-          note: "During Construction",
-        },
-        {
-          title: "Installment 3",
-          percent: paymentPlan.installment3,
-          note: "Handover",
-        },
-      ]
-    : defaultPlans;
+  // ✅ SAFE ARRAY FIX (Firestore / hydration issues handled)
+  const plans = Array.isArray(paymentPlan)
+    ? paymentPlan
+    : Object.values(paymentPlan || {});
+
+  // ❌ agar empty hai toh section hide
+  if (!plans.length) return null;
 
   return (
     <section
@@ -49,22 +20,23 @@ export default function PaymentPlanSection({ paymentPlan }) {
       </h2>
 
       <div className="bg-[#FBF6F1] rounded-2xl px-6 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 text-center gap-8 md:gap-0">
+        {/* 🔥 HORIZONTAL SCROLL */}
+        <div className="flex overflow-x-auto gap-8 no-scrollbar">
           {plans.map((p, i) => (
             <div
               key={i}
-              className={`${
-                i !== plans.length - 1 ? "md:border-r" : ""
-              }`}
+              className="min-w-[220px] text-center border-r last:border-0 pr-6"
             >
               <p className="text-lg font-medium mb-4">
-                {p.title}
+                {p?.title}
               </p>
+
               <p className="text-2xl font-semibold mb-2">
-                {p.percent}
+                {p?.percent}
               </p>
+
               <p className="text-sm text-gray-600">
-                {p.note}
+                {p?.note}
               </p>
             </div>
           ))}

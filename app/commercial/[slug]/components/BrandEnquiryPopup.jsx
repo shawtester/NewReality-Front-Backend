@@ -73,7 +73,7 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
           {/* HEADER */}
           <div className="flex items-center gap-3 mb-3">
-            <Image src="/images/logo.png" alt="Neev Realty" width={36} height={36} />
+            <Image src="/images/neevlogo.png" alt="Neev Realty" width={36} height={36} />
             <h2 className="text-xl font-semibold">
               Enquire <span className="text-[#F5A300]">Now</span>
             </h2>

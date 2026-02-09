@@ -26,7 +26,7 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
         ref={textRef}
         className={`
           transition-all duration-300 ease-in-out
-          ${isExpanded ? "max-h-none" : "line-clamp-1 pointer-events-auto"}
+          ${isExpanded ? "max-h-none" : `line-clamp-${maxLines}`}
           prose prose-sm max-w-none
           leading-[1.4rem] text-left
 
@@ -46,11 +46,10 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
           >
             {isExpanded ? "Read Less" : "Read More"}
             <span
-              className={`w-3 h-3 border-b-2 border-r-2 transition-transform duration-200 ${
-                isExpanded
+              className={`w-3 h-3 border-b-2 border-r-2 transition-transform duration-200 ${isExpanded
                   ? "rotate-225 -translate-y-[1px]"
                   : "rotate-45 translate-y-[1px]"
-              }`}
+                }`}
             />
           </button>
         </div>
@@ -73,25 +72,21 @@ export default function OverviewSection({ overview, propertyTitle }) {
 
         <div className="bg-white rounded-xl shadow-sm p-8">
           {/* TITLE */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-5">
             {overview.title && (
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
                 {overview.title}
-                {overview.subtitle && (
-                  <span className="block text-base font-normal text-gray-600 mt-1">
-                    {overview.subtitle}
-                  </span>
-                )}
-              </h2>
+              </h3>
             )}
           </div>
+
 
           {/* DESCRIPTION */}
           {overview.description && (
             <div className="max-w-xl mx-auto">
               <ExpandableText
                 html={overview.description}
-                maxLines={1}
+                maxLines={3}   // ✅ ab 3 line ke baad Read More aayega
                 className="text-sm md:text-base text-gray-600 font-light"
               />
             </div>

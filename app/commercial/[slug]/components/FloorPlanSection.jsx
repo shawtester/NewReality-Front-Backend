@@ -16,10 +16,8 @@ export default function FloorPlanSection({ floorPlans = [] }) {
     return Array.from(set);
   }, [floorPlans]);
 
-  /* ================= ACTIVE TAB ================= */
   const [activeType, setActiveType] = useState("");
-  const [openImages, setOpenImages] = useState([]); // modal images
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [previewImage, setPreviewImage] = useState(null); // 👈 NEW
 
   useEffect(() => {
     if (bhkTypes.length > 0) {
@@ -27,7 +25,6 @@ export default function FloorPlanSection({ floorPlans = [] }) {
     }
   }, [bhkTypes]);
 
-  /* ================= FILTER ================= */
   const filteredPlans = floorPlans.filter(
     (fp) => fp?.title?.trim() === activeType
   );
@@ -38,23 +35,6 @@ export default function FloorPlanSection({ floorPlans = [] }) {
       left: dir === "left" ? -260 : 260,
       behavior: "smooth",
     });
-  };
-
-  const openImageModal = (index) => {
-    setOpenImages(filteredPlans.map((fp) => fp.image));
-    setCurrentIndex(index);
-  };
-
-  const prevImage = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? openImages.length - 1 : prev - 1
-    );
-  };
-
-  const nextImage = () => {
-    setCurrentIndex((prev) =>
-      prev === openImages.length - 1 ? 0 : prev + 1
-    );
   };
 
   if (!floorPlans.length) return null;
@@ -76,14 +56,13 @@ export default function FloorPlanSection({ floorPlans = [] }) {
                   : "bg-gray-100 text-gray-600"
               }`}
             >
-              {t} 
+              {t} Apartment
             </button>
           ))}
         </div>
 
         {/* ===== SLIDER ===== */}
         <div className="relative">
-          {/* LEFT */}
           <button
             onClick={() => scroll("left")}
             className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10
@@ -93,12 +72,11 @@ export default function FloorPlanSection({ floorPlans = [] }) {
             <FaChevronLeft />
           </button>
 
-          {/* CARDS */}
           <div
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
           >
-            {filteredPlans.map((fp, idx) => (
+            {filteredPlans.map((fp) => (
               <div
                 key={fp.image}
                 className="min-w-[197px] bg-white rounded-xl p-4
@@ -106,10 +84,10 @@ export default function FloorPlanSection({ floorPlans = [] }) {
               >
                 <div className="text-xs text-gray-500 mb-2">📍 {fp.area}</div>
 
-                {/* IMAGE CLICK TO OPEN */}
+                {/* IMAGE (CLICKABLE) */}
                 <div
                   className="relative w-full h-[140px] mb-3 cursor-pointer"
-                  onClick={() => openImageModal(idx)}
+                  onClick={() => setPreviewImage(fp.image)} // 👈 OPEN
                 >
                   <Image
                     src={fp.image}
@@ -132,7 +110,6 @@ export default function FloorPlanSection({ floorPlans = [] }) {
             ))}
           </div>
 
-          {/* RIGHT */}
           <button
             onClick={() => scroll("right")}
             className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10
@@ -144,42 +121,32 @@ export default function FloorPlanSection({ floorPlans = [] }) {
         </div>
       </section>
 
-      {/* ================= FLOATING MODAL (65% SCREEN) ================= */}
-      {openImages.length > 0 && (
-        <div className="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
-          {/* Close Button */}
-          <button
-            onClick={() => setOpenImages([])}
-            className="absolute top-5 right-5 text-white text-2xl z-20"
+      {/* ===== IMAGE MODAL ===== */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative bg-white rounded-lg p-4 max-w-4xl w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
           >
-            <FaTimes />
-          </button>
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              <FaTimes size={18} />
+            </button>
 
-          {/* Prev Button */}
-          <button
-            onClick={prevImage}
-            className="absolute left-10 z-20 text-white text-3xl bg-black/30 p-2 rounded-full hover:bg-black/50 transition"
-          >
-            <FaChevronLeft />
-          </button>
-
-          {/* IMAGE */}
-          <div className="relative w-[65%] h-[65vh] flex items-center justify-center rounded-lg overflow-hidden">
-            <Image
-              src={openImages[currentIndex]}
-              alt="Floor Plan"
-              fill
-              className="object-contain"
-            />
+            <div className="relative w-full h-[70vh]">
+              <Image
+                src={previewImage}
+                alt="Floor Plan Preview"
+                fill
+                className="object-contain"
+              />
+            </div>
           </div>
-
-          {/* Next Button */}
-          <button
-            onClick={nextImage}
-            className="absolute right-10 z-20 text-white text-3xl bg-black/30 p-2 rounded-full hover:bg-black/50 transition"
-          >
-            <FaChevronRight />
-          </button>
         </div>
       )}
     </>

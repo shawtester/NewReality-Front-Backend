@@ -47,10 +47,11 @@ export default async function PropertyPage({ params }) {
     slug: property.slug,
     title: property.title,
     location: property.location,
-
+    
     builderId: property.builderId || null,
     builderName: property.developer || "",
-
+    configurations: property.configurations || [],
+    bhk: (property.configurations || []).join(", "),
     price: property.priceRange,
     size: property.areaRange,
     rera: property.reraNumber,
@@ -58,20 +59,18 @@ export default async function PropertyPage({ params }) {
 
     brochureUrl: property.brochure?.url || "",
 
-    images:
-      property.gallery?.length > 0
-        ? property.gallery.map((g) => g.url)
-        : property.mainImage?.url
-          ? [property.mainImage.url]
-          : property.image?.url
-            ? [property.image.url]
-            : [],
+    images: [
+      ...(property.mainImage?.url ? [property.mainImage.url] : []),
+      ...(property.gallery?.map((g) => g.url) || []),
+    ],
+
     video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
-    paymentPlan: property.paymentPlan || null,
+    paymentPlan: property.paymentPlan || [],
     amenities: amenitiesData,
 
+    locationImage: property.locationImage?.url || "",
     mapQuery: property.mapQuery || property.location || "",
     locationPoints: property.locationPoints || [],
 
@@ -83,6 +82,13 @@ export default async function PropertyPage({ params }) {
     builder: builder && typeof builder === "object" ? builder : null,
 
     disclaimer: property.disclaimer || "",
+
+    /* ================= QUICK FACTS ADD KAR (🔥 MAIN FIX) ================= */
+    projectArea: property.projectArea || "",
+    projectType: property.projectType || "",
+    projectStatus: property.projectStatus || "",
+    projectElevation: property.projectElevation || "",
+    possession: property.possession || "",
   };
 
   return (
@@ -119,6 +125,7 @@ export default async function PropertyPage({ params }) {
 
           <LocationSection
             mapQuery={cleanProperty.mapQuery}
+            locationImage={cleanProperty.locationImage}
             locationPoints={cleanProperty.locationPoints}
           />
 
@@ -140,7 +147,12 @@ export default async function PropertyPage({ params }) {
         </div>
 
         {/* RIGHT */}
-        <RightSidebar property={cleanProperty} />
+        <RightSidebar
+          property={{
+            ...cleanProperty,
+            images: cleanProperty.images.slice(1), // ❌ remove main image
+          }}
+        />
       </section>
 
       <Footer />

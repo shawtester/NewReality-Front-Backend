@@ -22,11 +22,13 @@ export default function RightSidebar({ property }) {
   const [open, setOpen] = useState(false);
   const scrollRef = useRef(null);
 
+  /* ✅ FIXED IMAGE FIELD (gallery instead of images) */
   const images =
-    property.images?.length > 0
-      ? property.images
+    property.gallery?.length > 0
+      ? property.gallery.map((g) => g.url || g)
       : ["/images/s1.png", "/images/s2.png", "/images/s3.png"];
 
+  /* ================= VIDEO ================= */
   const getVideoUrl = (video) => {
     if (!video) return "";
     if (typeof video === "object" && video.url) return video.url;
@@ -63,35 +65,24 @@ export default function RightSidebar({ property }) {
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
-  // ================= AUTO SCROLL FOR FLOATING GALLERY =================
+  /* ================= AUTO SCROLL ================= */
   useEffect(() => {
     if (!open || !scrollRef.current) return;
 
     const container = scrollRef.current;
 
     const interval = setInterval(() => {
-      // Stop auto-scroll if video is in view
-      const videoElement = container.querySelector("video, iframe");
-      if (videoElement) {
-        const rect = videoElement.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        // If video fully visible inside container, stop scrolling
-        if (
-          rect.left >= containerRect.left &&
-          rect.right <= containerRect.right
-        ) {
-          return; // skip this scroll step
-        }
-      }
-
       const maxScroll = container.scrollWidth - container.clientWidth;
 
       if (container.scrollLeft >= maxScroll) {
         container.scrollTo({ left: 0, behavior: "smooth" });
       } else {
-        container.scrollBy({ left: container.clientWidth, behavior: "smooth" });
+        container.scrollBy({
+          left: container.clientWidth,
+          behavior: "smooth",
+        });
       }
-    }, 3000); // every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [open]);
@@ -101,21 +92,6 @@ export default function RightSidebar({ property }) {
       {/* ================= MOBILE ================= */}
       <div className="block lg:hidden mt-12 space-y-4">
         <BrandCTA propertyTitle={property.title} />
-        <div className="bg-white rounded-xl p-5 shadow-sm text-center">
-          <p className="font-medium mb-4">Share</p>
-          <div className="flex justify-center gap-3">
-            {socialLinks.map(({ Icon, href }, i) => (
-              <Link
-                key={i}
-                href={href}
-                target="_blank"
-                className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded flex items-center justify-center"
-              >
-                <Icon />
-              </Link>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* ================= DESKTOP ================= */}
@@ -130,6 +106,7 @@ export default function RightSidebar({ property }) {
               height={120}
               className="object-cover rounded"
             />
+
             <div
               onClick={() => setOpen(true)}
               className="relative cursor-pointer group"
@@ -141,9 +118,11 @@ export default function RightSidebar({ property }) {
                 height={120}
                 className="object-cover rounded"
               />
+
               <span className="absolute bottom-2 left-2 bg-white/90 text-xs px-2 py-1 rounded">
                 {images.length}+ Photos
               </span>
+
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition" />
             </div>
           </div>
@@ -176,26 +155,32 @@ export default function RightSidebar({ property }) {
           </div>
         </div>
 
-        {/* QUICK FACTS */}
+        {/* ================= QUICK FACTS ================= */}
         <div className="bg-white rounded-xl p-5 shadow-sm">
-          <h3 className="font-semibold mb-3 border-b pb-2">Quick Facts</h3>
+          <h3 className="font-semibold mb-3 border-b pb-2">
+            Quick Facts
+          </h3>
+
           <div className="text-sm space-y-2 text-gray-600">
-            <p>Developer : {property.builderName}</p>
-            <p>Area : {property.size}</p>
-            <p>Price : {property.price}</p>
+            <p>Project Area : {property.projectArea || "-"}</p>
+            <p>Project Type : {property.projectType || "-"}</p>
+            <p>Project Status : {property.projectStatus || "-"}</p>
+            <p>Project Elevation / Tower : {property.projectElevation || "-"}</p>
             <p>RERA No : {property.rera}</p>
-            <p>Last Updated : {property.updatedAt}</p>
+            <p>Possession : {property.possession || "-"}</p>
           </div>
         </div>
 
-        {/* STICKY CTA + SHARE */}
+        {/* STICKY CTA */}
         <aside className="sticky top-[135px] space-y-4 z-20">
           <BrandCTA propertyTitle={property.title} />
+
           <div className="bg-white rounded-xl p-5 text-center shadow-sm">
             <div className="flex items-center justify-center gap-2 mb-4">
               <p className="font-medium">Share</p>
               <FaLink className="text-gray-400 text-sm" />
             </div>
+
             <div className="flex justify-center gap-3">
               {socialLinks.map(({ Icon, href }, i) => (
                 <Link
@@ -211,77 +196,6 @@ export default function RightSidebar({ property }) {
           </div>
         </aside>
       </div>
-
-      {/* ================= FLOATING GALLERY ================= */}
-      {open && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80">
-          {/* Close Button */}
-          <button
-            onClick={() => setOpen(false)}
-            className="absolute top-5 right-5 text-white text-2xl z-20"
-          >
-            <FaTimes />
-          </button>
-
-          {/* Image Carousel */}
-          <div className="relative w-[90%] max-w-6xl h-[70vh] flex items-center">
-            {/* Left Scroll Button */}
-            <button
-              onClick={() => scroll("left")}
-              className="absolute left-14 z-20 text-white text-3xl bg-black/30 p-2 rounded-full hover:bg-black/50 transition"
-            >
-              <FaChevronLeft />
-            </button>
-
-            {/* Scrollable Images/Videos */}
-            <div
-              ref={scrollRef}
-              className="flex w-full h-full overflow-x-auto scroll-smooth snap-x snap-mandatory"
-            >
-              {videoUrl && (
-                <div className="min-w-full h-full flex items-center justify-center snap-start">
-                  {videoUrl.includes("youtu") ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${getYouTubeId(videoUrl)}`}
-                      className="w-full h-full rounded-lg"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={videoUrl}
-                      controls
-                      className="w-full h-full object-contain rounded-lg"
-                    />
-                  )}
-                </div>
-              )}
-
-              {images.map((img, i) => (
-                <div
-                  key={i}
-                  className="min-w-full h-full flex items-center justify-center snap-start"
-                >
-                  <Image
-                    src={img}
-                    alt=""
-                    width={1400}
-                    height={900}
-                    className="object-contain max-h-full rounded-lg"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Right Scroll Button */}
-            <button
-              onClick={() => scroll("right")}
-              className="absolute right-14 z-20 text-white text-3xl bg-black/30 p-2 rounded-full hover:bg-black/50 transition"
-            >
-              <FaChevronRight />
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

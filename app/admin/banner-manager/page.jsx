@@ -9,7 +9,7 @@ export default function BannerManagerPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Banner Manager</h1>
+      <h1 className="text-2xl font-bold">Page Manager</h1>
 
       {/* Category Dropdown */}
       <CategorySelect

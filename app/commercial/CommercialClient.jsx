@@ -1,3 +1,12 @@
+
+
+
+
+
+
+
+
+
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,284 +18,260 @@ import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
-// ✅ FIXED EXPANDABLE TEXT COMPONENT
+/* ================= EXPANDABLE TEXT ================= */
 const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [isOverflowing, setIsOverflowing] = useState(false);
-    const textRef = useRef(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const textRef = useRef(null);
 
-    useEffect(() => {
-        if (textRef.current) {
-            const element = textRef.current;
-            const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
-            const maxHeight = lineHeight * maxLines;
-            setIsOverflowing(element.scrollHeight > maxHeight);
-        }
-    }, [text, maxLines]);
+  useEffect(() => {
+    if (textRef.current) {
+      const element = textRef.current;
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+      const maxHeight = lineHeight * maxLines;
+      setIsOverflowing(element.scrollHeight > maxHeight);
+    }
+  }, [text, maxLines]);
 
-    const toggleExpanded = () => {
-        setIsExpanded(!isExpanded);
-    };
+  return (
+    <div className={`space-y-1 ${className}`}>
+      <div
+        ref={textRef}
+        className="leading-relaxed transition-all duration-300"
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: isExpanded ? "unset" : maxLines,
+          WebkitBoxOrient: "vertical",
+          overflow: isExpanded ? "visible" : "hidden",
+        }}
+      >
+        {text}
+      </div>
 
-    return (
-        <div className={`space-y-1 ${className}`}>
-            <div
-                ref={textRef}
-                className={`
-                    transition-all duration-300 ease-in-out
-                    ${isExpanded ? 'max-h-none overflow-visible' : `max-h-[${maxLines * 1.4}em] overflow-hidden`}
-                    leading-relaxed
-                `}
-                style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: isExpanded ? 'unset' : maxLines,
-                    WebkitBoxOrient: 'vertical',
-                }}
-            >
-                {text}
-            </div>
-
-            {isOverflowing && (
-                <button
-                    onClick={toggleExpanded}
-                    className="text-sm text-[#F5A300] font-medium hover:text-yellow-600 transition-all duration-200 flex items-center gap-1 pt-1 cursor-pointer"
-                >
-                    {isExpanded ? (
-                        <>
-                            Read Less
-                            <span className="w-3 h-3 border-b-2 border-r-2 rotate-225 -translate-y-[1px] transition-transform duration-200" />
-                        </>
-                    ) : (
-                        <>
-                            Read More
-                            <span className="w-3 h-3 border-b-2 border-r-2 rotate-45 translate-y-[1px] transition-transform duration-200" />
-                        </>
-                    )}
-                </button>
-            )}
-        </div>
-    );
+      {isOverflowing && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-sm text-[#F5A300] font-medium pt-1"
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      )}
+    </div>
+  );
 };
 
 /* ================= COMMERCIAL FILTER FUNCTIONS ================= */
 const COMMERCIAL_TYPE_MAP = {
-    "retail-shops": "isRetail",
-    "sco-plots": "isSCO",
+  "retail-shops": "isRetail",
+  "sco-plots": "isSCO",
 };
 
-const filterForCommercial = (list = []) => {
-    return list.filter((item) => {
-        if (!item.propertyType) return true;
-        return item.propertyType === "commercial";
-    });
-};
+const filterForCommercial = (list = []) =>
+  list.filter(
+    (item) => !item.propertyType || item.propertyType === "commercial"
+  );
 
 const filterCommercialByType = (list = [], type) => {
-    const field = COMMERCIAL_TYPE_MAP[type];
-    if (!field) return filterForCommercial(list);
-    return list.filter(
-        (item) =>
-            (!item.propertyType || item.propertyType === "commercial") &&
-            item[field] === true
-    );
+  const field = COMMERCIAL_TYPE_MAP[type];
+  if (!field) return filterForCommercial(list);
+  return list.filter(
+    (item) =>
+      (!item.propertyType || item.propertyType === "commercial") &&
+      item[field] === true
+  );
 };
 
-/* ================= PAGE COMPONENT ================= */
+/* ================= PAGE ================= */
 export default function CommercialPage({ apartments = [] }) {
-    const [banner, setBanner] = useState(null);
-    const BASE_ROUTE = "/commercial";
-    const router = useRouter();
-    const searchParams = useSearchParams();
+  const BASE_ROUTE = "/commercial";
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    /* ================= STATES ================= */
-    const [keyword, setKeyword] = useState("");
-    const [type, setType] = useState("");
-    const [status, setStatus] = useState("");
-    const [locality, setLocality] = useState("");
-    const [budget, setBudget] = useState("");
-    const [bhk, setBhk] = useState("");
-    const [page, setPage] = useState(1);
-    const [filteredApartments, setFilteredApartments] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [pageTitle, setPageTitle] = useState("Commercial Properties for Sale in Gurgaon");
+  /* ================= STATES ================= */
+  const DEFAULT_INTRO_TEXT = `Strategic commercial properties in prime Gurgaon locations with excellent ROI potential.
+Explore high-demand retail shops and SCO plots along Dwarka Expressway, Golf Course Road,
+and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real estate market.`;
 
-    const apartmentsPerPage = 12;
+  const [banner, setBanner] = useState(null);
+  const [introText, setIntroText] = useState(DEFAULT_INTRO_TEXT);
+  const [pageTitleDynamic, setPageTitleDynamic] = useState(
+    "Commercial Properties for Sale in Gurgaon"
+  );
+  const [pageTitle, setPageTitle] = useState(
+    "Commercial Properties for Sale in Gurgaon"
+  );
 
-    /* ================= UTILS ================= */
-    const formatFilterName = (value) =>
-        value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
+  const [keyword, setKeyword] = useState("");
+  const [type, setType] = useState("");
+  const [status, setStatus] = useState("");
+  const [locality, setLocality] = useState("");
+  const [budget, setBudget] = useState("");
+  const [bhk, setBhk] = useState("");
+  const [page, setPage] = useState(1);
+  const [filteredApartments, setFilteredApartments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    /* ================= YOUR EXISTING LOGIC - UNCHANGED ================= */
-    useEffect(() => {
-        const urlKeyword = searchParams.get("q") || "";
-        const urlType = searchParams.get("type") || "";
-        const urlStatus = searchParams.get("status") || "";
-        const urlLocality = searchParams.get("locality") || "";
-        const urlBudget = searchParams.get("budget") || "";
-        const urlPage = Number(searchParams.get("page")) || 1;
+  const apartmentsPerPage = 12;
 
-        setKeyword(urlKeyword);
-        setType(urlType);
-        setStatus(urlStatus);
-        setLocality(urlLocality);
-        setBudget(urlBudget);
-        setPage(urlPage);
+  /* ================= UTILS ================= */
+  const formatFilterName = (value) =>
+    value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 
-        let title = "Commercial Properties for Sale in Gurgaon";
-        if (urlType) {
-            title = `${formatFilterName(urlType)} for Sale in Gurgaon`;
-        } else if (urlStatus) {
-            title = `${formatFilterName(urlStatus)} Projects in Gurgaon`;
-        } else if (urlLocality) {
-            title = `${formatFilterName(urlLocality)} Properties in Gurgaon`;
-        } else if (urlBudget) {
-            title = `${urlBudget.replace(/-/g, " ")} Properties in Gurgaon`;
-        }
-        setPageTitle(title);
+  /* ================= URL FILTER LOGIC ================= */
+  useEffect(() => {
+    const urlKeyword = searchParams.get("q") || "";
+    const urlType = searchParams.get("type") || "";
+    const urlStatus = searchParams.get("status") || "";
+    const urlLocality = searchParams.get("locality") || "";
+    const urlBudget = searchParams.get("budget") || "";
+    const urlPage = Number(searchParams.get("page")) || 1;
 
-        const hasFilters = urlKeyword || urlType || urlStatus || urlLocality || urlBudget;
+    setKeyword(urlKeyword);
+    setType(urlType);
+    setStatus(urlStatus);
+    setLocality(urlLocality);
+    setBudget(urlBudget);
+    setPage(urlPage);
 
-        if (urlType) {
-            setFilteredApartments(filterCommercialByType(apartments, urlType));
-            return;
-        }
+    let title = "Commercial Properties for Sale in Gurgaon";
 
-        if (hasFilters) {
-            handleSearch();
-        } else {
-            setFilteredApartments(filterForCommercial(apartments));
-        }
-    }, [searchParams, apartments]);
+    if (urlType) {
+      title = `${formatFilterName(urlType)} for Sale in Gurgaon`;
+    } else if (urlStatus) {
+      title = `${formatFilterName(urlStatus)} Projects in Gurgaon`;
+    } else if (urlLocality) {
+      title = `${formatFilterName(urlLocality)} Properties in Gurgaon`;
+    } else if (urlBudget) {
+      title = `${urlBudget.replace(/-/g, " ")} Properties in Gurgaon`;
+    }
 
-    useEffect(() => {
-        let category = "commercial";
+    setPageTitleDynamic(title);
 
-        const urlType = searchParams.get("type");
+    if (urlType) {
+      setFilteredApartments(filterCommercialByType(apartments, urlType));
+    } else {
+      setFilteredApartments(filterForCommercial(apartments));
+    }
+  }, [searchParams, apartments]);
 
-        if (urlType === "retail-shops") category = "retail";
-        else if (urlType === "sco-plots") category = "sco";
+  /* ================= BANNER + ADMIN OVERRIDE (RESIDENTIAL STYLE) ================= */
+  useEffect(() => {
+    let category = "commercial";
+    const urlType = searchParams.get("type");
 
-        getBanner(category).then((data) => {
-            console.log("🔥 Banner Data:", data); // debug
-            setBanner(data);
-        });
+    if (urlType === "retail-shops") category = "retail";
+    else if (urlType === "sco-plots") category = "sco";
 
-    }, [searchParams]);
+    const fetchBanner = async () => {
+      const data = await getBanner(category);
+      setBanner(data);
 
+      if (data?.introText) setIntroText(data.introText);
+      else setIntroText(DEFAULT_INTRO_TEXT);
 
-    const handleSearch = useCallback(async () => {
-        // YOUR EXISTING SEARCH LOGIC - UNCHANGED
-        try {
-            setLoading(true);
-            const params = new URLSearchParams({
-                q: keyword || undefined,
-                type: type || undefined,
-                status: status || undefined,
-                locality: locality || undefined,
-                budget: budget || undefined,
-            });
-
-            for (const [k, v] of params) {
-                if (!v) params.delete(k);
-            }
-
-            const res = await fetch(`/api/search?${params.toString()}`);
-            const data = await res.json();
-            const safeData = Array.isArray(data) ? data : [];
-            const commercialOnly = filterCommercialByType(safeData, type);
-
-            if (commercialOnly.length === 0) {
-                setFilteredApartments(filterForCommercial(apartments));
-            } else {
-                setFilteredApartments(commercialOnly);
-            }
-            setPage(1);
-        } catch (err) {
-            console.error("Search error ❌");
-            setFilteredApartments(filterForCommercial(apartments));
-        } finally {
-            setLoading(false);
-        }
-    }, [keyword, type, status, locality, budget, apartments]);
-
-    const handleFilterChange = useCallback((filterName, value) => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (value) params.set(filterName, value);
-        else params.delete(filterName);
-        params.set("page", "1");
-        router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
-    }, [searchParams, router]);
-
-    const clearFilters = () => {
-        router.push(BASE_ROUTE, { scroll: false });
+      if (data?.pageTitle) setPageTitle(data.pageTitle);
+      else setPageTitle(pageTitleDynamic);
     };
 
-    const handlePageChange = useCallback((newPage) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("page", newPage.toString());
-        router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
-    }, [searchParams, router]);
+    fetchBanner();
+  }, [searchParams, pageTitleDynamic]);
 
-    /* ================= EXACT SAME PAGINATION ================= */
-    const totalPages = useMemo(() => {
-        return Math.ceil(filteredApartments.length / apartmentsPerPage);
-    }, [filteredApartments.length]);
+  /* ================= SEARCH ================= */
+  const handleSearch = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        q: keyword || undefined,
+        type: type || undefined,
+        status: status || undefined,
+        locality: locality || undefined,
+        budget: budget || undefined,
+      });
 
-    const currentPage = Number(searchParams.get("page")) || page;
-    const startIndex = (currentPage - 1) * apartmentsPerPage;
-    const endIndex = startIndex + apartmentsPerPage;
-    const currentApartments = filteredApartments.slice(startIndex, endIndex);
+      for (const [k, v] of params) if (!v) params.delete(k);
 
-    /* ================= ✅ UPDATED LAYOUT WITH EXPANDABLE TEXT ================= */
-    return (
-        <>
-            <Header />
+      const res = await fetch(`/api/search?${params.toString()}`);
+      const data = await res.json();
+      const safeData = Array.isArray(data) ? data : [];
+      setFilteredApartments(filterCommercialByType(safeData, type));
+      setPage(1);
+    } catch {
+      setFilteredApartments(filterForCommercial(apartments));
+    } finally {
+      setLoading(false);
+    }
+  }, [keyword, type, status, locality, budget, apartments]);
 
-            {/* ================= 1. PAGE INTRO ================= */}
-            <section className="bg-[#F6FBFF]">
-                <div className="max-w-[1240px] mx-auto px-4 py-6">
-                    <div className="text-sm text-gray-500 mb-3">Commercial</div>
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                        <div className="max-w-4xl">
-                            <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
-                                {pageTitle}
-                            </h1>
-                            {/* ✅ EXPANDABLE TEXT - REPLACED p TAG */}
-                            <ExpandableText
-                                maxLines={2}
-                                className="mt-2 text-sm sm:text-[15px] text-gray-600"
-                            >
-                                Strategic commercial properties in prime Gurgaon locations with excellent ROI potential.
-                                Explore high-demand retail shops and SCO plots along Dwarka Expressway, Golf Course Road,
-                                and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real estate market.
-                            </ExpandableText>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                            {filteredApartments.length} results
-                        </div>
-                    </div>
-                </div>
-            </section>
+  const handlePageChange = useCallback(
+    (newPage) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", newPage.toString());
+      router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, router]
+  );
 
-            {/* ================= 2. TRENDING BANNER ================= */}
-            <section className="bg-white py-6 sm:py-10 md:py-5">
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
-                    <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
-                        Trending <span className="text-[#F5A300]">Projects</span>
-                    </h2>
-                    <div className="relative w-full h-[230px] md:h-[300px] md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
-                        <Image
-                            src={banner?.image || "/default-banner.jpg"}
-                            alt="Trending Banner"
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
+  /* ================= PAGINATION ================= */
+  const totalPages = useMemo(
+    () => Math.ceil(filteredApartments.length / apartmentsPerPage),
+    [filteredApartments.length]
+  );
 
-                </div>
-            </section>
+  const currentPage = Number(searchParams.get("page")) || page;
+  const startIndex = (currentPage - 1) * apartmentsPerPage;
+  const currentApartments = filteredApartments.slice(
+    startIndex,
+    startIndex + apartmentsPerPage
+  );
 
-            {/* ================= 3. HERO SECTION ================= */}
+  /* ================= RENDER ================= */
+  return (
+    <>
+      <Header />
+
+      {/* PAGE INTRO */}
+      <section className="bg-[#F6FBFF]">
+        <div className="max-w-[1240px] mx-auto px-4 py-6">
+          <div className="text-sm text-gray-500 mb-3">Commercial</div>
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+            <div className="max-w-4xl">
+              <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
+                {banner?.pageTitle || pageTitleDynamic}
+              </h1>
+
+              <ExpandableText
+                maxLines={2}
+                className="mt-2 text-sm sm:text-[15px] text-gray-600"
+              >
+                {introText}
+              </ExpandableText>
+            </div>
+
+            <div className="text-sm text-gray-500">
+              {filteredApartments.length} results
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRENDING BANNER */}
+      <section className="bg-white py-6">
+        <div className="max-w-[1440px] mx-auto px-4">
+          <h2 className="text-center text-2xl font-bold mb-4">
+            Trending <span className="text-[#F5A300]">Projects</span>
+          </h2>
+          <div className="relative w-full h-[250px] rounded-lg overflow-hidden">
+            <Image
+              src={banner?.image || "/default-banner.jpg"}
+              alt="Trending Banner"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+       {/* ================= 3. HERO SECTION ================= */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 {/* MOBILE HERO TEXT */}
                 <div className="lg:hidden mb-6 text-center px-2">
@@ -367,24 +352,38 @@ export default function CommercialPage({ apartments = [] }) {
                 </div>
             </section>
 
-            {/* ================= 4. LISTINGS ================= */}
-            <main className="py-10 lg:pt-20">
-                <div className="max-w-[1240px] mx-auto px-4 lg:px-12">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {currentApartments.map((item) => (
-                            <PropertyCard key={item.id} baseRoute="commercial" property={{
-                                title: item.title, developer: item.developer, location: item.location,
-                                bhk: item.configurations?.join(", "), size: item.areaRange, price: item.priceRange,
-                                img: item.mainImage?.url || "/placeholder.jpg", slug: item.slug || item.id,
-                                isTrending: item.isTrending, isNewLaunch: item.isNewLaunch, isRera: item.isRera,
-                            }} />
-                        ))}
-                    </div>
-                </div>
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-            </main>
+      {/* LISTINGS */}
+      <main className="py-10">
+        <div className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {currentApartments.map((item) => (
+            <PropertyCard
+              key={item.id}
+              baseRoute="commercial"
+              property={{
+                title: item.title,
+                developer: item.developer,
+                location: item.location,
+                bhk: item.configurations?.join(", "),
+                size: item.areaRange,
+                price: item.priceRange,
+                img: item.mainImage?.url || "/placeholder.jpg",
+                slug: item.slug || item.id,
+                isTrending: item.isTrending,
+                isNewLaunch: item.isNewLaunch,
+                isRera: item.isRera,
+              }}
+            />
+          ))}
+        </div>
 
-            <Footer />
-        </>
-    );
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </main>
+
+      <Footer />
+    </>
+  );
 }

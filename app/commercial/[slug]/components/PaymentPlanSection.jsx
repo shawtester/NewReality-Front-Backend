@@ -1,14 +1,18 @@
 "use client";
 
 export default function PaymentPlanSection({ paymentPlan }) {
-
-  // ✅ SAFE ARRAY FIX (Firestore / hydration issues handled)
+  // ✅ SAFE ARRAY FIX
   const plans = Array.isArray(paymentPlan)
     ? paymentPlan
     : Object.values(paymentPlan || {});
 
-  // ❌ agar empty hai toh section hide
   if (!plans.length) return null;
+
+  /* ================= LAYOUT LOGIC ================= */
+
+  const isSingle = plans.length === 1;
+  const isDouble = plans.length === 2;
+  const isScrollable = plans.length >= 3;
 
   return (
     <section
@@ -20,12 +24,22 @@ export default function PaymentPlanSection({ paymentPlan }) {
       </h2>
 
       <div className="bg-[#FBF6F1] rounded-2xl px-6 py-10">
-        {/* 🔥 HORIZONTAL SCROLL */}
-        <div className="flex overflow-x-auto gap-8 no-scrollbar">
+        <div
+          className={`
+            flex gap-8 no-scrollbar
+            ${isScrollable ? "overflow-x-auto" : ""}
+            ${isSingle ? "justify-center" : ""}
+            ${isDouble ? "justify-between" : ""}
+          `}
+        >
           {plans.map((p, i) => (
             <div
               key={i}
-              className="min-w-[220px] text-center border-r last:border-0 pr-6"
+              className={`
+                text-center border-r last:border-0 pr-6
+                ${isSingle ? "w-[260px]" : ""}
+                ${isDouble ? "w-1/2" : "min-w-[220px]"}
+              `}
             >
               <p className="text-lg font-medium mb-4">
                 {p?.title}

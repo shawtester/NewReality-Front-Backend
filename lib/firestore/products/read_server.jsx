@@ -6,12 +6,34 @@ import {
   getDoc,
   query,
   where,
-  orderBy, 
+  orderBy,
   doc,
   limit,
 } from "firebase/firestore";
 
+/* =====================================================
+   🔹 SAFE SERIALIZER (🔥 IMPORTANT FIX)
+===================================================== */
+const serializeProperty = (d) => {
+  const data = d.data();
 
+  return {
+    id: d.id,
+
+    ...data,
+
+    // ✅ FORCE brochure pass (Next.js nested object fix)
+    brochure: data?.brochure
+      ? {
+          url: data.brochure.url || "",
+          name: data.brochure.name || "",
+        }
+      : null,
+
+    // ✅ Timestamp safe
+    timestampCreate: data?.timestampCreate?.seconds ?? null,
+  };
+};
 
 /* =====================================================
    🔹 ALL ACTIVE PROPERTIES (HOME PAGE)
@@ -25,12 +47,7 @@ export async function getAllProperties() {
 
   const snap = await getDocs(q);
 
-  return snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-    // ✅ Next.js warning fix
-    timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
-  }));
+  return snap.docs.map((d) => serializeProperty(d));
 }
 
 /* =====================================================
@@ -46,11 +63,7 @@ export async function getNewLaunchProperties() {
 
   const snap = await getDocs(q);
 
-  return snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-    timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
-  }));
+  return snap.docs.map((d) => serializeProperty(d));
 }
 
 /* =====================================================
@@ -66,11 +79,7 @@ export async function getTrendingProperties() {
 
   const snap = await getDocs(q);
 
-  return snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-    timestampCreate: d.data()?.timestampCreate?.seconds ?? null,
-  }));
+  return snap.docs.map((d) => serializeProperty(d));
 }
 
 /* =====================================================
@@ -90,13 +99,7 @@ export async function getPropertyBySlug(slug) {
 
   if (snap.empty) return null;
 
-  const docSnap = snap.docs[0];
-
-  return {
-    id: docSnap.id,
-    ...docSnap.data(),
-    timestampCreate: docSnap.data()?.timestampCreate?.seconds ?? null,
-  };
+  return serializeProperty(snap.docs[0]);
 }
 
 /* =====================================================
@@ -110,30 +113,20 @@ export async function getPropertyById(id) {
 
   if (!snap.exists()) return null;
 
-  const data = snap.data();
-
-  return {
-    id: snap.id,
-    ...data,
-    timestampCreate: data?.timestampCreate?.seconds ?? null,
-  };
+  return serializeProperty(snap);
 }
 
 /* =====================================================
    🔹 SAFE HELPER: GET PROPERTY BY SLUG OR ID
-   (Client-side fallback utility)
 ===================================================== */
 export async function getPropertyBySlugOrId(value) {
   if (!value) return null;
 
-  // 1️⃣ Try slug
   let property = await getPropertyBySlug(value);
 
-  // 2️⃣ Fallback to ID
   if (!property) {
     property = await getPropertyById(value);
   }
 
   return property;
 }
-

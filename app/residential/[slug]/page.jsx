@@ -22,6 +22,44 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
+export async function generateMetadata({ params }) {
+  const property = await getPropertyBySlugOrId(params.slug);
+
+  if (!property) {
+    return {
+      title: "Property Not Found",
+      description: "",
+    };
+  }
+
+  const title =
+    property.metaTitle ||
+    `${property.title} in ${property.location} | Price & Details`;
+
+  const description =
+    property.metaDescription ||
+    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
+
+  const keywords =
+    property.metaKeywords ||
+    `${property.title}, ${property.location}, real estate`;
+
+  return {
+    title,
+    description,
+    keywords,
+
+    openGraph: {
+      title,
+      description,
+      images: property.mainImage?.url
+        ? [property.mainImage.url]
+        : [],
+    },
+  };
+}
+
+
 export const dynamic = "force-dynamic";
 
 export default async function PropertyPage({ params }) {
@@ -47,7 +85,7 @@ export default async function PropertyPage({ params }) {
     slug: property.slug,
     title: property.title,
     location: property.location,
-    
+
     builderId: property.builderId || null,
     builderName: property.developer || "",
     configurations: property.configurations || [],
@@ -57,7 +95,8 @@ export default async function PropertyPage({ params }) {
     rera: property.reraNumber,
     updatedAt: property.lastUpdated,
 
-    brochureUrl: property.brochure?.url || "",
+    brochure: property.brochure || null,
+
 
     images: [
       ...(property.mainImage?.url ? [property.mainImage.url] : []),

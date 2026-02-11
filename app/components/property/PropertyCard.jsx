@@ -19,6 +19,9 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
   const [open, setOpen] = useState(false);
   const [countryCode, setCountryCode] = useState("+91");
 
+  /* ✅ NEW — THANK YOU STATE */
+  const [showThankYou, setShowThankYou] = useState(false);
+
   // 🔹 FORM STATE (LOGIC ONLY)
   const [form, setForm] = useState({
     name: "",
@@ -55,7 +58,20 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
       });
 
       setForm({ name: "", email: "", phone: "", message: "" });
+
+      /* ✅ FORM CLOSE FIRST */
       setOpen(false);
+
+      /* ✅ SHOW THANK YOU AFTER SMALL DELAY */
+      setTimeout(() => {
+        setShowThankYou(true);
+      }, 150);
+
+      /* ✅ AUTO CLOSE THANK YOU */
+      setTimeout(() => {
+        setShowThankYou(false);
+      }, 2200);
+
     } catch (error) {
       console.error("Contact submit error:", error);
     }
@@ -97,20 +113,16 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
                   />
                 </span>
               )}
-
             </div>
 
-            {/* BUILDER */}
             <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
               By <span className="font-medium text-gray-700">{builder}</span>
             </p>
 
-            {/* LOCATION */}
             <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
               {location}
             </p>
 
-            {/* DETAILS */}
             <div className="mt-2 flex items-center justify-between text-[11px] md:text-xs lg:text-sm text-gray-500">
               <span>{bhk}</span>
               <span>{size}</span>
@@ -118,7 +130,6 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
 
             <div className="my-2 md:my-3 lg:my-4 h-px w-full bg-gray-200" />
 
-            {/* PRICE + CONTACT */}
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs md:text-sm lg:text-base font-semibold text-gray-900">
                 {price}
@@ -150,7 +161,6 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6 relative">
-            {/* CLOSE */}
             <button
               onClick={() => setOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-black"
@@ -158,7 +168,6 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
               ✕
             </button>
 
-            {/* HEADER */}
             <div className="mb-5">
               <h3 className="text-xl font-semibold text-gray-900">
                 Get in Touch
@@ -171,17 +180,14 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
               </p>
             </div>
 
-            {/* FORM — ORIGINAL LAYOUT PRESERVED */}
             <form className="space-y-4" onSubmit={handleSubmit}>
-              {/* NAME */}
               <div>
                 <label className="text-xs font-medium text-gray-600">
                   Full Name
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter your name"
-                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm outline-none"
                   value={form.name}
                   onChange={(e) =>
                     setForm({ ...form, name: e.target.value })
@@ -190,7 +196,6 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
                 />
               </div>
 
-              {/* PHONE */}
               <div>
                 <label className="text-xs font-medium text-gray-600">
                   Phone Number
@@ -210,7 +215,6 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
 
                   <input
                     type="tel"
-                    placeholder="Enter phone number"
                     className="flex-1 px-3 py-2 text-sm outline-none"
                     value={form.phone}
                     onChange={(e) =>
@@ -221,15 +225,13 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
                 </div>
               </div>
 
-              {/* EMAIL */}
               <div>
                 <label className="text-xs font-medium text-gray-600">
                   Email Address
                 </label>
                 <input
                   type="email"
-                  placeholder="Enter your email"
-                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm outline-none"
                   value={form.email}
                   onChange={(e) =>
                     setForm({ ...form, email: e.target.value })
@@ -238,15 +240,13 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
                 />
               </div>
 
-              {/* MESSAGE */}
               <div>
                 <label className="text-xs font-medium text-gray-600">
                   Message (optional)
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Any specific requirement?"
-                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-[#F5A300] outline-none"
+                  className="mt-1 w-full border rounded-lg px-4 py-2 text-sm outline-none"
                   value={form.message}
                   onChange={(e) =>
                     setForm({ ...form, message: e.target.value })
@@ -254,14 +254,25 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
                 />
               </div>
 
-              {/* SUBMIT */}
               <button
                 type="submit"
-                className="w-full bg-[#F5A300] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#e39a00] transition"
+                className="w-full bg-[#F5A300] text-white py-2.5 rounded-lg text-sm font-semibold"
               >
                 Request Callback
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ THANK YOU POPUP */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-10 text-center shadow-xl">
+            <h3 className="text-lg font-semibold text-[#F5A300]">
+              Thank You 
+            </h3>
+            
           </div>
         </div>
       )}

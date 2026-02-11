@@ -5,6 +5,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
+
   const [loanAmount, setLoanAmount] = useState(2500000);
   const [interestRate, setInterestRate] = useState(10.5);
   const [tenure, setTenure] = useState(30);
@@ -49,6 +50,18 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       maximumFractionDigits: 2,
     })}`;
 
+  /* ================= DONUT ================= */
+  const interestPercent =
+    totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0;
+
+  const principalPercent = 100 - interestPercent;
+
+  const radius = 70;
+  const circumference = 2 * Math.PI * radius;
+
+  const interestStroke = (interestPercent / 100) * circumference;
+  const principalStroke = circumference - interestStroke;
+
   /* ================= VALIDATION ================= */
   const validate = () => {
     const newErrors = {};
@@ -84,7 +97,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
         createdAt: serverTimestamp(),
       });
 
-      /* ✅ THANK YOU POPUP */
+      /* THANK YOU POPUP */
       setShowThankYou(true);
 
       setTimeout(() => {
@@ -95,6 +108,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       setName("");
       setPhone("");
       setEmail("");
+
     } finally {
       setLoading(false);
     }
@@ -113,43 +127,73 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
             <h3 className="text-lg font-semibold mb-4 text-center">
               Break-up of Total Payment
             </h3>
+
+            <svg width="200" height="200" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r={radius} fill="none" stroke="#F1D2A2" strokeWidth="20" />
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke="#9C6A1E"
+                strokeWidth="20"
+                strokeDasharray={`${interestStroke} ${principalStroke}`}
+                transform="rotate(-90 100 100)"
+              />
+            </svg>
+
+            <div className="flex gap-8 mt-6 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#9C6A1E]" />
+                Interest ({interestPercent.toFixed(1)}%)
+              </span>
+
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#F1D2A2]" />
+                Principal ({principalPercent.toFixed(1)}%)
+              </span>
+            </div>
           </div>
 
           {/* LEFT */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
+
             <div>
               <label className="text-sm text-gray-600">Loan Amount</label>
-              <input
-                type="number"
-                value={loanAmount}
-                onChange={(e) => setLoanAmount(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md"
-              />
+              <input type="number" value={loanAmount} onChange={(e) => setLoanAmount(+e.target.value)} className="w-full mt-1 px-4 py-2 border rounded-md" />
             </div>
 
             <div>
-              <label className="text-sm text-gray-600">
-                Interest Rate (%)
-              </label>
-              <input
-                type="number"
-                value={interestRate}
-                onChange={(e) => setInterestRate(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md"
-              />
+              <label className="text-sm text-gray-600">Interest Rate (%)</label>
+              <input type="number" value={interestRate} onChange={(e) => setInterestRate(+e.target.value)} className="w-full mt-1 px-4 py-2 border rounded-md" />
             </div>
 
             <div>
-              <label className="text-sm text-gray-600">
-                Loan Tenure (Years)
-              </label>
-              <input
-                type="number"
-                value={tenure}
-                onChange={(e) => setTenure(+e.target.value)}
-                className="w-full mt-1 px-4 py-2 border rounded-md"
-              />
+              <label className="text-sm text-gray-600">Loan Tenure (Years)</label>
+              <input type="number" value={tenure} onChange={(e) => setTenure(+e.target.value)} className="w-full mt-1 px-4 py-2 border rounded-md" />
             </div>
+
+            <div className="bg-gray-50 rounded-md p-4">
+              <p className="text-sm text-gray-600">Monthly EMI</p>
+              <p className="text-2xl font-bold text-[#F5A300]">
+                {formatCurrency(emi)}
+              </p>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span>Interest to be paid</span>
+              <span className="font-medium">
+                {formatCurrency(totalInterest)}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-sm border-t pt-2">
+              <span>Total of Payments</span>
+              <span className="font-semibold">
+                {formatCurrency(totalPayment)}
+              </span>
+            </div>
+
 
             <button
               onClick={() => setShowLoanPopup(true)}
@@ -165,7 +209,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       {showLoanPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
 
-          {/* ✅ THANK YOU */}
           {showThankYou && (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center">
               <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl">
@@ -180,6 +223,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
           )}
 
           <div className="bg-white w-full max-w-md rounded-xl p-6 relative">
+
             <button
               onClick={() => setShowLoanPopup(false)}
               className="absolute top-3 right-3 text-xl"
@@ -187,50 +231,17 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
               ✕
             </button>
 
-            <h3 className="text-xl font-semibold mb-1">
-              Apply for Loan
-            </h3>
-
-            <p className="text-sm text-gray-500 mb-4">
-              Property: <span className="font-medium">{propertyTitle}</span>
-            </p>
+            <h3 className="text-xl font-semibold mb-1">Apply for Loan</h3>
 
             <div className="space-y-3">
-              <div>
-                <input
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md"
-                />
-                {errors.name && (
-                  <p className="text-xs text-red-500">{errors.name}</p>
-                )}
-              </div>
+              <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
 
-              <div>
-                <input
-                  placeholder="Phone Number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md"
-                />
-                {errors.phone && (
-                  <p className="text-xs text-red-500">{errors.phone}</p>
-                )}
-              </div>
+              <input placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
 
-              <div>
-                <input
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md"
-                />
-                {errors.email && (
-                  <p className="text-xs text-red-500">{errors.email}</p>
-                )}
-              </div>
+              <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
             </div>
 
             <button
@@ -246,4 +257,3 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
     </>
   );
 }
-

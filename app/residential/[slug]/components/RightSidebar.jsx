@@ -67,6 +67,16 @@ export default function RightSidebar({ property }) {
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
+  const copyPropertyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Property link copied ✅");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   return (
     <>
       {/* ================= MOBILE ================= */}
@@ -173,8 +183,16 @@ export default function RightSidebar({ property }) {
           <div className="bg-white rounded-xl p-5 text-center shadow-sm">
             <div className="flex items-center justify-center gap-2 mb-4">
               <p className="font-medium">Share</p>
-              <FaLink className="text-gray-400 text-sm" />
+
+              <button
+                onClick={copyPropertyLink}
+                className="text-gray-400 text-sm hover:text-[#DBA40D] transition"
+                title="Copy Property Link"
+              >
+                <FaLink />
+              </button>
             </div>
+
 
             <div className="flex justify-center gap-3">
               {socialLinks.map(({ Icon, href }, i) => (

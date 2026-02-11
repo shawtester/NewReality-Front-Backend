@@ -50,23 +50,15 @@ export default function TitleBlockWithBrochure({ property }) {
         propertyTitle: property.title,
         createdAt: serverTimestamp(),
       });
-
+      /* ✅ THANK YOU POPUP */
+      setShowThankYou(true);
+      
       if (property?.brochure?.url) {
-        const link = document.createElement("a");
-        link.href = property.brochure.url;
-        link.setAttribute(
-          "download",
-          property.brochure.name || "brochure.pdf"
-        );
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+         window.open(property.brochure.url, "_blank");
       } else {
         alert("Brochure not available");
       }
 
-      /* ✅ THANK YOU POPUP */
-      setShowThankYou(true);
 
       setTimeout(() => {
         setShowThankYou(false);

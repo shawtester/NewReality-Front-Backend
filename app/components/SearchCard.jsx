@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FiMapPin, FiSearch, FiPlay } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-
 import { getHero } from "@/lib/firestore/hero/read";
 
 const TAGS = [
@@ -29,8 +28,6 @@ export default function SearchCard() {
 
   const [hero, setHero] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // ✅ ADDED STATE (VIDEO POPUP)
   const [showVideo, setShowVideo] = useState(false);
 
   /* ================= FETCH HERO ================= */
@@ -76,7 +73,6 @@ export default function SearchCard() {
     if (hero?.mediaType === "instagram") {
       videoUrl = hero.videoUrl;
     } else {
-      // 🔥 AUTO CONVERT YOUTUBE LINK TO EMBED FORMAT
       const idMatch =
         hero.videoUrl.match(/embed\/([^?]+)/) ||
         hero.videoUrl.match(/v=([^&]+)/) ||
@@ -89,7 +85,6 @@ export default function SearchCard() {
         : hero.videoUrl;
     }
   }
-
 
   /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
@@ -116,15 +111,17 @@ export default function SearchCard() {
     <section className="relative w-full">
       {/* ================= HERO ================= */}
       <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden">
+        
         {/* BACKGROUND SLIDER */}
         {hero?.images?.length ? (
           hero.images.map((img, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide
                   ? "opacity-100 z-10"
                   : "opacity-0 z-0"
-                }`}
+              }`}
             >
               <Image
                 src={img}
@@ -144,22 +141,21 @@ export default function SearchCard() {
           />
         )}
 
-        {/* ================= MOBILE VIDEO BUTTON (UPDATED) ================= */}
-        {hero?.videoUrl && (
-          <button
-            onClick={() => setShowVideo(true)}
-            className="absolute md:hidden left-4 bottom-4 z-30 flex items-center gap-2 bg-black/70 backdrop-blur text-white px-4 py-2 rounded-full shadow-lg"
-          >
-            <FiPlay className="text-lg" />
-            <span className="text-xs font-medium">
-              Watch Video
-            </span>
-          </button>
-        )}
+      {/* ================= MOBILE YOUTUBE PLAY ICON ================= */}
+{hero?.videoUrl && (
+  <button
+    onClick={() => setShowVideo(true)}
+    className="absolute md:hidden right-4 top-1/2 -translate-y-1/2 
+               z-40 w-16 h-16 flex items-center justify-center
+               rounded-full bg-red-600 shadow-2xl"
+  >
+    <FiPlay className="text-white text-3xl ml-1" />
+  </button>
+)}
 
-        {/* ================= MOBILE VIDEO POPUP (NEW) ================= */}
+        {/* ================= MOBILE VIDEO POPUP ================= */}
         {showVideo && hero?.videoUrl && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4 md:hidden">
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4 md:hidden">
             <div className="relative w-full max-w-[320px] rounded-2xl overflow-hidden bg-black">
               <button
                 onClick={() => setShowVideo(false)}
@@ -189,12 +185,12 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* ================= DESKTOP VIDEO ================= */}
+        {/* ================= DESKTOP VIDEO (UNCHANGED) ================= */}
         {hero?.videoUrl && hero?.mediaType === "youtube" && (
           <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
             <iframe
               className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
-              src={`${hero.videoUrl}?autoplay=1&mute=1`}
+              src={`${videoUrl}?autoplay=1&mute=1`}
               allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
             />
@@ -216,6 +212,7 @@ export default function SearchCard() {
       {/* ================= SEARCH CARD ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-20">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
+          
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">
               Find your perfect home with{" "}
@@ -223,23 +220,25 @@ export default function SearchCard() {
             </h2>
 
             <div className="flex rounded-full bg-gray-100">
-              {[{ label: "Residential", value: "residential" }, { label: "Commercial", value: "commercial" }].map(
-                (tab) => (
-                  <button
-                    key={tab.value}
-                    onClick={() => {
-                      setPropertyType(tab.value);
-                      setResults([]);
-                    }}
-                    className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
-                        ? "bg-white shadow text-gray-900"
-                        : "text-gray-500"
-                      }`}
-                  >
-                    {tab.label}
-                  </button>
-                )
-              )}
+              {[
+                { label: "Residential", value: "residential" },
+                { label: "Commercial", value: "commercial" },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
+                  onClick={() => {
+                    setPropertyType(tab.value);
+                    setResults([]);
+                  }}
+                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${
+                    propertyType === tab.value
+                      ? "bg-white shadow text-gray-900"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 

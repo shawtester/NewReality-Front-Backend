@@ -10,8 +10,8 @@ import { getHero } from "@/lib/firestore/hero/read";
 const TAGS = [
   "Sohna Road",
   "Golf Course Road",
-  "MG Road",
-  "Northern Peripheral Road",
+  "Golf Course Extension",
+  "Old Gurgaon",
   "Dwarka Expressway",
   "New Gurgaon",
 ];
@@ -122,8 +122,8 @@ export default function SearchCard() {
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide
-                  ? "opacity-100 z-10"
-                  : "opacity-0 z-0"
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0"
                 }`}
             >
               <Image
@@ -230,10 +230,18 @@ export default function SearchCard() {
                     onClick={() => {
                       setPropertyType(tab.value);
                       setResults([]);
+
+                      // 🔥 PAGE REDIRECT
+                      if (tab.value === "residential") {
+                        router.push("/residential");
+                      } else if (tab.value === "commercial") {
+                        router.push("/commercial");
+                      }
                     }}
+
                     className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
-                        ? "bg-white shadow text-gray-900"
-                        : "text-gray-500"
+                      ? "bg-white shadow text-gray-900"
+                      : "text-gray-500"
                       }`}
                   >
                     {tab.label}
@@ -295,9 +303,10 @@ export default function SearchCard() {
             <button
               key={tag}
               onClick={() => {
-                setQuery(tag);
-                handleSearch(tag);
+                const slug = tag.toLowerCase().replaceAll(" ", "-");
+                router.push(`/${slug}`);
               }}
+
               className="whitespace-nowrap rounded-full border px-3 py-1.5 text-xs bg-white hover:bg-gray-50"
             >
               {tag}

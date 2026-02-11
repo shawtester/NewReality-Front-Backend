@@ -124,7 +124,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   const handleBannerImageClick = useCallback(() => {
     const link = getCurrentImageLink(currentImageIndex);
     console.log("🔗 Banner click - Image index:", currentImageIndex, "Link:", link);
-    
+
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     } else {
@@ -212,7 +212,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     if (!banner?.images || banner.images.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
+      setCurrentImageIndex((prevIndex) =>
         prevIndex === banner.images.length - 1 ? 0 : prevIndex + 1
       );
     }, 4000);
@@ -250,14 +250,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     startIndex + apartmentsPerPage
   );
 
-<<<<<<< HEAD
   const displayTitle = banner?.pageTitle || pageTitleDynamic;
   const totalImages = banner?.images?.length || 0;
 
-=======
-
-  /* ================= RENDER ================= */
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
   return (
     <>
       <Header />
@@ -291,7 +286,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
           <h2 className="text-center text-2xl font-bold mb-6">
             Trending <span className="text-[#F5A300]">Projects</span>
           </h2>
-          
+
           <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
             {banner?.images && totalImages > 0 ? (
               <>
@@ -301,7 +296,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                     <div
                       key={index}
                       className="absolute inset-0 w-full h-full"
-                      style={{ 
+                      style={{
                         opacity: currentImageIndex === index ? 1 : 0,
                         transition: 'opacity 1000ms ease-in-out'
                       }}
@@ -319,7 +314,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 </div>
 
                 {/* ✅ CLICK OVERLAY - Gets link from YOUR imageLinks map */}
-                <div 
+                <div
                   className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
                   onClick={handleBannerImageClick}
                   role="button"
@@ -339,11 +334,10 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
-                        currentImageIndex === index
+                      className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${currentImageIndex === index
                           ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
                           : 'bg-white/80 hover:bg-white hover:scale-110'
-                      }`}
+                        }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
@@ -366,15 +360,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* HERO + SEARCH */}
       <section className="lg:bg-[#F6FBFF] pt-4 relative">
         {/* Mobile Hero Text */}
-=======
-      {/* ================= 3. HERO SECTION ================= */}
-      <section className="lg:bg-[#F6FBFF] pt-4 relative">
-        {/* MOBILE HERO TEXT */}
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
         <div className="lg:hidden mb-6 text-center px-2">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
             Your <span className="text-[#F5A300]">Property</span>, <br />
@@ -397,28 +385,27 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
             </div>
           </div>
 
-<<<<<<< HEAD
           {/* Mobile Search */}
           <div className="lg:hidden mt-8 mb-12">
             <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
-              <input 
-                value={keyword} 
-                onChange={(e) => setKeyword(e.target.value)} 
-                placeholder="Enter Keyword" 
-                className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" 
+              <input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Enter Keyword"
+                className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0"
               />
-              <select 
-                value={type} 
-                onChange={(e) => handleFilterChange('type', e.target.value)} 
+              <select
+                value={type}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option>Type</option>
                 <option value="retail-shops">Retail Shops</option>
                 <option value="sco-plots">SCO Plots</option>
               </select>
-              <select 
-                value={status} 
-                onChange={(e) => handleFilterChange('status', e.target.value)} 
+              <select
+                value={status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option>Status</option>
@@ -427,9 +414,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="under-construction">Under Construction</option>
                 <option value="pre-launch">Pre Launch</option>
               </select>
-              <select 
-                value={locality} 
-                onChange={(e) => handleFilterChange('locality', e.target.value)} 
+              <select
+                value={locality}
+                onChange={(e) => handleFilterChange('locality', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option>Localities</option>
@@ -442,9 +429,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="spr">SPR</option>
                 <option value="nh8">NH8</option>
               </select>
-              <select 
-                value={budget} 
-                onChange={(e) => handleFilterChange('budget', e.target.value)} 
+              <select
+                value={budget}
+                onChange={(e) => handleFilterChange('budget', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option>Budget</option>
@@ -457,16 +444,16 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="7-8-cr">7 – 8 Cr</option>
                 <option value="above-8-cr">Above 8 Cr</option>
               </select>
-              <select 
-                value={bhk} 
-                onChange={(e) => handleFilterChange('bhk', e.target.value)} 
+              <select
+                value={bhk}
+                onChange={(e) => handleFilterChange('bhk', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option value="">Size</option>
                 <option value="above-5-bhk">Large Spaces</option>
               </select>
-              <button 
-                onClick={() => handleFilterChange('q', keyword || null)} 
+              <button
+                onClick={() => handleFilterChange('q', keyword || null)}
                 className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0"
               >
                 Search
@@ -475,35 +462,26 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
           </div>
 
           {/* Desktop Search */}
-          <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-            <div className="
-              bg-white relative
-              lg:left-[44%]
-              xl:left-[10%]
-              2xl:right-[28%]
-              shadow-2xl px-5 py-3
-              flex items-center gap-3
-              rounded-full
-              border border-yellow-400
-            ">
-              <input 
-                value={keyword} 
-                onChange={(e) => setKeyword(e.target.value)} 
-                placeholder="Enter Keyword" 
-                className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" 
+          <div className="hidden lg:block absolute bottom-[100px] left-1/2 -translate-x-[60%] w-full max-w-[950px] z-20 px-4">
+            <div className="bg-white shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
+              <input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Enter Keyword"
+                className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0"
               />
-              <select 
-                value={type} 
-                onChange={(e) => handleFilterChange('type', e.target.value)} 
+              <select
+                value={type}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
                 className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0"
               >
                 <option>Type</option>
                 <option value="retail-shops">Retail Shops</option>
                 <option value="sco-plots">SCO Plots</option>
               </select>
-              <select 
-                value={status} 
-                onChange={(e) => handleFilterChange('status', e.target.value)} 
+              <select
+                value={status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
                 className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0"
               >
                 <option>Status</option>
@@ -512,9 +490,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="under-construction">Under Construction</option>
                 <option value="pre-launch">Pre Launch</option>
               </select>
-              <select 
-                value={locality} 
-                onChange={(e) => handleFilterChange('locality', e.target.value)} 
+              <select
+                value={locality}
+                onChange={(e) => handleFilterChange('locality', e.target.value)}
                 className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0"
               >
                 <option>Localities</option>
@@ -527,9 +505,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="spr">SPR</option>
                 <option value="nh8">NH8</option>
               </select>
-              <select 
-                value={budget} 
-                onChange={(e) => handleFilterChange('budget', e.target.value)} 
+              <select
+                value={budget}
+                onChange={(e) => handleFilterChange('budget', e.target.value)}
                 className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0"
               >
                 <option>Budget</option>
@@ -542,73 +520,20 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="7-8-cr">7 – 8 Cr</option>
                 <option value="above-8-cr">Above 8 Cr</option>
               </select>
-              <select 
-                value={bhk} 
-                onChange={(e) => handleFilterChange('bhk', e.target.value)} 
+              <select
+                value={bhk}
+                onChange={(e) => handleFilterChange('bhk', e.target.value)}
                 className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0"
               >
                 <option value="">Size</option>
                 <option value="above-5-bhk">Large Spaces</option>
               </select>
-              <button 
-                onClick={() => handleFilterChange('q', keyword || null)} 
+              <button
+                onClick={() => handleFilterChange('q', keyword || null)}
                 className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0"
               >
                 Search
               </button>
-=======
-          {/* ✅ MOBILE SEARCH - 6 SELECTS EXACT SAME */}
-          <div className="lg:hidden mt-8 mb-12">
-            <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
-              <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
-              <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                <option>Type</option><option value="commercial">Commercial Property</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>
-              </select>
-              <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                <option>Status</option><option value="new-launch">New Launch Project</option><option value="ready-to-move">Ready to Move Project</option><option value="under-construction">Under Construction Project</option><option value="pre-launch">Pre Launch Project</option>
-              </select>
-              <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
-              </select>
-              <select value={budget} onChange={(e) => handleFilterChange('budget', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
-              </select>
-              <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                <option value="">Size</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
-              </select>
-              <button className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">Search</button>
-            </div>
-          </div>
-
-          {/* ✅ DESKTOP SEARCH - EXACT POSITIONING */}
-          <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-            <div className="
-  bg-white relative
-  lg:left-[44%]
-  xl:left-[10%]
-  2xl:right-[28%]
-  shadow-2xl px-5 py-3
-  flex items-center gap-3
-  rounded-full
-  border border-yellow-400
-">                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
-              <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                <option>Type</option><option value="commercial">Commercial Property</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>
-              </select>
-              <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                <option>Status</option><option value="new-launch">New Launch Project</option><option value="ready-to-move">Ready to Move Project</option><option value="under-construction">Under Construction Project</option><option value="pre-launch">Pre Launch Project</option>
-              </select>
-              <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
-              </select>
-              <select value={budget} onChange={(e) => handleFilterChange('budget', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
-              </select>
-              <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                <option value="">Size</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
-              </select>
-              <button className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">Search</button>
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
             </div>
           </div>
         </div>

@@ -10,8 +10,9 @@ export default function NewLaunchProjects({ properties = [] }) {
     .filter((p) => p?.isNewLaunch)
     .sort((a, b) => {
       //  Firestore Timestamp support
-      const dateA = a?.createdAt?.seconds || 0;
-      const dateB = b?.createdAt?.seconds || 0;
+      const dateA = a?.timestampCreate?.seconds || 0;
+      const dateB = b?.timestampCreate?.seconds || 0;
+
       return dateB - dateA; // Latest first
     });
 

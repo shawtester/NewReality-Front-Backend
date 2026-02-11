@@ -205,8 +205,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   // ✅ LATEST CREATED FIRST SORTING
   const sortedApartments = useMemo(() => {
     return [...filteredApartments].sort((a, b) => {
-      const dateA = a?.createdAt?.seconds || 0;
-      const dateB = b?.createdAt?.seconds || 0;
+      const dateA = a?.timestampCreate?.seconds || 0;
+      const dateB = b?.timestampCreate?.seconds || 0;
+
       return dateB - dateA; // 🔥 Latest first
     });
   }, [filteredApartments]);
@@ -221,9 +222,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   const currentPage = Number(searchParams.get("page")) || page;
   const startIndex = (currentPage - 1) * apartmentsPerPage;
   const currentApartments = sortedApartments.slice(
-  startIndex,
-  startIndex + apartmentsPerPage
-);
+    startIndex,
+    startIndex + apartmentsPerPage
+  );
 
 
   /* ================= RENDER ================= */

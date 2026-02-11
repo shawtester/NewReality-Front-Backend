@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadBanner";
 import { updateBanner } from "@/lib/firestore/banners/write";
 import { getBanner } from "@/lib/firestore/banners/read";
 
-// ✅ DYNAMIC INTRO TEXT MAPPING (FALLBACK - SAME AS MAIN PAGE)
+// ✅ COMPLETE INTRO TEXTS (PLAIN TEXT)
 const INTRO_TEXTS = {
     default: "Booming Micro Residential Apartments Market in Gurgaon – luxury apartments offering massive long-term capital gains. Explore premium projects with world-class amenities, strategic locations along Dwarka Expressway, Golf Course Road, and Southern Peripheral Road. Perfect for both end-users and investors seeking high ROI in Gurgaon's thriving real estate market.",
     residential: "Booming residential market in Gurgaon – luxury apartments, builder floors and villas offering massive long-term capital gains. Explore premium projects with world-class amenities along Dwarka Expressway, Golf Course Road, and SPR.",
@@ -18,35 +21,61 @@ const INTRO_TEXTS = {
 };
 
 export default function BannerUploader({ category }) {
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentBanner, setCurrentBanner] = useState(null);
     const [currentIntroText, setCurrentIntroText] = useState("");
     const [currentPageTitle, setCurrentPageTitle] = useState("");
-    
-    // ✅ NEW: EDITABLE INTRO TEXT STATES
-    const [editMode, setEditMode] = useState(false);
     const [editedIntroText, setEditedIntroText] = useState("");
     const [editedPageTitle, setEditedPageTitle] = useState("");
     const [savingIntro, setSavingIntro] = useState(false);
+    const [imageLinks, setImageLinks] = useState({});
+    const [error, setError] = useState("");
+    const [editMode, setEditMode] = useState(false);
 
-    // ✅ FETCH CURRENT BANNER + INTRO + PAGE TITLE ON LOAD
+    const modules = {
+        toolbar: [
+            [{ header: [1, 2, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['clean']
+        ],
+    };
+
+    const formats = [
+        'header', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet',
+        'link', 'color', 'background', 'align'
+    ];
+
+    // ✅ EXTRACT PLAIN TEXT FROM HTML (REMOVES ALL TAGS)
+    const extractPlainText = (html) => {
+        if (!html) return "";
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        return tempDiv.textContent || tempDiv.innerText || "";
+    };
+
     useEffect(() => {
         const fetchCurrentBanner = async () => {
             try {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
                 
-                // ✅ Use saved intro text OR fallback
-                const savedIntro = banner?.introText || INTRO_TEXTS[category] || INTRO_TEXTS.default;
+                if (banner?.imageLinks) {
+                    setImageLinks(banner.imageLinks);
+                }
+                
+                const savedIntro = extractPlainText(banner?.introText || INTRO_TEXTS[category] || INTRO_TEXTS.default);
                 setCurrentIntroText(savedIntro);
                 setEditedIntroText(savedIntro);
-                
-                // 🔥 NEW: Use saved page title OR dynamic fallback
+
                 const savedPageTitle = banner?.pageTitle || generateDynamicPageTitle(category);
                 setCurrentPageTitle(savedPageTitle);
                 setEditedPageTitle(savedPageTitle);
-                
+                setError("");
             } catch (err) {
                 console.error("No existing banner:", err);
                 const fallbackIntro = INTRO_TEXTS[category] || INTRO_TEXTS.default;
@@ -58,286 +87,355 @@ export default function BannerUploader({ category }) {
             }
         };
 
-        if (category) {
-            fetchCurrentBanner();
-        }
+        if (category) fetchCurrentBanner();
     }, [category]);
 
-    // 🔥 NEW: DYNAMIC PAGE TITLE GENERATOR (same logic as main page)
+    useEffect(() => {
+        if (files.length > 0) {
+            const newLinks = { ...imageLinks };
+            files.forEach((file) => {
+                const previewUrl = URL.createObjectURL(file);
+                if (!newLinks[previewUrl]) {
+                    newLinks[previewUrl] = "";
+                }
+            });
+            setImageLinks(newLinks);
+        }
+    }, [files, imageLinks]);
+
     const generateDynamicPageTitle = (cat) => {
         const bhkMap = {
             "1-bhk": "1 BHK", "1.5-bhk": "1.5 BHK", "2-bhk": "2 BHK", "2.5-bhk": "2.5 BHK",
             "3-bhk": "3 BHK", "3.5-bhk": "3.5 BHK", "4-bhk": "4 BHK", "4.5-bhk": "4.5 BHK",
             "5-bhk": "5 BHK", "above-5-bhk": "5+ BHK"
         };
-        
-        const formatName = (value) => value?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '';
-        
+        const formatName = (v) => v?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '';
         if (cat.includes('-bhk')) return `${bhkMap[cat] || 'Properties'} Properties for Sale in Gurgaon`;
-        if (cat === 'new-launch' || cat === 'ready-to-move' || cat === 'under-construction' || cat === 'pre-launch') {
-            return `${formatName(cat)} Projects in Gurgaon`;
-        }
-        if (['dwarka-expressway', 'golf-course-road', 'golf-course-extension-road', 'sohna-road', 'new-gurgaon', 'old-gurgaon', 'spr', 'nh8'].includes(cat)) {
-            return `${formatName(cat)} Properties in Gurgaon`;
-        }
-        
+        if (['new-launch','ready-to-move','under-construction','pre-launch'].includes(cat)) return `${formatName(cat)} Projects in Gurgaon`;
         return "Residential Apartments Property for Sale in Gurgaon";
     };
 
-    // ✅ SAVE BANNER + INTRO + PAGE TITLE TOGETHER
+    const updateImageLink = (imageUrl, linkUrl) => {
+        setImageLinks(prev => ({
+            ...prev,
+            [imageUrl]: linkUrl
+        }));
+    };
+
     const handleSave = async () => {
-        if (!file && !editMode) return alert("Select banner or edit intro/page title");
+        setError("");
+        
+        if (files.length === 0 && editedIntroText === currentIntroText && editedPageTitle === currentPageTitle) {
+            alert("No changes detected!");
+            return;
+        }
 
         setLoading(true);
 
         try {
-            let imageUrl = currentBanner?.image;
+            let imageUrls = currentBanner?.images || [];
+            let updatedLinks = { ...imageLinks };
 
-            // Upload image if new file selected
-            if (file) {
-                imageUrl = await uploadToCloudinary(file, "banners");
+            if (files.length > 0) {
+                const uploadedUrls = await Promise.all(
+                    files.map(file => uploadToCloudinary(file, "banners"))
+                );
+                imageUrls = [...imageUrls, ...uploadedUrls];
+                
+                files.forEach((file, idx) => {
+                    const previewUrl = URL.createObjectURL(file);
+                    if (updatedLinks[previewUrl]) {
+                        updatedLinks[uploadedUrls[idx]] = updatedLinks[previewUrl];
+                        delete updatedLinks[previewUrl];
+                    }
+                });
             }
 
-            // 🔥 SAVE BANNER + INTRO TEXT + PAGE TITLE TO FIRESTORE
+            const introText = extractPlainText(editedIntroText || currentIntroText || "").trim();
+            const pageTitle = (editedPageTitle || currentPageTitle || "").trim();
+
+            if (!pageTitle) {
+                setError("Page title cannot be empty");
+                return;
+            }
+            if (!introText) {
+                setError("Intro text cannot be empty");
+                return;
+            }
+
             await updateBanner({
                 category,
-                image: imageUrl,
-                introText: editedIntroText || currentIntroText,
-                pageTitle: editedPageTitle || currentPageTitle, // ✅ NEW: Save page title
+                images: imageUrls,
+                imageLinks: updatedLinks,
+                introText,
+                pageTitle
             });
 
-            alert("✅ Banner, Intro & Page Title Updated Successfully!");
-            setFile(null);
+            alert("✅ Banner Images, Links & Plain Intro Text Updated!");
+            setFiles([]);
+            setEditMode(false);
             
-            // ✅ REFETCH TO UPDATE PREVIEW
             const updatedBanner = await getBanner(category);
             setCurrentBanner(updatedBanner);
-            setCurrentIntroText(updatedBanner?.introText || editedIntroText);
-            setCurrentPageTitle(updatedBanner?.pageTitle || editedPageTitle);
-            
-        } catch (err) {
-            console.error(err);
-            alert("❌ Update Failed");
-        }
+            setImageLinks(updatedBanner?.imageLinks || {});
+            setCurrentIntroText(extractPlainText(introText));
+            setCurrentPageTitle(pageTitle);
 
+        } catch (err) {
+            console.error("Save error:", err);
+            setError(`Save failed: ${err.message || 'Unknown error'}`);
+        }
         setLoading(false);
     };
 
-    // ✅ SAVE INTRO + PAGE TITLE ONLY
     const handleSaveTextOnly = async () => {
-        if (!editedIntroText.trim() || !editedPageTitle.trim()) {
-            return alert("Intro text and page title cannot be empty");
+        setError("");
+        
+        const introText = extractPlainText(editedIntroText || "").trim();
+        const pageTitle = editedPageTitle.trim();
+
+        if (!introText) {
+            setError("Intro text cannot be empty");
+            return;
+        }
+        if (!pageTitle) {
+            setError("Page title cannot be empty");
+            return;
         }
 
         setSavingIntro(true);
-
         try {
             await updateBanner({
                 category,
-                image: currentBanner?.image, // Keep existing image
-                introText: editedIntroText.trim(),
-                pageTitle: editedPageTitle.trim(), // ✅ NEW: Save page title
+                images: currentBanner?.images || [],
+                imageLinks: imageLinks,
+                introText,
+                pageTitle
             });
 
-            alert("✅ Intro Text & Page Title Updated!");
-            setCurrentIntroText(editedIntroText);
-            setCurrentPageTitle(editedPageTitle);
+            alert("✅ Plain Intro Text & Page Title Updated!");
+            setCurrentIntroText(introText);
+            setCurrentPageTitle(pageTitle);
             setEditMode(false);
-            
         } catch (err) {
-            console.error(err);
-            alert("❌ Text Update Failed");
+            console.error("Text save error:", err);
+            setError(`Text save failed: ${err.message || 'Unknown error'}`);
         }
-
         setSavingIntro(false);
     };
 
     return (
-        <div className="space-y-6 p-6 bg-white rounded-xl shadow-lg max-w-2xl mx-auto">
-            {/* ✅ PAGE TITLE */}
-            <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 capitalize">
-                    {category.replace(/-/g, ' ')} Banner & Content
-                </h1>
-                <p className="text-sm text-gray-500 mt-1">
-                    Current: {currentBanner ? "✅ Live" : "No banner yet"}
+        <div className="space-y-6 p-6 bg-white rounded-xl shadow-lg max-w-4xl mx-auto">
+            <h1 className="text-2xl font-bold text-center text-gray-900 capitalize">
+                {category.replace(/-/g,' ')} Banner & Content
+            </h1>
+
+            {/* 🔥 ERROR DISPLAY */}
+            {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <p className="text-sm text-red-800">{error}</p>
+                    <button 
+                        onClick={() => setError("")}
+                        className="text-red-600 text-xs hover:underline mt-1"
+                    >
+                        Dismiss
+                    </button>
+                </div>
+            )}
+
+            {/* 🔥 EDIT MODE TOGGLE */}
+            <button
+                onClick={() => setEditMode(!editMode)}
+                className="px-4 py-2 bg-[#F5A300] text-white rounded-lg text-sm hover:bg-yellow-500 transition-all w-fit"
+            >
+                {editMode ? 'Cancel Edit' : '✏️ Edit Mode'}
+            </button>
+
+            {/* 🔥 FIXED CURRENT BANNERS - CLICKABLE LINKS */}
+            {currentBanner?.images?.length > 0 && (
+                <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Current Banners:</h3>
+                    <div className="space-y-3">
+                        {currentBanner.images.map((img, idx) => {
+                            const imageLink = imageLinks[img] || '#';
+                            const hasValidLink = imageLink !== '' && imageLink !== '#';
+                            
+                            return (
+                                <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                    <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible group">
+                                        {/* ✅ FIXED: Proper clickable Link wrapper */}
+                                        <Link 
+                                            href={hasValidLink ? imageLink : '#'} 
+                                            target="_blank" 
+                                            rel="noopener"
+                                            className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
+                                        >
+                                            <Image 
+                                                src={img} 
+                                                alt={`Banner ${idx+1}`} 
+                                                fill 
+                                                className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                                                sizes="(max-width: 768px) 128px, 128px"
+                                            />
+                                            {/* ✅ Visual link indicator */}
+                                            {hasValidLink && (
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                                                    <span className="text-white text-xs font-medium px-2 py-1 bg-black/50 rounded-full">
+                                                        🔗 GO
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </Link>
+                                    </div>
+                                    
+                                    {/* ✅ Link input in edit mode */}
+                                    {editMode && (
+                                        <div className="flex-1 min-w-0">
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                Link for this image:
+                                            </label>
+                                            <input
+                                                type="url"
+                                                value={imageLinks[img] || ''}
+                                                onChange={(e) => updateImageLink(img, e.target.value)}
+                                                placeholder="https://your-site.com/project-page"
+                                                className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {hasValidLink 
+                                                    ? `✅ Click image above to test: ${imageLink.slice(0, 40)}...`
+                                                    : '💡 Add URL to make image clickable'
+                                                }
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* 🔥 FIXED NEW BANNER PREVIEW - CLICKABLE LINKS */}
+            {files.length > 0 && (
+                <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">New Images Preview:</h3>
+                    <div className="space-y-3">
+                        {files.map((file, idx) => {
+                            const previewUrl = URL.createObjectURL(file);
+                            const imageLink = imageLinks[previewUrl] || '#';
+                            const hasValidLink = imageLink !== '' && imageLink !== '#';
+                            
+                            return (
+                                <div key={idx} className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl border border-green-200">
+                                    <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border-green-300 cursor-pointer group overflow-visible">
+                                        <Link 
+                                            href={hasValidLink ? imageLink : '#'} 
+                                            target="_blank" 
+                                            rel="noopener"
+                                            className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
+                                        >
+                                            <Image 
+                                                src={previewUrl} 
+                                                alt={`Preview ${idx+1}`} 
+                                                fill 
+                                                className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                                                sizes="(max-width: 768px) 128px, 128px"
+                                            />
+                                            {hasValidLink && (
+                                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                                                    <span className="text-white text-xs font-medium px-2 py-1 bg-black/50 rounded-full">
+                                                        🔗 GO
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </Link>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Link for this image:</label>
+                                        <input
+                                            type="url"
+                                            value={imageLinks[previewUrl] || ''}
+                                            onChange={(e) => updateImageLink(previewUrl, e.target.value)}
+                                            placeholder="https://your-site.com/project-page"
+                                            className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* 🔥 PAGE TITLE & REST OF FORM - UNCHANGED */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Page Title</label>
+                <input
+                    type="text"
+                    value={editedPageTitle}
+                    onChange={e => setEditedPageTitle(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F5A300] focus:border-transparent text-sm"
+                    maxLength={80}
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Intro Text (Saved as Plain Text)
+                </label>
+                <div className="border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#F5A300]">
+                    <ReactQuill
+                        theme="snow"
+                        value={editedIntroText}
+                        onChange={setEditedIntroText}
+                        modules={modules}
+                        formats={formats}
+                        placeholder="Write your page intro (will be saved as plain text without formatting)..."
+                        className="h-[150px]"
+                        style={{ height: '150px', fontSize: '14px' }}
+                    />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                    💡 You can use rich formatting in editor, but it will be saved/rendered as plain text
                 </p>
             </div>
 
-            {/* ✅ CURRENT BANNER PREVIEW */}
-            {currentBanner?.image && (
-                <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Current Live Banner:</h3>
-                    <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-md border-2 border-dashed border-blue-200">
-                        <Image
-                            src={currentBanner.image}
-                            alt={`${category} banner`}
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/20 hover:bg-black/0 transition-all duration-300" />
-                    </div>
-                </div>
-            )}
-
-            {/* ✅ NEW BANNER PREVIEW */}
-            {file && (
-                <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">New Banner Preview:</h3>
-                    <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-md border-2 border-dashed border-green-200">
-                        <Image
-                            src={URL.createObjectURL(file)}
-                            alt="new banner preview"
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/10" />
-                    </div>
-                </div>
-            )}
-
-            {/* 🔥 NEW: PAGE TITLE EDITOR */}
-            <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                    Page Title 
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        currentBanner?.pageTitle ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                        {currentBanner?.pageTitle ? 'Custom Live' : 'Dynamic Fallback'}
-                    </span>
-                </h3>
-                {editMode ? (
-                    <input
-                        type="text"
-                        value={editedPageTitle}
-                        onChange={(e) => setEditedPageTitle(e.target.value)}
-                        placeholder="Enter page title (e.g. '3 BHK Properties in Gurgaon')"
-                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F5A300] focus:border-transparent text-sm"
-                        maxLength={80}
-                    />
-                ) : (
-                    <div className="p-3 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border-l-4 border-emerald-400 shadow-sm">
-                        <p className="text-sm font-semibold text-gray-900">{currentPageTitle} </p>
-                        <p className="text-xs text-gray-600 mt-1">This appears as H1 on the page</p>
-                    </div>
-                )}
-            </div>
-
-            {/* ✅ EDITABLE INTRO TEXT */}
-            <div>
-                <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                        Intro Text Preview:
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            currentBanner?.introText ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                            {currentBanner?.introText ? 'Live' : 'Editable'}
-                        </span>
-                    </h3>
-                    <button
-                        onClick={() => setEditMode(!editMode)}
-                        className="text-xs px-3 py-1 bg-[#F5A300]/20 hover:bg-[#F5A300]/30 text-[#F5A300] rounded-full font-medium transition-all duration-200"
-                    >
-                        {editMode ? 'Preview' : 'Edit'}
-                    </button>
-                </div>
-
-                {editMode ? (
-                    // ✅ EDIT MODE - TEXTAREA
-                    <div className="space-y-3">
-                        <textarea
-                            value={editedIntroText}
-                            onChange={(e) => setEditedIntroText(e.target.value)}
-                            placeholder="Write compelling intro text (max 2 lines recommended)..."
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F5A300] focus:border-transparent resize-vertical min-h-[100px] text-sm leading-relaxed"
-                            rows={4}
-                        />
-                        <div className="flex gap-2 pt-2">
-                            <button
-                                onClick={handleSaveTextOnly}
-                                disabled={!editedIntroText.trim() || !editedPageTitle.trim() || savingIntro}
-                                className="flex-1 bg-[#F5A300] text-white px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all duration-200 disabled:bg-gray-400"
-                            >
-                                {savingIntro ? "Saving..." : "Save Text Only"}
-                            </button>
-                            <button
-                                onClick={() => setEditMode(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                        <div className="text-xs text-gray-500 text-center pt-2">
-                            Intro: {editedIntroText.length}/300 | Title: {editedPageTitle.length}/80
-                        </div>
-                    </div>
-                ) : (
-                    // ✅ PREVIEW MODE
-                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-l-4 border-[#F5A300] shadow-sm max-h-28 overflow-hidden hover:max-h-none transition-all duration-300">
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                            {currentIntroText}
-                        </p>
-                        {currentIntroText.length > 150 && (
-                            <span className="text-xs text-gray-500 block mt-2">✨ Exactly what users see (2-line preview)</span>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* 🔥 FILE INPUT */}
             <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors">
                 <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    multiple
+                    onChange={e => setFiles(Array.from(e.target.files))}
                     className="hidden"
                     id={`banner-upload-${category}`}
                 />
-                <label
-                    htmlFor={`banner-upload-${category}`}
-                    className="cursor-pointer flex flex-col items-center gap-2 p-4"
-                >
+                <label htmlFor={`banner-upload-${category}`} className="cursor-pointer flex flex-col items-center gap-2">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                         <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                     </div>
-                    <div>
-                        <p className="font-medium text-gray-900">{file ? "New banner selected" : "Click to upload new banner"}</p>
-                        <p className="text-sm text-gray-500">JPG, PNG (Max 5MB recommended)</p>
-                    </div>
+                    <p className="font-medium text-gray-900">{files.length > 0 ? `${files.length} files selected` : "Click to upload new banners"}</p>
+                    <p className="text-sm text-gray-500">JPG, PNG (Max 5MB each)</p>
                 </label>
             </div>
 
-            {/* ✅ MAIN SAVE BUTTON - BANNER + INTRO + PAGE TITLE */}
             <button
                 onClick={handleSave}
-                disabled={(!file && !editMode) || loading}
-                className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-lg ${
-                    (!file && !editMode) || loading
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-[#F5A300] to-yellow-500 hover:from-yellow-500 hover:to-[#F5A300] hover:shadow-xl hover:scale-[1.02]'
-                }`}
+                disabled={loading}
+                className="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-[#F5A300] to-yellow-500 hover:from-yellow-500 hover:to-[#F5A300] transition-all duration-200 shadow-lg disabled:bg-gray-400"
             >
-                {loading ? (
-                    <>
-                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Saving...
-                    </>
-                ) : (
-                    <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {file && editMode ? "Save Banner + Content" : file ? "Save Banner" : "Save Content Changes"}
-                    </>
-                )}
+                {loading ? "Saving..." : "💾 Save All (Images + Plain Text)"}
             </button>
 
-          
+            <button
+                onClick={handleSaveTextOnly}
+                disabled={savingIntro}
+                className="w-full py-3 px-6 rounded-xl font-semibold text-[#F5A300] bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+            >
+                {savingIntro ? "Saving..." : "✏️ Save Plain Text Only"}
+            </button>
         </div>
     );
 }

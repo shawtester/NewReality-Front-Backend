@@ -169,19 +169,32 @@ export default function FooterSeoPage({ params, properties = [] }) {
     );
   }
 
-  /* ================= SEARCH ================= */
+  /* ================= SEARCH + LATEST SORT ================= */
   const finalFiltered = useMemo(() => {
-    if (!search) return filtered;
+    let result = [...filtered];
 
-    const keyword = search.toLowerCase();
+    // 🔎 SEARCH FILTER
+    if (search) {
+      const keyword = search.toLowerCase();
 
-    return filtered.filter(
-      (p) =>
-        p.title?.toLowerCase().includes(keyword) ||
-        p.developer?.toLowerCase().includes(keyword) ||
-        p.location?.toLowerCase().includes(keyword)
-    );
+      result = result.filter(
+        (p) =>
+          p.title?.toLowerCase().includes(keyword) ||
+          p.developer?.toLowerCase().includes(keyword) ||
+          p.location?.toLowerCase().includes(keyword)
+      );
+    }
+
+    // 🔥 LATEST CREATED FIRST (Firestore timestamp)
+    result.sort((a, b) => {
+      const dateA = a?.createdAt?.seconds || 0;
+      const dateB = b?.createdAt?.seconds || 0;
+      return dateB - dateA;
+    });
+
+    return result;
   }, [search, filtered]);
+
 
   return (
     <>

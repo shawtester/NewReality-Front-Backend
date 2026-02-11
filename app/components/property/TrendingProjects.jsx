@@ -6,8 +6,15 @@ import PropertyCard from "./PropertyCard";
 import slugify from "slugify";
 
 export default function TrendingProjects({ properties = [] }) {
-  // ✅ Filter trending projects safely
-  const trending = properties.filter((p) => p?.isTrending);
+  //  Filter + Latest First Sorting
+  const trending = properties
+    .filter((p) => p?.isTrending)
+    .sort((a, b) => {
+      //  Firestore Timestamp support
+      const dateA = a?.createdAt?.seconds || 0;
+      const dateB = b?.createdAt?.seconds || 0;
+      return dateB - dateA; // Latest first
+    });
 
   if (!trending.length) return null;
 
@@ -49,12 +56,10 @@ export default function TrendingProjects({ properties = [] }) {
                 bhk: p.configurations?.join(", "),
                 size: p.areaRange,
                 price: p.priceRange,
-
-                // ✅ IMAGE SAFE FALLBACK
                 img: p.mainImage?.url || "/placeholder.png",
 
-                // ✅ TITLE BASED SLUG (SEO FRIENDLY)
-                slug: p.slug || p.id, 
+                //  SLUG FIRST ELSE ID
+                slug: p.slug || p.id,
                 isRera: p.isRera,
               }}
             />

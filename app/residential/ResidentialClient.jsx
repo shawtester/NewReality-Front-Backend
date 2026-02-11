@@ -148,7 +148,7 @@ export default function ResidentialPage({ apartments = [] }) {
     const [introText, setIntroText] = useState(INTRO_TEXTS.default);
     const [pageTitleDynamic, setPageTitleDynamic] = useState("Residential Apartments Property for Sale in Gurgaon"); // 🔥 NEW STATE
     const [pageTitle, setPageTitle] = useState("Residential Apartments Property for Sale in Gurgaon");
-    
+
     const BASE_ROUTE = "/residential";
     const router = useRouter();
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
@@ -291,9 +291,9 @@ export default function ResidentialPage({ apartments = [] }) {
             try {
                 const bannerData = await getBanner(category);
                 console.log('📥 Banner data loaded:', bannerData);
-                
+
                 setBanner(bannerData);
-                
+
                 // 🔥 CUSTOM FIRESTORE INTRO TEXT (HIGHEST PRIORITY)
                 if (bannerData?.introText) {
                     console.log('✅ Using CUSTOM Firestore introText:', bannerData.introText);
@@ -346,10 +346,21 @@ export default function ResidentialPage({ apartments = [] }) {
         return Math.ceil(filteredApartments.length / apartmentsPerPage);
     }, [filteredApartments.length]);
 
+    // ✅ LATEST CREATED FIRST SORTING
+    const sortedApartments = useMemo(() => {
+        return [...filteredApartments].sort((a, b) => {
+            const dateA = a?.createdAt?.seconds || 0;
+            const dateB = b?.createdAt?.seconds || 0;
+            return dateB - dateA; // 🔥 latest first
+        });
+    }, [filteredApartments]);
+
+
     const currentPage = Number(searchParams.get('page')) || page;
     const startIndex = (currentPage - 1) * apartmentsPerPage;
     const endIndex = startIndex + apartmentsPerPage;
-    const currentApartments = filteredApartments.slice(startIndex, endIndex);
+    const currentApartments = sortedApartments.slice(startIndex, endIndex);
+
 
     // 🔥 DYNAMIC TITLE FOR DISPLAY (Firestore first, then dynamic fallback)
     const displayTitle = banner?.pageTitle || pageTitleDynamic;
@@ -459,7 +470,7 @@ export default function ResidentialPage({ apartments = [] }) {
                             flex items-center gap-3
                             rounded-full
                             border border-yellow-400
-                        "> 
+                        ">
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option><option value="residential">Residential Property</option><option value="commercial">Commercial Property</option><option value="luxury-apartment">Luxury Apartment</option><option value="builder-floor">Builder Floor</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>

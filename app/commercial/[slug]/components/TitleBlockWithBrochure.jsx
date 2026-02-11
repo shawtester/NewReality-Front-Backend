@@ -52,9 +52,11 @@ export default function TitleBlockWithBrochure({ property }) {
       });
       /* ✅ THANK YOU POPUP */
       setShowThankYou(true);
-      
+
       if (property?.brochure?.url) {
-         window.open(property.brochure.url, "_blank");
+        setTimeout(() => {
+          window.open(property.brochure.url, "_blank");
+        }, 1800);
       } else {
         alert("Brochure not available");
       }

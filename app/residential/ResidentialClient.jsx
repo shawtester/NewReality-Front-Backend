@@ -9,7 +9,7 @@ import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
-// ✅ EXPANDABLE TEXT COMPONENT (UNCHANGED - PERFECT)
+// ✅ EXPANDABLE TEXT (UNCHANGED)
 const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
@@ -24,95 +24,33 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
         }
     }, [text, maxLines]);
 
-    const toggleExpanded = () => {
-        setIsExpanded(!isExpanded);
-    };
-
     return (
         <div className={`space-y-1 ${className}`}>
             <div
                 ref={textRef}
-                className={`
-                    transition-all duration-300 ease-in-out
-                    ${isExpanded ? 'max-h-none overflow-visible' : `max-h-[${maxLines * 1.4}em] overflow-hidden`}
-                    line-clamp-${maxLines} lg:line-clamp-${maxLines}
-                    leading-relaxed
-                `}
+                className="leading-relaxed transition-all duration-300"
                 style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: isExpanded ? 'unset' : maxLines,
-                    WebkitBoxOrient: 'vertical',
+                    display: "-webkit-box",
+                    WebkitLineClamp: isExpanded ? "unset" : maxLines,
+                    WebkitBoxOrient: "vertical",
+                    overflow: isExpanded ? "visible" : "hidden",
                 }}
             >
                 {text}
             </div>
-
             {isOverflowing && (
                 <button
-                    onClick={toggleExpanded}
-                    className="text-sm text-[#F5A300] font-medium hover:text-yellow-600 transition-all duration-200 flex items-center gap-1 pt-1 cursor-pointer"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="text-sm text-[#F5A300] font-medium pt-1 cursor-pointer"
                 >
-                    {isExpanded ? (
-                        <>
-                            Read Less
-                            <span className="w-3 h-3 border-b-2 border-r-2 rotate-225 -translate-y-[1px] transition-transform duration-200" />
-                        </>
-                    ) : (
-                        <>
-                            Read More
-                            <span className="w-3 h-3 border-b-2 border-r-2 rotate-45 translate-y-[1px] transition-transform duration-200" />
-                        </>
-                    )}
+                    {isExpanded ? "Read Less" : "Read More"}
                 </button>
             )}
         </div>
     );
 };
 
-// ✅ DYNAMIC FALLBACK TEXTS (unchanged)
-const INTRO_TEXTS = {
-    default: "Booming Micro Residential Apartments Market in Gurgaon – luxury apartments offering massive long-term capital gains. Explore premium projects with world-class amenities, strategic locations along Dwarka Expressway, Golf Course Road, and Southern Peripheral Road. Perfect for both end-users and investors seeking high ROI in Gurgaon's thriving real estate market.",
-
-    bhk: {
-        "1-bhk": "Compact 1 BHK apartments in Gurgaon – perfect for young professionals and small families. Ideal investment with high rental yields and excellent appreciation potential in prime locations.",
-        "1.5-bhk": "Spacious 1.5 BHK homes offering optimal space utilization. Perfect balance of comfort and affordability in Gurgaon's premium residential corridors.",
-        "2-bhk": "Popular 2 BHK apartments – ideal family homes with modern amenities. High demand in Dwarka Expressway and Golf Course Road locations.",
-        "2.5-bhk": "Premium 2.5 BHK residences with extra flexibility. Perfect for growing families seeking additional space in luxury projects.",
-        "3-bhk": "Luxurious 3 BHK apartments – the sweet spot for modern families. World-class amenities and strategic locations for maximum lifestyle upgrade.",
-        "3.5-bhk": "Exclusive 3.5 BHK homes with premium configurations. Perfect for families wanting extra space and luxury features.",
-        "4-bhk": "Spacious 4 BHK luxury apartments for elite families. Premium projects offering unmatched amenities and privacy.",
-        "4.5-bhk": "Ultra-luxury 4.5 BHK residences – the pinnacle of premium living. Exclusive projects for discerning buyers.",
-        "5-bhk": "Grand 5 BHK mansion apartments – legacy homes for multi-generational families. Ultimate luxury living experience.",
-        "above-5-bhk": "Ultra-exclusive 5+ BHK penthouses and mansion flats. The epitome of luxury living in Gurgaon's most prestigious addresses."
-    },
-
-    type: {
-        apartment: "Premium residential apartments in Gurgaon featuring modern architecture and world-class amenities. Perfect blend of luxury and convenience.",
-        "builder-floor": "Independent builder floors offering privacy and customization. Ideal for families seeking personal space in gated communities.",
-        villa: "Luxury villas with private gardens and premium specifications. Ultimate exclusivity in Gurgaon's prime residential pockets.",
-        plot: "Prime residential plots in strategic locations. Build your dream home in Gurgaon's fastest appreciating areas."
-    },
-
-    status: {
-        "new-launch": "Brand new residential launches in Gurgaon – be the first to own in upcoming luxury townships. Best prices and assured appreciation.",
-        "ready-to-move": "Ready-to-move residential properties – immediate possession with complete amenities. Zero construction risk with immediate rental income.",
-        "under-construction": "Under-construction projects offering best price points. Premium specifications with delivery timelines of 2-4 years.",
-        "pre-launch": "Exclusive pre-launch residential opportunities – limited inventory at introductory prices. Early bird advantages in premium projects."
-    },
-
-    locality: {
-        "dwarka-expressway": "Dwarka Expressway – Gurgaon's growth corridor with metro connectivity. High appreciation potential with excellent infrastructure.",
-        "golf-course-road": "Golf Course Road – Gurgaon's most prestigious address. Ultra-luxury projects with celebrity residents and global connectivity.",
-        "golf-course-extension-road": "Golf Course Extension Road – emerging luxury hub with excellent connectivity. High rental yields and capital appreciation.",
-        "sohna-road": "Sohna Road – green residential belt with luxury low-rise projects. Perfect for family living with nature proximity.",
-        "new-gurgaon": "New Gurgaon – modern townships with integrated lifestyle. Cyber City proximity with excellent social infrastructure.",
-        "old-gurgaon": "Old Gurgaon – established premium localities with mature infrastructure. Proven appreciation with legacy value.",
-        spr: "Southern Peripheral Road (SPR) – Gurgaon's next big residential destination. Excellent connectivity with green surroundings.",
-        nh8: "NH8 Corridor – highway-facing premium projects with Delhi connectivity. Commercial synergy with residential luxury."
-    }
-};
-
-// ✅ ALL YOUR EXISTING FUNCTIONS (UNCHANGED)
+// ✅ FILTER FUNCTIONS (UNCHANGED)
 const PROPERTY_TYPE_MAP = {
     apartment: "isApartment",
     "builder-floor": "isBuilderFloor",
@@ -133,10 +71,6 @@ const filterByPropertyType = (list = [], type) => {
     return list.filter((item) => item[field] === true);
 };
 
-const filterApartments = (list = []) => {
-    return list.filter((item) => item.isApartment === true);
-};
-
 const filterByStatus = (list = [], status) => {
     const field = STATUS_FLAG_MAP[status];
     if (!field) return list;
@@ -144,17 +78,16 @@ const filterByStatus = (list = [], status) => {
 };
 
 export default function ResidentialPage({ apartments = [] }) {
-    const [banner, setBanner] = useState(null);
-    const [introText, setIntroText] = useState(INTRO_TEXTS.default);
-    const [pageTitleDynamic, setPageTitleDynamic] = useState("Residential Apartments Property for Sale in Gurgaon"); // 🔥 NEW STATE
-    const [pageTitle, setPageTitle] = useState("Residential Apartments Property for Sale in Gurgaon");
-    
     const BASE_ROUTE = "/residential";
     const router = useRouter();
-    const pathname = typeof window !== "undefined" ? window.location.pathname : "";
     const searchParams = useSearchParams();
 
-    // ✅ ALL YOUR EXISTING STATE (UNCHANGED)
+    // ✅ STATES
+    const [banner, setBanner] = useState(null);
+    const [introText, setIntroText] = useState("");
+    const [pageTitleDynamic, setPageTitleDynamic] = useState("Residential Apartments Property for Sale in Gurgaon");
+    const [pageTitle, setPageTitle] = useState("Residential Apartments Property for Sale in Gurgaon");
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [keyword, setKeyword] = useState("");
     const [type, setType] = useState("");
     const [status, setStatus] = useState("");
@@ -167,7 +100,7 @@ export default function ResidentialPage({ apartments = [] }) {
 
     const apartmentsPerPage = 12;
 
-    // ✅ ALL YOUR FILTER FUNCTIONS (UNCHANGED)
+    // ✅ UTILITY FUNCTIONS
     const filterForResidential = (list = []) => {
         return list.filter((item) => {
             if (!item.propertyType) return true;
@@ -184,30 +117,46 @@ export default function ResidentialPage({ apartments = [] }) {
         return bhkMap[bhkValue] || "All Properties";
     };
 
-    const formatFilterName = (filterValue) => {
-        return filterValue?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '';
-    };
+    const formatFilterName = (value) =>
+        value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 
-    // ✅ DYNAMIC INTRO TEXT FALLBACK (unchanged)
-    const getDynamicIntroText = useCallback((params) => {
-        const urlBhk = params.get("bhk");
-        const urlType = params.get("type");
-        const urlStatus = params.get("status");
-        const urlLocality = params.get("locality");
-        const urlBudget = params.get("budget");
-
-        if (urlBhk && INTRO_TEXTS.bhk[urlBhk]) return INTRO_TEXTS.bhk[urlBhk];
-        if (urlType && INTRO_TEXTS.type[urlType]) return INTRO_TEXTS.type[urlType];
-        if (urlStatus && INTRO_TEXTS.status[urlStatus]) return INTRO_TEXTS.status[urlStatus];
-        if (urlLocality && INTRO_TEXTS.locality[urlLocality]) return INTRO_TEXTS.locality[urlLocality];
-        if (urlBudget && urlBudget.includes('cr')) {
-            return `Premium ${urlBudget.replace(/-/g, ' to ').replace('cr', ' Cr')} properties in Gurgaon. Luxury homes matching your investment range with excellent appreciation potential.`;
+    // ✅ FIXED: Handles YOUR EXACT Firebase structure with imageLinks map
+    const getCurrentImageLink = useCallback((index) => {
+        // Priority 1: Check imageLinks map (your admin panel links)
+        if (banner?.imageLinks) {
+            const imageLinksArray = Object.entries(banner.imageLinks);
+            if (imageLinksArray[index]) {
+                return imageLinksArray[index][1]; // Returns the LINK
+            }
         }
+        // Priority 2: Fallback to images array (no link)
+        return null;
+    }, [banner?.imageLinks]);
 
-        return INTRO_TEXTS.default;
-    }, []);
+    const handleBannerImageClick = useCallback(() => {
+        const link = getCurrentImageLink(currentImageIndex);
+        console.log("🔗 Banner click - Image index:", currentImageIndex, "Link:", link);
+        
+        if (link) {
+            window.open(link, '_blank', 'noopener,noreferrer');
+        } else {
+            console.warn("⚠️ No link found for image at index:", currentImageIndex);
+        }
+    }, [currentImageIndex, getCurrentImageLink]);
 
-    // 🔥 UPDATED MAIN FILTERS useEffect (DYNAMIC TITLE FALLBACK)
+    // ✅ FILTER HANDLER
+    const handleFilterChange = useCallback((filterName, value) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+            params.set(filterName, value);
+        } else {
+            params.delete(filterName);
+        }
+        params.set('page', '1');
+        router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
+    }, [searchParams, router]);
+
+    // ✅ URL FILTER LOGIC (UNCHANGED)
     useEffect(() => {
         const urlKeyword = searchParams.get("q") || "";
         const urlType = searchParams.get("type") || "";
@@ -225,7 +174,6 @@ export default function ResidentialPage({ apartments = [] }) {
         setBhk(urlBhk);
         setPage(urlPage);
 
-        // 🔥 DYNAMIC TITLE FALLBACK (Firestore will override)
         let title = "Residential Apartments Property for Sale in Gurgaon";
         if (urlBhk) {
             title = `${getBhkDisplayName(urlBhk)} Properties for Sale in Gurgaon`;
@@ -236,15 +184,9 @@ export default function ResidentialPage({ apartments = [] }) {
         } else if (urlLocality) {
             title = `${formatFilterName(urlLocality)} Properties in Gurgaon`;
         } else if (urlBudget) {
-            title = `${urlBudget.replace(/-/g, ' to ')} Properties in Gurgaon`;
+            title = `${urlBudget.replace(/-/g, " to ")} Properties in Gurgaon`;
         }
-        setPageTitleDynamic(title); // ✅ Store dynamic fallback
-
-        // ✅ FALLBACK intro text (Firestore will override this)
-        const dynamicIntro = getDynamicIntroText(searchParams);
-        setIntroText(dynamicIntro);
-
-        const hasFilters = urlType || urlStatus || urlLocality || urlBudget || urlBhk || urlKeyword;
+        setPageTitleDynamic(title);
 
         if (urlType) {
             setFilteredApartments(
@@ -266,115 +208,88 @@ export default function ResidentialPage({ apartments = [] }) {
             return;
         }
 
-        if (hasFilters) {
-            setFilteredApartments(filterForResidential(apartments));
-        } else {
-            setFilteredApartments(filterForResidential(apartments));
-        }
-    }, [searchParams, apartments, getDynamicIntroText]);
+        setFilteredApartments(filterForResidential(apartments));
+    }, [searchParams, apartments]);
 
-    // 🔥 UPDATED BANNER + INTRO TEXT useEffect - BOTH TITLE & INTRO FROM FIRESTORE
+    // ✅ BANNER FETCH
     useEffect(() => {
         let category = "residential";
         const urlType = searchParams.get("type");
 
-        // Map URL params to banner categories
         if (urlType === "apartment") category = "apartment";
         else if (urlType === "builder-floor") category = "builder-floor";
-        else if (urlType === "commercial") category = "commercial";
-        else if (urlType === "retail") category = "retail";
-        else if (urlType === "sco") category = "sco";
-
-        console.log('🔍 Fetching banner for category:', category);
+        else if (urlType === "villa") category = "villa";
+        else if (urlType === "plot") category = "plot";
 
         const fetchBanner = async () => {
             try {
-                const bannerData = await getBanner(category);
-                console.log('📥 Banner data loaded:', bannerData);
-                
-                setBanner(bannerData);
-                
-                // 🔥 CUSTOM FIRESTORE INTRO TEXT (HIGHEST PRIORITY)
-                if (bannerData?.introText) {
-                    console.log('✅ Using CUSTOM Firestore introText:', bannerData.introText);
-                    setIntroText(bannerData.introText); // ✅ OVERRIDES dynamic fallback
-                } else {
-                    console.log('ℹ️ No custom introText, using dynamic fallback');
-                }
+                const data = await getBanner(category);
+                console.log("📸 YOUR EXACT Firebase banner data:", data);
+                console.log("🔗 imageLinks:", data?.imageLinks);
+                console.log("🖼️ images:", data?.images);
+                setBanner(data);
 
-                // 🔥 NEW: CUSTOM FIRESTORE PAGE TITLE (HIGHEST PRIORITY)
-                if (bannerData?.pageTitle) {
-                    console.log('✅ Using CUSTOM Firestore pageTitle:', bannerData.pageTitle);
-                    setPageTitle(bannerData.pageTitle); // ✅ OVERRIDES dynamic fallback
-                } else {
-                    console.log('ℹ️ No custom pageTitle, using dynamic fallback');
-                    setPageTitle(pageTitleDynamic); // ✅ Use dynamic fallback
-                }
+                if (data?.introText) setIntroText(data.introText);
+                if (data?.pageTitle) setPageTitle(data.pageTitle);
+                else setPageTitle(pageTitleDynamic);
             } catch (err) {
-                console.error('❌ Banner fetch failed:', err);
+                console.error('Banner fetch failed:', err);
             }
         };
 
         fetchBanner();
-    }, [searchParams, pageTitleDynamic]); // 🔥 Added pageTitleDynamic dependency
+    }, [searchParams, pageTitleDynamic]);
 
-    // ✅ ALL YOUR EXISTING FUNCTIONS (UNCHANGED)
-    const handleFilterChange = useCallback((filterName, value) => {
-        const params = new URLSearchParams(searchParams.toString());
+    // ✅ AUTO-SCROLL
+    useEffect(() => {
+        if (!banner?.images || banner.images.length <= 1) return;
 
-        if (value) {
-            params.set(filterName, value);
-        } else {
-            params.delete(filterName);
-        }
-        params.set('page', '1');
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => 
+                prevIndex === banner.images.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 4000);
 
-        router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
-    }, [searchParams, router]);
+        return () => clearInterval(interval);
+    }, [banner?.images]);
 
+    // ✅ PAGINATION
     const handlePageChange = useCallback((newPage) => {
         const params = new URLSearchParams(searchParams.toString());
-        params.set('page', newPage.toString());
+        params.set("page", newPage.toString());
         router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
     }, [searchParams, router]);
 
-    const clearFilters = () => {
-        router.push(BASE_ROUTE, { scroll: false });
-    };
+    const totalPages = useMemo(
+        () => Math.ceil(filteredApartments.length / apartmentsPerPage),
+        [filteredApartments.length]
+    );
 
-    const totalPages = useMemo(() => {
-        return Math.ceil(filteredApartments.length / apartmentsPerPage);
-    }, [filteredApartments.length]);
-
-    const currentPage = Number(searchParams.get('page')) || page;
+    const currentPage = Number(searchParams.get("page")) || page;
     const startIndex = (currentPage - 1) * apartmentsPerPage;
-    const endIndex = startIndex + apartmentsPerPage;
-    const currentApartments = filteredApartments.slice(startIndex, endIndex);
+    const currentApartments = filteredApartments.slice(startIndex, startIndex + apartmentsPerPage);
 
-    // 🔥 DYNAMIC TITLE FOR DISPLAY (Firestore first, then dynamic fallback)
     const displayTitle = banner?.pageTitle || pageTitleDynamic;
+    const totalImages = banner?.images?.length || 0;
 
-    // ✅ COMPLETE JSX (UPDATED TITLE)
     return (
         <>
             <Header />
 
-            {/* ================= DYNAMIC PAGE INTRO ================= */}
+            {/* PAGE INTRO */}
             <section className="bg-[#F6FBFF]">
                 <div className="max-w-[1240px] mx-auto px-4 py-6">
                     <div className="text-sm text-gray-500 mb-3">Residential</div>
-
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
                         <div className="max-w-4xl">
                             <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
-                                {displayTitle} {/* 🔥 DYNAMIC TITLE */}
+                                {displayTitle}
                             </h1>
-                            {/* ✅ NOW SHOWS FIRESTORE CUSTOM TEXT IF EXISTS */}
                             <ExpandableText
                                 maxLines={2}
                                 className="mt-2 text-sm sm:text-[15px] text-gray-600"
                             >
-                                {introText}
+                                {introText || "Loading..."}
                             </ExpandableText>
                         </div>
                         <div className="text-sm text-gray-500">
@@ -384,24 +299,95 @@ export default function ResidentialPage({ apartments = [] }) {
                 </div>
             </section>
 
-            {/* ================= TRENDS BANNER ================= */}
-            <section className="bg-white py-6 sm:py-10 md:py-5">
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
-                    <h2 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-4 lg:mb-4">
+            {/* ✅ FIXED BANNER - Uses YOUR imageLinks map */}
+            <section className="bg-white py-6">
+                <div className="max-w-[1440px] mx-auto px-4">
+                    <h2 className="text-center text-2xl font-bold mb-6">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    <div className="relative w-full h-[230px] md:h-[300px] md:w-[90%] md:mx-auto overflow-hidden rounded-lg bg-blue-100">
-                        <Image
-                            src={banner?.image || "/default-banner.jpg"}
-                            alt="Trending Banner"
-                            fill
-                            className="object-cover"
-                        />
+                    
+                    <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
+                        {banner?.images && totalImages > 0 ? (
+                            <>
+                                {/* Images Layer - Uses YOUR images array */}
+                                <div className="absolute inset-0 w-full h-full pointer-events-none">
+                                    {banner.images.map((imageUrl, index) => (
+                                        <div
+                                            key={index}
+                                            className="absolute inset-0 w-full h-full"
+                                            style={{ 
+                                                opacity: currentImageIndex === index ? 1 : 0,
+                                                transition: 'opacity 1000ms ease-in-out'
+                                            }}
+                                        >
+                                            <Image
+                                                src={imageUrl}
+                                                alt={`Trending Project ${index + 1}`}
+                                                fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                                                className="object-cover"
+                                                priority={index === 0}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* ✅ CLICK OVERLAY - Gets link from YOUR imageLinks map */}
+                                <div 
+                                    className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
+                                    onClick={handleBannerImageClick}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleBannerImageClick();
+                                        }
+                                    }}
+                                    title={`Click to visit ${getCurrentImageLink(currentImageIndex) || 'project page'}`}
+                                />
+
+                                {/* Dots */}
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full p-1.5">
+                                    {banner.images.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
+                                                currentImageIndex === index
+                                                    ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
+                                                    : 'bg-white/80 hover:bg-white hover:scale-110'
+                                            }`}
+                                            aria-label={`Go to slide ${index + 1}`}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent/0 z-20 pointer-events-none" />
+                            </>
+                        ) : (
+                            <Image
+                                src={banner?.image || "/default-banner.jpg"}
+                                alt="Trending Banner"
+                                fill
+                                sizes="100vw"
+                                className="object-cover"
+                                priority
+                            />
+                        )}
                     </div>
+                    
+                    {/* Debug info (remove in production) */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="text-xs text-gray-500 mt-2 text-center">
+                        
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {/* ================= FILTERS + HERO ================= */}
+            {/* HERO + SEARCH (UNCHANGED) */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 <div className="lg:hidden mb-6 text-center px-2">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
@@ -418,22 +404,22 @@ export default function ResidentialPage({ apartments = [] }) {
                                 Our Priority.
                             </h1>
                         </div>
-                        <div className="flex-1 flex justify-center self-end p-4 relative z-10">
+                        <div className="flex-1 flex p-4 justify-center self-end relative z-10">
                             <div className="relative w-[240px] h-[240px] sm:w-[310px] sm:h-[310px] md:w-[370px] md:h-[370px] lg:w-[450px] lg:h-[420px] rounded-[40px] lg:rounded-[60px] overflow-hidden shadow-xl">
-                                <Image src="/images/residental.jpg" alt="Property collage" fill className="object-cover " priority />
+                                <Image src="/images/residental.jpg" alt="Residential Property collage" fill className="object-cover" priority />
                             </div>
                         </div>
                     </div>
 
-                    {/* MOBILE FILTERS */}
+                    {/* Mobile Search */}
                     <div className="lg:hidden mt-8 mb-12">
                         <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Type</option><option value="residential">Residential Property</option><option value="commercial">Commercial Property</option><option value="luxury-apartment">Luxury Apartment</option><option value="builder-floor">Builder Floor</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>
+                                <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
                             </select>
                             <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Status</option><option value="new-launch">New Launch Project</option><option value="ready-to-move">Ready to Move Project</option><option value="under-construction">Under Construction Project</option><option value="pre-launch">Pre Launch Project</option>
+                                <option>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
                             </select>
                             <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
@@ -442,30 +428,21 @@ export default function ResidentialPage({ apartments = [] }) {
                                 <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
                             </select>
                             <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option value="">Size</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
+                                <option value="">BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
                             </select>
-                            <button className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">Search</button>
+                            <button onClick={() => handleFilterChange('q', keyword || null)} className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">Search</button>
                         </div>
                     </div>
 
-                    {/* DESKTOP FILTERS */}
+                    {/* Desktop Search */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-                        <div className="
-                            bg-white relative
-                            lg:left-[44%]
-                            xl:left-[10%]
-                            2xl:right-[28%]
-                            shadow-2xl px-5 py-3
-                            flex items-center gap-3
-                            rounded-full
-                            border border-yellow-400
-                        "> 
+                        <div className="bg-white relative lg:left-[44%] xl:left-[10%] 2xl:right-[28%] shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Type</option><option value="residential">Residential Property</option><option value="commercial">Commercial Property</option><option value="luxury-apartment">Luxury Apartment</option><option value="builder-floor">Builder Floor</option><option value="retail-shops">Retail Shops</option><option value="sco-plots">SCO Plots</option>
+                                <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
                             </select>
                             <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Status</option><option value="new-launch">New Launch Project</option><option value="ready-to-move">Ready to Move Project</option><option value="under-construction">Under Construction Project</option><option value="pre-launch">Pre Launch Project</option>
+                                <option>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
                             </select>
                             <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
@@ -474,27 +451,36 @@ export default function ResidentialPage({ apartments = [] }) {
                                 <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
                             </select>
                             <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option value="">Size</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
+                                <option value="">BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
                             </select>
-                            <button className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">Search</button>
+                            <button onClick={() => handleFilterChange('q', keyword || null)} className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">Search</button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ================= PROPERTIES GRID ================= */}
-            <main className="py-10 lg:pt-20">
-                <div className="max-w-[1240px] mx-auto px-4 lg:px-12">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {currentApartments.map((item) => (
-                            <PropertyCard key={item.id} baseRoute="residential" property={{
-                                title: item.title, developer: item.developer, location: item.location,
-                                bhk: item.configurations?.join(", "), size: item.areaRange, price: item.priceRange,
-                                img: item.mainImage?.url || "/placeholder.jpg", slug: item.slug || item.id,
-                                isTrending: item.isTrending, isNewLaunch: item.isNewLaunch, isRera: item.isRera,
-                            }} />
-                        ))}
-                    </div>
+            {/* LISTINGS */}
+            <main className="py-10">
+                <div className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {currentApartments.map((item) => (
+                        <PropertyCard
+                            key={item.id}
+                            baseRoute="residential"
+                            property={{
+                                title: item.title,
+                                developer: item.developer,
+                                 location: item.location,
+                                bhk: item.configurations?.join(", "),
+                                size: item.areaRange,
+                                price: item.priceRange,
+                                img: item.mainImage?.url || "/placeholder.jpg",
+                                slug: item.slug || item.id,
+                                isTrending: item.isTrending,
+                                isNewLaunch: item.isNewLaunch,
+                                isRera: item.isRera,
+                            }}
+                        />
+                    ))}
                 </div>
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             </main>

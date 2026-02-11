@@ -16,6 +16,10 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /* ✅ NEW STATES */
+  const [errors, setErrors] = useState({});
+  const [showThankYou, setShowThankYou] = useState(false);
+
   /* ================= EMI CALC ================= */
   const { emi, totalInterest, totalPayment } = useMemo(() => {
     const P = loanAmount;
@@ -45,24 +49,25 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       maximumFractionDigits: 2,
     })}`;
 
-  /* ================= DONUT CHART DATA ================= */
-  const interestPercent =
-    totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0;
+  /* ================= VALIDATION ================= */
+  const validate = () => {
+    const newErrors = {};
 
-  const principalPercent = 100 - interestPercent;
+    if (!name.trim()) newErrors.name = "Name is required";
 
-  const radius = 70;
-  const circumference = 2 * Math.PI * radius;
+    if (!/^[6-9]\d{9}$/.test(phone))
+      newErrors.phone = "Enter valid 10 digit phone";
 
-  const interestStroke = (interestPercent / 100) * circumference;
-  const principalStroke = circumference - interestStroke;
+    if (email && !/^\S+@\S+\.\S+$/.test(email))
+      newErrors.email = "Enter valid email";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   /* ================= SUBMIT ================= */
   const handleLoanSubmit = async () => {
-    if (!name || !phone) {
-      alert("Name and Phone are required");
-      return;
-    }
+    if (!validate()) return;
 
     try {
       setLoading(true);
@@ -79,7 +84,14 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
         createdAt: serverTimestamp(),
       });
 
-      setShowLoanPopup(false);
+      /* ✅ THANK YOU POPUP */
+      setShowThankYou(true);
+
+      setTimeout(() => {
+        setShowThankYou(false);
+        setShowLoanPopup(false);
+      }, 2000);
+
       setName("");
       setPhone("");
       setEmail("");
@@ -96,50 +108,11 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-[#F6FAFF] p-6 rounded-xl">
 
-          {/* RIGHT – REAL TIME GRAPH */}
+          {/* RIGHT GRAPH */}
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold mb-4 text-center">
               Break-up of Total Payment
             </h3>
-
-            {/* DONUT */}
-            <svg width="200" height="200" viewBox="0 0 200 200">
-              <circle
-                cx="100"
-                cy="100"
-                r={radius}
-                fill="none"
-                stroke="#F1D2A2"
-                strokeWidth="20"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r={radius}
-                fill="none"
-                stroke="#9C6A1E"
-                strokeWidth="20"
-                strokeDasharray={`${interestStroke} ${principalStroke}`}
-                strokeDashoffset="0"
-                transform="rotate(-90 100 100)"
-              />
-            </svg>
-
-            <div className="flex gap-8 mt-6 text-sm">
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#9C6A1E]" />
-                <span>
-                  Interest ({interestPercent.toFixed(1)}%)
-                </span>
-              </span>
-
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#F1D2A2]" />
-                <span>
-                  Principal ({principalPercent.toFixed(1)}%)
-                </span>
-              </span>
-            </div>
           </div>
 
           {/* LEFT */}
@@ -178,27 +151,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
               />
             </div>
 
-            <div className="bg-gray-50 rounded-md p-4">
-              <p className="text-sm text-gray-600">Monthly EMI</p>
-              <p className="text-2xl font-bold text-[#F5A300]">
-                {formatCurrency(emi)}
-              </p>
-            </div>
-
-            <div className="flex justify-between text-sm">
-              <span>Interest to be paid</span>
-              <span className="font-medium">
-                {formatCurrency(totalInterest)}
-              </span>
-            </div>
-
-            <div className="flex justify-between text-sm border-t pt-2">
-              <span>Total of Payments</span>
-              <span className="font-semibold">
-                {formatCurrency(totalPayment)}
-              </span>
-            </div>
-
             <button
               onClick={() => setShowLoanPopup(true)}
               className="w-full mt-4 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold"
@@ -212,6 +164,21 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       {/* ================= POPUP ================= */}
       {showLoanPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+
+          {/* ✅ THANK YOU */}
+          {showThankYou && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+              <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl">
+                <h3 className="text-lg font-semibold text-[#c8950a]">
+                  Thank You 🙌
+                </h3>
+                <p className="text-sm mt-1">
+                  Our team will contact you shortly.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white w-full max-w-md rounded-xl p-6 relative">
             <button
               onClick={() => setShowLoanPopup(false)}
@@ -229,24 +196,41 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
             </p>
 
             <div className="space-y-3">
-              <input
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-md"
-              />
-              <input
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-4 py-2 border rounded-md"
-              />
-              <input
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-md"
-              />
+              <div>
+                <input
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
+                {errors.phone && (
+                  <p className="text-xs text-red-500">{errors.phone}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email}</p>
+                )}
+              </div>
             </div>
 
             <button
@@ -262,3 +246,4 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
     </>
   );
 }
+

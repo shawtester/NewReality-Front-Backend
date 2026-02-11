@@ -14,11 +14,7 @@ const ExpandableText = ({ children, maxLines = 2 }) => {
 
   return (
     <div className="mt-2 text-sm text-gray-600 leading-relaxed">
-      <p
-        className={`transition-all ${
-          expanded ? "" : "line-clamp-2"
-        }`}
-      >
+      <p className={`${expanded ? "" : "line-clamp-2"}`}>
         {children}
       </p>
 
@@ -37,6 +33,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
 
   const [search, setSearch] = useState("");
   const [description, setDescription] = useState("");
+  const [heading, setHeading] = useState("");
 
   /* ================= NORMALIZED SLUG ================= */
   const normalizedSlug = slug
@@ -46,9 +43,9 @@ export default function FooterSeoPage({ params, properties = [] }) {
     .replace("-properties", "")
     .replace("-projects", "");
 
-  /* ================= FETCH ADMIN DESCRIPTION ================= */
+  /* ================= FETCH ADMIN SEO DATA ================= */
   useEffect(() => {
-    const fetchDescription = async () => {
+    const fetchSeoData = async () => {
       const collections = [
         "projects_by_budget",
         "projects_by_location",
@@ -61,18 +58,17 @@ export default function FooterSeoPage({ params, properties = [] }) {
         const snap = await getDoc(doc(db, "footer_links", col));
         const data = snap.data();
 
-        const found = data?.links?.find(
-          (l) => l.value === slug
-        );
+        const found = data?.links?.find((l) => l.value === slug);
 
-        if (found?.description) {
-          setDescription(found.description);
+        if (found) {
+          if (found.description) setDescription(found.description);
+          if (found.heading) setHeading(found.heading);
           break;
         }
       }
     };
 
-    fetchDescription();
+    fetchSeoData();
   }, [slug]);
 
   let filtered = [...properties];
@@ -191,14 +187,13 @@ export default function FooterSeoPage({ params, properties = [] }) {
     <>
       <Header />
 
-      {/* ================= INTRO SECTION (LIKE RESIDENTIAL) ================= */}
+      {/* ================= INTRO SECTION ================= */}
       <section className="bg-[#F6FBFF]">
         <div className="max-w-[1240px] mx-auto px-4 py-6">
-
           <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
             <div className="max-w-4xl">
               <h1 className="text-xl md:text-[26px] font-semibold text-gray-900 capitalize">
-                {slug.replaceAll("-", " ")} Properties
+                {heading || `${slug.replaceAll("-", " ")} Properties`}
               </h1>
 
               {description && (
@@ -217,7 +212,6 @@ export default function FooterSeoPage({ params, properties = [] }) {
 
       {/* ================= LISTING ================= */}
       <section className="max-w-[1240px] mx-auto px-4 py-16">
-        {/* SEARCH BAR */}
         <div className="mb-8 flex justify-center">
           <input
             type="text"
@@ -263,4 +257,3 @@ export default function FooterSeoPage({ params, properties = [] }) {
     </>
   );
 }
-

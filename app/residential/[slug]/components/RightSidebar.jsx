@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useMemo, useState } from "react";
 import {
   FaInstagram,
   FaLinkedinIn,
@@ -10,9 +10,6 @@ import {
   FaFacebookF,
   FaTwitter,
   FaLink,
-  FaTimes,
-  FaChevronLeft,
-  FaChevronRight,
 } from "react-icons/fa";
 import BrandCTA from "./BrandCTA";
 
@@ -20,13 +17,29 @@ export default function RightSidebar({ property }) {
   if (!property) return null;
 
   const [open, setOpen] = useState(false);
-  const scrollRef = useRef(null);
+  const [index, setIndex] = useState(0); // ✅ NEW
 
-  /* ✅ FIXED IMAGE FIELD (gallery instead of images) */
-  const images =
-    property.gallery?.length > 0
-      ? property.gallery.map((g) => g.url || g)
-      : ["/images/s1.png", "/images/s2.png", "/images/s3.png"];
+  /* ================= IMAGE RESOLUTION ================= */
+
+  const mainImage =
+    property.mainImage?.url ||
+    property.featureImageURL ||
+    property.featuredImage ||
+    null;
+
+  const galleryImages = useMemo(() => {
+    if (property.gallery?.length > 0) {
+      return property.gallery.map((img) =>
+        typeof img === "string" ? img : img.url
+      );
+    }
+
+    if (property.imageList?.length > 0) {
+      return property.imageList;
+    }
+
+    return [];
+  }, [property]);
 
   /* ================= VIDEO ================= */
   const getVideoUrl = (video) => {
@@ -44,17 +57,6 @@ export default function RightSidebar({ property }) {
     return "";
   };
 
-  const scroll = (dir) => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({
-      left:
-        dir === "left"
-          ? -scrollRef.current.clientWidth
-          : scrollRef.current.clientWidth,
-      behavior: "smooth",
-    });
-  };
-
   const videoUrl = getVideoUrl(property.video);
 
   const socialLinks = [
@@ -65,28 +67,6 @@ export default function RightSidebar({ property }) {
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
 
-  /* ================= AUTO SCROLL ================= */
-  useEffect(() => {
-    if (!open || !scrollRef.current) return;
-
-    const container = scrollRef.current;
-
-    const interval = setInterval(() => {
-      const maxScroll = container.scrollWidth - container.clientWidth;
-
-      if (container.scrollLeft >= maxScroll) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        container.scrollBy({
-          left: container.clientWidth,
-          behavior: "smooth",
-        });
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [open]);
-
   return (
     <>
       {/* ================= MOBILE ================= */}
@@ -95,83 +75,98 @@ export default function RightSidebar({ property }) {
       </div>
 
       {/* ================= DESKTOP ================= */}
-      <div className="w-[340px] hidden lg:block space-y-4">
-        {/* IMAGE GRID */}
-        <div className="bg-white rounded-xl overflow-hidden">
-          <div className="grid grid-cols-2 gap-1 mb-1">
-            <Image
-              src={images[0]}
-              alt=""
-              width={200}
-              height={120}
-              className="object-cover rounded"
-            />
+      <div className="w-[390px] hidden lg:flex flex-col gap-4">
+        {(mainImage || galleryImages.length > 0 || videoUrl) && (
+          <div className="bg-white rounded-xl overflow-hidden flex flex-col h-[420px]">
 
-            <div
-              onClick={() => setOpen(true)}
-              className="relative cursor-pointer group"
-            >
-              <Image
-                src={images[1]}
-                alt=""
-                width={200}
-                height={120}
-                className="object-cover rounded"
-              />
+            {/* TOP IMAGES */}
+            <div className="grid grid-cols-2 gap-2 px-2">
+              {mainImage && (
+                <div
+                  onClick={() => {
+                    setIndex(0);
+                    setOpen(true);
+                  }}
+                  className="relative h-[120px] rounded-lg overflow-hidden cursor-pointer"
+                >
+                  <Image
+                    src={galleryImages[0]}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
 
-              <span className="absolute bottom-2 left-2 bg-white/90 text-xs px-2 py-1 rounded">
-                {images.length}+ Photos
-              </span>
+              {galleryImages.length > 0 && (
+                <div
+                  onClick={() => {
+                    setIndex(1);
+                    setOpen(true);
+                  }}
+                  className="relative h-[120px] rounded-lg overflow-hidden cursor-pointer group"
+                >
+                  <Image
+                    src={galleryImages[1]}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
 
-              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition" />
+                  <span className="absolute bottom-2 left-2 bg-white/90 text-xs px-2 py-1 rounded">
+                    {galleryImages.length}+ Photos
+                  </span>
+
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition" />
+                </div>
+              )}
+            </div>
+
+            {/* VIDEO / IMAGE */}
+            <div className="relative flex-1 bg-black m-2 rounded-lg overflow-hidden">
+              {videoUrl ? (
+                videoUrl.includes("youtu") ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(videoUrl)}`}
+                    className="w-full h-full"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={videoUrl}
+                    controls
+                    className="w-full h-full object-cover"
+                  />
+                )
+              ) : (
+                mainImage && (
+                  <Image
+                    src={galleryImages[3]}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                )
+              )}
             </div>
           </div>
-
-          {/* VIDEO PREVIEW */}
-          <div className="relative bg-black rounded-lg overflow-hidden">
-            {videoUrl ? (
-              videoUrl.includes("youtu") ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${getYouTubeId(videoUrl)}`}
-                  className="w-full h-[185px]"
-                  allowFullScreen
-                />
-              ) : (
-                <video
-                  src={videoUrl}
-                  controls
-                  className="w-full h-[185px] object-cover"
-                />
-              )
-            ) : (
-              <Image
-                src={images[0]}
-                alt=""
-                width={400}
-                height={200}
-                className="w-full h-[185px] object-cover"
-              />
-            )}
-          </div>
-        </div>
+        )}
 
         {/* ================= QUICK FACTS ================= */}
         <div className="bg-white rounded-xl p-5 shadow-sm">
-          <h3 className="font-semibold mb-3 border-b pb-2">
-            Quick Facts
-          </h3>
+          <h3 className="font-semibold mb-3 border-b pb-2">Quick Facts</h3>
 
           <div className="text-sm space-y-2 text-gray-600">
             <p>Project Area : {property.projectArea || "-"}</p>
             <p>Project Type : {property.projectType || "-"}</p>
             <p>Project Status : {property.projectStatus || "-"}</p>
             <p>Project Elevation / Tower : {property.projectElevation || "-"}</p>
-            <p>RERA No : {property.rera}</p>
+            <p>RERA No : {property.rera || "-"}</p>
             <p>Possession : {property.possession || "-"}</p>
           </div>
         </div>
 
-        {/* STICKY CTA */}
+        {/* ================= STICKY CTA ================= */}
         <aside className="sticky top-[135px] space-y-4 z-20">
           <BrandCTA propertyTitle={property.title} />
 
@@ -196,6 +191,52 @@ export default function RightSidebar({ property }) {
           </div>
         </aside>
       </div>
+
+      {/* ================= FULLSCREEN GALLERY ================= */}
+      {open && (
+        <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
+
+          {/* CLOSE */}
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-6 right-6 text-white text-3xl"
+          >
+            ✕
+          </button>
+
+          {/* LEFT */}
+          <button
+            onClick={() =>
+              setIndex((prev) =>
+                prev === 0 ? galleryImages.length - 1 : prev - 1
+              )
+            }
+            className="absolute left-6 text-white text-4xl"
+          >
+            ❮
+          </button>
+
+          {/* IMAGE */}
+          <div className="relative w-[90vw] h-[80vh]">
+            <Image
+              src={galleryImages[index]}
+              alt=""
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          {/* RIGHT */}
+          <button
+            onClick={() =>
+              setIndex((prev) => (prev + 1) % galleryImages.length)
+            }
+            className="absolute right-6 text-white text-4xl"
+          >
+            ❯
+          </button>
+        </div>
+      )}
     </>
   );
 }

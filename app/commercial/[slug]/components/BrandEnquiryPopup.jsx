@@ -15,7 +15,14 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     email: "",
     message: "",
   });
+
   const [loading, setLoading] = useState(false);
+
+  /* ✅ NEW — THANK YOU POPUP STATE */
+  const [showThankYou, setShowThankYou] = useState(false);
+
+  /* ✅ NEW — VALIDATION ERRORS */
+  const [errors, setErrors] = useState({});
 
   // Disable scroll when popup is open
   useEffect(() => {
@@ -30,25 +37,59 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  /* ================= VALIDATION ================= */
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = "Enter valid 10 digit phone";
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = "Enter valid email";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    /* ✅ VALIDATION CHECK */
+    if (!validate()) return;
+
     setLoading(true);
 
     try {
-      // Save enquiry to Firestore
       await addDoc(collection(db, "contacts"), {
         ...formData,
         propertyTitle,
-        source: "property", // mark this as property enquiry
+        source: "property",
         status: "new",
         createdAt: serverTimestamp(),
       });
 
       toast.success("Enquiry submitted successfully ✅");
+
       setFormData({ name: "", phone: "", email: "", message: "" });
-      onClose();
+
+      /* ✅ SHOW THANK YOU POPUP */
+      setShowThankYou(true);
+
+      /* Auto close after 2 sec */
+      setTimeout(() => {
+        setShowThankYou(false);
+        onClose();
+      }, 2000);
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to submit enquiry ❌");
@@ -61,6 +102,22 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     <Portal>
       {/* OVERLAY */}
       <div className="fixed inset-0 z-[99999] bg-black/60 flex items-center justify-center px-4">
+
+        {/* ================= THANK YOU POPUP ================= */}
+        {showThankYou && (
+          <div className="fixed inset-0 z-[100000] flex items-center justify-center">
+            <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl animate-fadeIn">
+              <h3 className="text-lg font-semibold text-[#c8950a]">
+                Thank You 🙌
+              </h3>
+              <p className="text-sm mt-1">
+                Our team will contact you shortly.
+              </p>
+            </div>
+          </div>
+        )}
+
+
         {/* MODAL */}
         <div className="relative bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl">
           {/* CLOSE */}
@@ -81,7 +138,6 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
           {/* FORM */}
           <form className="space-y-3" onSubmit={handleSubmit}>
-            {/* INTERESTED IN */}
             <p className="text-sm font-semibold text-gray-800">
               I Am Interested In{" "}
               <span className="block mt-1 text-sm text-[#c8950a] font-medium">
@@ -89,40 +145,52 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
               </span>
             </p>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#F5A300]"
-            />
-
-            <div className="flex border border-gray-300 rounded-md overflow-hidden">
-              <select className="px-3 text-sm bg-gray-50 outline-none border-r">
-                <option>+91 India</option>
-              </select>
+            <div>
               <input
-                type="tel"
-                name="phone"
-                placeholder="Phone"
-                value={formData.phone}
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
                 onChange={handleChange}
-                required
-                className="flex-1 px-4 py-2 outline-none"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#F5A300]"
               />
+              {errors.name && (
+                <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+              )}
             </div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#F5A300]"
-            />
+            <div>
+              <div className="flex border border-gray-300 rounded-md overflow-hidden">
+                <select className="px-3 text-sm bg-gray-50 outline-none border-r">
+                  <option>+91 India</option>
+                </select>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="flex-1 px-4 py-2 outline-none"
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:border-[#F5A300]"
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+              )}
+            </div>
 
             <textarea
               rows={2}
@@ -146,3 +214,4 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     </Portal>
   );
 }
+

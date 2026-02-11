@@ -22,6 +22,42 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
+export async function generateMetadata({ params }) {
+  const property = await getPropertyBySlugOrId(params.slug);
+
+  if (!property) {
+    return {
+      title: "Property Not Found",
+      description: "",
+    };
+  }
+
+  const title =
+    property.metaTitle ||
+    `${property.title} in ${property.location} | Price & Details`;
+
+  const description =
+    property.metaDescription ||
+    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
+
+  const keywords =
+    property.metaKeywords ||
+    `${property.title}, ${property.location}, real estate`;
+
+  return {
+    title,
+    description,
+    keywords,
+    openGraph: {
+      title,
+      description,
+      images: property.mainImage?.url
+        ? [property.mainImage.url]
+        : [],
+    },
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function PropertyPage({ params }) {
@@ -42,12 +78,13 @@ export default async function PropertyPage({ params }) {
     property.amenities || []
   );
 
+  /* ================= CLEAN PROPERTY ================= */
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
     title: property.title,
     location: property.location,
-    
+
     builderId: property.builderId || null,
     builderName: property.developer || "",
     configurations: property.configurations || [],
@@ -57,8 +94,13 @@ export default async function PropertyPage({ params }) {
     rera: property.reraNumber,
     updatedAt: property.lastUpdated,
 
-    brochureUrl: property.brochure?.url || "",
+    brochure: property.brochure || null,
 
+    /* 🔥 MAIN FIX — RIGHTSIDEBAR DATA */
+    mainImage: property.mainImage || null,
+    gallery: property.gallery || [],
+
+    /* Mobile Gallery ke liye URLs array */
     images: [
       ...(property.mainImage?.url ? [property.mainImage.url] : []),
       ...(property.gallery?.map((g) => g.url) || []),
@@ -83,7 +125,7 @@ export default async function PropertyPage({ params }) {
 
     disclaimer: property.disclaimer || "",
 
-    /* ================= QUICK FACTS ADD KAR (🔥 MAIN FIX) ================= */
+    /* QUICK FACTS */
     projectArea: property.projectArea || "",
     projectType: property.projectType || "",
     projectStatus: property.projectStatus || "",
@@ -95,7 +137,7 @@ export default async function PropertyPage({ params }) {
     <ApartmentClient>
       <AutoPopup propertyTitle={cleanProperty.title} />
 
-      <section className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section className="max-w-[1240px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
           <MobileGallery
@@ -120,7 +162,6 @@ export default async function PropertyPage({ params }) {
             paymentPlan={cleanProperty.paymentPlan}
           />
 
-
           <AmenitiesSection amenities={cleanProperty.amenities} />
 
           <LocationSection
@@ -133,7 +174,6 @@ export default async function PropertyPage({ params }) {
 
           <FAQSection faq={cleanProperty.faq} />
 
-          {/* ✅ DEVELOPER SECTION ONLY WHEN BUILDER EXISTS */}
           {cleanProperty.builder && (
             <DeveloperSection builder={cleanProperty.builder} />
           )}
@@ -147,12 +187,8 @@ export default async function PropertyPage({ params }) {
         </div>
 
         {/* RIGHT */}
-        <RightSidebar
-          property={{
-            ...cleanProperty,
-            images: cleanProperty.images.slice(1), // ❌ remove main image
-          }}
-        />
+        {/* 🔥 MAIN FIX — NO DATA OVERRIDE */}
+        <RightSidebar property={cleanProperty} />
       </section>
 
       <Footer />

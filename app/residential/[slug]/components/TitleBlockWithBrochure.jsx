@@ -14,14 +14,36 @@ export default function TitleBlockWithBrochure({ property }) {
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
 
-  async function handleSubmit() {
-    if (!lead.name || !lead.email || !lead.phone) {
-      alert("All fields required");
-      return;
+  /* ✅ NEW — THANK YOU STATE */
+  const [showThankYou, setShowThankYou] = useState(false);
+
+  /* ✅ NEW — ERRORS */
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!lead.name.trim()) {
+      newErrors.name = "Name is required";
     }
 
+    if (!/^[6-9]\d{9}$/.test(lead.phone)) {
+      newErrors.phone = "Enter valid 10 digit phone";
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(lead.email)) {
+      newErrors.email = "Enter valid email";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  async function handleSubmit() {
+    /* ✅ VALIDATION */
+    if (!validate()) return;
+
     try {
-      // ✅ Save Lead First
       await addDoc(collection(db, "brochureLeads"), {
         ...lead,
         propertySlug: property.slug,
@@ -29,19 +51,13 @@ export default function TitleBlockWithBrochure({ property }) {
         createdAt: serverTimestamp(),
       });
 
-      // ✅ DIRECT DOWNLOAD (NO URL MODIFY)
       if (property?.brochure?.url) {
         const link = document.createElement("a");
-
-        // 🔥 ORIGINAL CLOUDINARY URL USE KARO
         link.href = property.brochure.url;
-
-        // 🔥 browser ko force download bolte hain
         link.setAttribute(
           "download",
           property.brochure.name || "brochure.pdf"
         );
-
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -49,7 +65,14 @@ export default function TitleBlockWithBrochure({ property }) {
         alert("Brochure not available");
       }
 
-      setShowBrochurePopup(false);
+      /* ✅ THANK YOU POPUP */
+      setShowThankYou(true);
+
+      setTimeout(() => {
+        setShowThankYou(false);
+        setShowBrochurePopup(false);
+      }, 2000);
+
       setLead({ name: "", email: "", phone: "" });
     } catch (err) {
       console.error(err);
@@ -70,7 +93,7 @@ export default function TitleBlockWithBrochure({ property }) {
               {property.title}
             </h1>
 
-            <p className="text-sm text-pink-600">{property.location}</p>
+            <p className="text-sm text-[#F5A300]">{property.location}</p>
 
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
               {typeof property.builderName === "string" && (
@@ -80,7 +103,7 @@ export default function TitleBlockWithBrochure({ property }) {
                   </span>
                   <span>
                     By{" "}
-                    <span className="text-pink-600">
+                    <span className="text-[#F5A300]">
                       {property.builderName}
                     </span>
                   </span>
@@ -147,6 +170,22 @@ export default function TitleBlockWithBrochure({ property }) {
       {/* ================= BROCHURE POPUP ================= */}
       {showBrochurePopup && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
+
+          {/* ✅ THANK YOU POPUP */}
+          {showThankYou && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+              <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl">
+                <h3 className="text-lg font-semibold text-[#c8950a]">
+                  Thank You 🙌
+                </h3>
+                <p className="text-sm mt-1">
+                  Your brochure is downloading.
+                </p>
+              </div>
+            </div>
+          )}
+
+
           <div className="relative w-full max-w-md bg-white rounded-xl p-6">
             <button
               onClick={() => setShowBrochurePopup(false)}
@@ -171,35 +210,50 @@ export default function TitleBlockWithBrochure({ property }) {
             </p>
 
             <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Full Name*"
-                value={lead.name}
-                onChange={(e) =>
-                  setLead({ ...lead, name: e.target.value })
-                }
-                className="w-full border rounded-md px-4 py-2 text-sm"
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Full Name*"
+                  value={lead.name}
+                  onChange={(e) =>
+                    setLead({ ...lead, name: e.target.value })
+                  }
+                  className="w-full border rounded-md px-4 py-2 text-sm"
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                )}
+              </div>
 
-              <input
-                type="email"
-                placeholder="Email Address*"
-                value={lead.email}
-                onChange={(e) =>
-                  setLead({ ...lead, email: e.target.value })
-                }
-                className="w-full border rounded-md px-4 py-2 text-sm"
-              />
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email Address*"
+                  value={lead.email}
+                  onChange={(e) =>
+                    setLead({ ...lead, email: e.target.value })
+                  }
+                  className="w-full border rounded-md px-4 py-2 text-sm"
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
+              </div>
 
-              <input
-                type="tel"
-                placeholder="Contact Number*"
-                value={lead.phone}
-                onChange={(e) =>
-                  setLead({ ...lead, phone: e.target.value })
-                }
-                className="w-full border rounded-md px-4 py-2 text-sm"
-              />
+              <div>
+                <input
+                  type="tel"
+                  placeholder="Contact Number*"
+                  value={lead.phone}
+                  onChange={(e) =>
+                    setLead({ ...lead, phone: e.target.value })
+                  }
+                  className="w-full border rounded-md px-4 py-2 text-sm"
+                />
+                {errors.phone && (
+                  <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+                )}
+              </div>
             </div>
 
             <button

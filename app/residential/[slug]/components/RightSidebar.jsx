@@ -82,7 +82,36 @@ export default function RightSidebar({ property }) {
       {/* ================= MOBILE ================= */}
       <div className="block lg:hidden mt-12 space-y-4">
         <BrandCTA propertyTitle={property.title} />
+
+        {/* 🔥 MOBILE SHARE BOX */}
+        <div className="bg-white rounded-xl p-5 text-center shadow-sm">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <p className="font-medium">Share</p>
+
+            <button
+              onClick={copyPropertyLink}
+              className="text-gray-400 text-sm hover:text-[#DBA40D] transition"
+              title="Copy Property Link"
+            >
+              <FaLink />
+            </button>
+          </div>
+
+          <div className="flex justify-center gap-3">
+            {socialLinks.map(({ Icon, href }, i) => (
+              <Link
+                key={i}
+                href={href}
+                target="_blank"
+                className="w-9 h-9 p-2 bg-[#DBA40D] text-white rounded flex items-center justify-center"
+              >
+                <Icon />
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
+
 
       {/* ================= DESKTOP ================= */}
       <div className="w-[390px] hidden lg:flex flex-col gap-4">

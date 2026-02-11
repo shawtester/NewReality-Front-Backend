@@ -259,6 +259,22 @@ export default function TitleBlockWithBrochure({ property }) {
           </div>
         </div>
       )}
+
+      {/* ================= MOBILE QUICK FACTS ================= */}
+      <div className="lg:hidden bg-white rounded-xl p-5 shadow-sm mt-4">
+        <h3 className="font-semibold mb-3 border-b pb-2">
+          Quick Facts
+        </h3>
+
+        <div className="text-sm space-y-2 text-gray-600">
+          <p>Project Area : {property.projectArea || "-"}</p>
+          <p>Project Type : {property.projectType || "-"}</p>
+          <p>Project Status : {property.projectStatus || "-"}</p>
+          <p>Project Elevation / Tower : {property.projectElevation || "-"}</p>
+          <p>RERA No : {property.rera || "-"}</p>
+          <p>Possession : {property.possession || "-"}</p>
+        </div>
+      </div>
     </>
   );
 }

@@ -1,20 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
 import { useFormState, useFormStatus } from "react-dom";
-import { submitContactForm } from "@/app/actions/contactActions"; // Adjust path
+import { submitContactForm } from "@/app/actions/contactActions";
 
 export default function GetInTouchModal({
   open,
   onClose,
   propertyTitle = "Property Inquiry",
 }) {
-  const [state, formAction] = useFormState(submitContactForm, { 
-    success: false, 
-    message: "" 
+  const [state, formAction] = useFormState(submitContactForm, {
+    success: false,
+    message: "",
   });
+
+  /* ✅ NEW — THANK YOU POPUP STATE */
+  const [showThankYou, setShowThankYou] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
@@ -23,10 +26,39 @@ export default function GetInTouchModal({
     };
   }, [open]);
 
+  /* ✅ SUCCESS LISTENER */
+  useEffect(() => {
+    if (state?.success) {
+      setShowThankYou(true);
+
+      // Auto close modal
+      setTimeout(() => {
+        setShowThankYou(false);
+        onClose();
+      }, 2200);
+    }
+  }, [state?.success, onClose]);
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4">
+
+      {/* ================= THANK YOU POPUP ================= */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center">
+          <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl animate-fadeIn">
+            <h3 className="text-lg font-semibold text-[#c8950a]">
+              Thank You 🙌
+            </h3>
+            <p className="text-sm mt-1">
+              Our team will contact you shortly.
+            </p>
+          </div>
+        </div>
+      )}
+
+
       {/* MODAL */}
       <div className="relative w-full max-w-md bg-white rounded-2xl p-4 shadow-xl">
         {/* CLOSE */}
@@ -58,8 +90,6 @@ export default function GetInTouchModal({
         {/* FORM */}
         <form className="mt-4 space-y-3" action={formAction}>
           <input type="hidden" name="propertyTitle" value={propertyTitle} />
-
-          {/* ✅ SOURCE TRACKING */}
           <input type="hidden" name="source" value="get-in-touch-modal" />
 
           <p className="text-sm font-semibold text-gray-800">
@@ -86,7 +116,7 @@ export default function GetInTouchModal({
               type="tel"
               placeholder="Phone"
               required
-              pattern="[0-9]{10}"
+              pattern="[6-9][0-9]{9}"
               className="flex-1 px-3 py-1.5 outline-none"
             />
           </div>
@@ -125,11 +155,12 @@ export default function GetInTouchModal({
           <SubmitButton />
 
           {state.message && (
-            <div className={`p-3 rounded-md text-sm font-medium text-center ${
-              state.success 
-                ? 'bg-green-50 border border-green-200 text-green-800' 
-                : 'bg-red-50 border border-red-200 text-red-800'
-            }`}>
+            <div
+              className={`p-3 rounded-md text-sm font-medium text-center ${state.success
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+                }`}
+            >
               {state.message}
             </div>
           )}
@@ -153,7 +184,7 @@ function SubmitButton() {
           Sending...
         </>
       ) : (
-        'Get a Call'
+        "Get a Call"
       )}
     </button>
   );

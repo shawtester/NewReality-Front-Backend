@@ -9,49 +9,36 @@ export default function AmenitiesSection({ amenities = [] }) {
     <section id="amenities" className="max-w-[1240px] mx-auto px-4 mt-12">
       <h2 className="text-xl font-semibold mb-6">Amenities</h2>
 
-      {/* ================= ALL DEVICES (SAME LAYOUT) ================= */}
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-4">
-          {amenities.map((a, i) => (
-            <div
-              key={i}
-              className="
-                w-[160px] h-[140px]
-                lg:w-[172px] lg:h-[149px]
-                bg-white border border-gray-300 rounded-[4px]
-                overflow-hidden flex flex-col flex-shrink-0
-                hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]
-                hover:border-gray-400
-                transition-all duration-200
-              "
-            >
-              {/* IMAGE */}
-              <div className="h-[90px] lg:h-[100px] w-full bg-gray-50 flex items-center justify-center">
-                {a.image?.url ? (
-                  <Image
-                    src={a.image.url}
-                    alt={a.name || "Amenity"}
-                    width={160}
-                    height={90}
-                    className="object-contain"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                    No Image
-                  </div>
-                )}
-              </div>
-
-              {/* NAME */}
-              <div className="flex-1 flex items-center justify-center px-2 text-center">
-                <p className="text-xs font-medium text-gray-700 leading-tight">
-                  {a.name}
-                </p>
-              </div>
+      {/* GRID LIST */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-6">
+        {amenities.map((a, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 border-b border-gray-200 pb-4"
+          >
+            {/* ICON */}
+            <div className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center flex-shrink-0">
+              {a.image?.url ? (
+                <Image
+                  src={a.image.url}
+                  alt={a.name || "Amenity"}
+                  width={26}
+                  height={26}
+                  className="object-contain"
+                />
+              ) : (
+                <span className="text-[10px] text-gray-400">Icon</span>
+              )}
             </div>
-          ))}
-        </div>
+
+            {/* NAME */}
+            <p className="text-sm text-gray-800 font-medium">
+              {a.name}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
+

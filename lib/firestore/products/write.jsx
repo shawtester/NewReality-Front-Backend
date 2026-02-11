@@ -29,6 +29,23 @@ const removeUndefined = (obj) => {
   return obj;
 };
 
+const removeEmpty = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(removeEmpty);
+  }
+
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj)
+        .filter(([_, v]) => v !== "" && v !== undefined)
+        .map(([k, v]) => [k, removeEmpty(v)])
+    );
+  }
+
+  return obj;
+};
+
+
 /* ================= SLUG HELPER ================= */
 const generateSlug = (data) => {
   const base =
@@ -57,24 +74,27 @@ export const createNewProperty = async ({ data }) => {
 
   const safeBrochure = data.brochure
     ? {
-        url: data.brochure.url || "",
-        name: data.brochure.name || "",
-      }
+      url: data.brochure.url || "",
+      name: data.brochure.name || "",
+    }
     : null;
 
-  const payload = removeUndefined({
-    ...defaultProperty, // fallback defaults
-    ...data,            // admin data overrides defaults
+  const payload = removeEmpty(
+    removeUndefined({
+      ...data,
+      slug,
 
-    id: newId,
-    slug,
+      floorPlans: Array.isArray(data.floorPlans)
+        ? data.floorPlans
+        : [],
 
-    mainImage: safeMainImage,
-    brochure: safeBrochure,
+      mainImage: safeMainImage,
+      brochure: safeBrochure,
 
-    timestampCreate: Timestamp.now(),
-    timestampUpdate: null,
-  });
+      timestampUpdate: Timestamp.now(),
+    })
+  );
+
 
   // ✅ SAVE PROPERTY (SAFE)
   await setDoc(doc(db, "properties", newId), payload, {
@@ -102,9 +122,9 @@ export const updateProperty = async ({ data }) => {
 
   const safeBrochure = data.brochure
     ? {
-        url: data.brochure.url || "",
-        name: data.brochure.name || "",
-      }
+      url: data.brochure.url || "",
+      name: data.brochure.name || "",
+    }
     : null;
 
   const payload = removeUndefined({

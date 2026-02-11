@@ -10,7 +10,7 @@ export default function FAQSection({ faq = [] }) {
       <div className="bg-[#F4F6F6] rounded-xl p-8">
         <h2 className="text-lg font-semibold mb-6">
           Frequently Asked Questions
-          <span className="block w-10 h-[2px] bg-pink-600 mt-2"></span>
+          <span className="block w-10 h-[2px] bg-[#F5A300] mt-2"></span>
         </h2>
 
         {/* FAQ LIST */}

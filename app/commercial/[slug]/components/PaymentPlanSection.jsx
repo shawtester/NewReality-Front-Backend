@@ -26,12 +26,30 @@ export default function PaymentPlanSection({ paymentPlan }) {
       <div className="bg-[#FBF6F1] rounded-2xl px-6 py-10">
         <div
           className={`
-            flex gap-8 no-scrollbar
+            flex gap-8
             ${isScrollable ? "overflow-x-auto" : ""}
             ${isSingle ? "justify-center" : ""}
             ${isDouble ? "justify-between" : ""}
           `}
+          /* ✅ SCROLLBAR HIDE WITHOUT GLOBAL CSS */
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+          onScroll={(e) => {
+            e.currentTarget.style.setProperty(
+              "--webkit-scrollbar",
+              "display:none"
+            );
+          }}
         >
+          {/* 🔥 INLINE STYLE TAG (LOCAL ONLY) */}
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+
           {plans.map((p, i) => (
             <div
               key={i}

@@ -5,8 +5,16 @@ import PropertyCard from "./PropertyCard";
 import slugify from "slugify";
 
 export default function NewLaunchProjects({ properties = [] }) {
-  // ✅ Filter only New Launch projects
-  const newLaunch = properties.filter((p) => p?.isNewLaunch);
+  // Filter + Latest First Sorting
+  const newLaunch = properties
+    .filter((p) => p?.isNewLaunch)
+    .sort((a, b) => {
+      //  Firestore Timestamp support
+      const dateA = a?.timestampCreate?.seconds || 0;
+      const dateB = b?.timestampCreate?.seconds || 0;
+
+      return dateB - dateA; // Latest first
+    });
 
   if (!newLaunch.length) return null;
 
@@ -48,15 +56,13 @@ export default function NewLaunchProjects({ properties = [] }) {
                 bhk: p.configurations?.join(", "),
                 size: p.areaRange,
                 price: p.priceRange,
-
                 img: p.mainImage?.url || "/images/placeholder.jpg",
 
-                // ✅ SLUG FIRST, ELSE ID (NO BREAKING)
+                //  SLUG FIRST ELSE ID
                 slug: p.slug || p.id,
                 isRera: p.isRera,
               }}
             />
-
           </div>
         ))}
       </div>

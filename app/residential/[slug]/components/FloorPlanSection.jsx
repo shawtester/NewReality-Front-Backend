@@ -11,13 +11,13 @@ export default function FloorPlanSection({ floorPlans = [] }) {
   const bhkTypes = useMemo(() => {
     const set = new Set();
     floorPlans.forEach((fp) => {
-      if (fp?.title) set.add(fp.title.trim());
+      if (fp?.type) set.add(fp.type.trim()); // ✅ FIXED (title → type)
     });
     return Array.from(set);
   }, [floorPlans]);
 
   const [activeType, setActiveType] = useState("");
-  const [previewImage, setPreviewImage] = useState(null); // 👈 NEW
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     if (bhkTypes.length > 0) {
@@ -25,8 +25,9 @@ export default function FloorPlanSection({ floorPlans = [] }) {
     }
   }, [bhkTypes]);
 
+  // ✅ FILTER BY TYPE
   const filteredPlans = floorPlans.filter(
-    (fp) => fp?.title?.trim() === activeType
+    (fp) => fp?.type?.trim() === activeType
   );
 
   const scroll = (dir) => {
@@ -56,7 +57,7 @@ export default function FloorPlanSection({ floorPlans = [] }) {
                   : "bg-gray-100 text-gray-600"
               }`}
             >
-              {t} Apartment
+              {t}
             </button>
           ))}
         </div>
@@ -76,18 +77,18 @@ export default function FloorPlanSection({ floorPlans = [] }) {
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
           >
-            {filteredPlans.map((fp) => (
+            {filteredPlans.map((fp, idx) => (
               <div
-                key={fp.image}
+                key={idx}
                 className="min-w-[197px] bg-white rounded-xl p-4
                            shadow-sm hover:shadow-md transition"
               >
                 <div className="text-xs text-gray-500 mb-2">📍 {fp.area}</div>
 
-                {/* IMAGE (CLICKABLE) */}
+                {/* IMAGE */}
                 <div
                   className="relative w-full h-[140px] mb-3 cursor-pointer"
-                  onClick={() => setPreviewImage(fp.image)} // 👈 OPEN
+                  onClick={() => setPreviewImage(fp.image)}
                 >
                   <Image
                     src={fp.image}
@@ -97,8 +98,9 @@ export default function FloorPlanSection({ floorPlans = [] }) {
                   />
                 </div>
 
+                {/* TITLE  */}
                 <p className="text-sm font-medium">{fp.title}</p>
-                <p className="text-sm font-semibold">INR {fp.price}</p>
+                <p className="text-sm font-semibold">{fp.price}</p>
 
                 <div className="flex justify-between items-center mt-3 text-xs">
                   <span className="text-[#F5A300] cursor-pointer">

@@ -164,7 +164,12 @@ export default function BasicDetails({ data, handleData }) {
 
             try {
               const video = await uploadVideoToCloudinary(file);
-              handleData("video", video);
+
+              handleData("video", {
+                url: video.url,
+                name: file.name,
+              });
+
               alert("Video uploaded successfully!");
             } catch (err) {
               alert(err.message);
@@ -174,10 +179,14 @@ export default function BasicDetails({ data, handleData }) {
         />
 
         {data.video?.url && (
-          <p className="text-xs text-green-600 mt-1">
-            Video uploaded
-          </p>
+          <div className="mt-2">
+            <Chip
+              label={data.video.name || "Uploaded Video"}
+              onRemove={() => handleData("video", null)}
+            />
+          </div>
         )}
+
       </div>
 
 
@@ -208,6 +217,20 @@ export default function BasicDetails({ data, handleData }) {
           placeholder="Search or select developer"
           className="w-full border rounded-lg px-3 py-2 text-sm"
         />
+
+        {data.developer && (
+          <div className="mt-2">
+            <Chip
+              label={data.developer}
+              onRemove={() => {
+                handleData("developer", "");
+                handleData("builderId", "");
+                setSearchBuilder("");
+              }}
+            />
+          </div>
+        )}
+
 
         {showDropdown && (
           <div className="absolute z-30 mt-1 w-full bg-white border rounded-lg shadow max-h-60 overflow-y-auto">

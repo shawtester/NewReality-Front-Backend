@@ -48,7 +48,6 @@ export async function generateMetadata({ params }) {
     title,
     description,
     keywords,
-
     openGraph: {
       title,
       description,
@@ -58,7 +57,6 @@ export async function generateMetadata({ params }) {
     },
   };
 }
-
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +78,7 @@ export default async function PropertyPage({ params }) {
     property.amenities || []
   );
 
+  /* ================= CLEAN PROPERTY ================= */
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
@@ -97,7 +96,11 @@ export default async function PropertyPage({ params }) {
 
     brochure: property.brochure || null,
 
+    /* 🔥 MAIN FIX — RIGHTSIDEBAR DATA */
+    mainImage: property.mainImage || null,
+    gallery: property.gallery || [],
 
+    /* Mobile Gallery ke liye URLs array */
     images: [
       ...(property.mainImage?.url ? [property.mainImage.url] : []),
       ...(property.gallery?.map((g) => g.url) || []),
@@ -122,7 +125,7 @@ export default async function PropertyPage({ params }) {
 
     disclaimer: property.disclaimer || "",
 
-    /* ================= QUICK FACTS ADD KAR (🔥 MAIN FIX) ================= */
+    /* QUICK FACTS */
     projectArea: property.projectArea || "",
     projectType: property.projectType || "",
     projectStatus: property.projectStatus || "",
@@ -134,7 +137,7 @@ export default async function PropertyPage({ params }) {
     <ApartmentClient>
       <AutoPopup propertyTitle={cleanProperty.title} />
 
-      <section className="max-w-[1240px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section className="max-w-[1240px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
           <MobileGallery
@@ -159,7 +162,6 @@ export default async function PropertyPage({ params }) {
             paymentPlan={cleanProperty.paymentPlan}
           />
 
-
           <AmenitiesSection amenities={cleanProperty.amenities} />
 
           <LocationSection
@@ -172,7 +174,6 @@ export default async function PropertyPage({ params }) {
 
           <FAQSection faq={cleanProperty.faq} />
 
-          {/* ✅ DEVELOPER SECTION ONLY WHEN BUILDER EXISTS */}
           {cleanProperty.builder && (
             <DeveloperSection builder={cleanProperty.builder} />
           )}
@@ -186,12 +187,8 @@ export default async function PropertyPage({ params }) {
         </div>
 
         {/* RIGHT */}
-        <RightSidebar
-          property={{
-            ...cleanProperty,
-            images: cleanProperty.images.slice(1), // ❌ remove main image
-          }}
-        />
+        {/* 🔥 MAIN FIX — NO DATA OVERRIDE */}
+        <RightSidebar property={cleanProperty} />
       </section>
 
       <Footer />

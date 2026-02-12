@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { FiMapPin, FiSearch, FiPlay } from "react-icons/fi";
+import { FiMapPin, FiSearch, FiPlay, FiX } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { getHero } from "@/lib/firestore/hero/read";
 
@@ -140,17 +140,17 @@ export default function SearchCard() {
           />
         )}
 
-      {/* ================= MOBILE YOUTUBE PLAY ICON ================= */}
-{hero?.videoUrl && (
-  <button
-    onClick={() => setShowVideo(true)}
-    className="absolute md:hidden right-4 top-1/2 -translate-y-1/2 
-               z-40 w-16 h-16 flex items-center justify-center
-               rounded-full bg-red-600 shadow-2xl"
-  >
-    <FiPlay className="text-white text-3xl ml-1" />
-  </button>
-)}
+        {/* ================= MOBILE YOUTUBE PLAY ICON ================= */}
+        {hero?.videoUrl && (
+          <button
+            onClick={() => setShowVideo(true)}
+            className="absolute md:hidden right-4 top-1/2 -translate-y-1/2 
+                     z-40 w-16 h-16 flex items-center justify-center
+                     rounded-full bg-red-600 shadow-2xl"
+          >
+            <FiPlay className="text-white text-3xl ml-1" />
+          </button>
+        )}
 
         {/* ================= MOBILE VIDEO POPUP ================= */}
         {showVideo && hero?.videoUrl && (
@@ -184,26 +184,53 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* ================= DESKTOP VIDEO (UNCHANGED) ================= */}
+        {/* ================= DESKTOP YOUTUBE VIDEO WITH CLOSE BUTTON ================= */}
         {hero?.videoUrl && hero?.mediaType === "youtube" && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
-            <iframe
-              className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
-              src={`${videoUrl}?autoplay=1&mute=1`}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-30 relative group">
+            <div className="relative">
+              {/* ✅ FIXED CLOSE BUTTON - VISIBLE ON HOVER */}
+              <button
+                onClick={() => setHero(null)}
+                className="absolute -top-2 -right-2 z-40 bg-white hover:bg-gray-50 text-gray-800 p-2 rounded-full shadow-2xl border-2 border-white
+                         opacity-0 group-hover:opacity-100 hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100
+                         flex items-center justify-center w-10 h-10"
+                title="Close video"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+              
+              <iframe
+                className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
+                src={`${videoUrl}?autoplay=1&mute=1`}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           </div>
         )}
 
+        {/* ================= DESKTOP INSTAGRAM VIDEO WITH CLOSE BUTTON ================= */}
         {hero?.videoUrl && hero?.mediaType === "instagram" && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-10 z-20">
-            <blockquote
-              className="instagram-media rounded-2xl overflow-hidden"
-              data-instgrm-permalink={hero.videoUrl}
-              data-instgrm-version="14"
-              style={{ width: "150px", minWidth: "150px", height: "300px" }}
-            ></blockquote>
+          <div className="absolute inset-0  hidden md:flex items-center rounded-lg justify-end pr-10 z-30 right-60 bottom-20 group">
+            <div className="relative">
+              {/* ✅ FIXED CLOSE BUTTON - VISIBLE ON HOVER */}
+              <button
+                onClick={() => setHero(null)}
+                className="relative top-10  z-40 bg-white hover:bg-gray-50 text-gray-800 p-2 rounded-full shadow-2xl border-2 border-white
+                         opacity-0 group-hover:opacity-100 hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100
+                         flex items-center justify-center w-10 h-10"
+                title="Close video"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+              
+              <blockquote
+                className="instagram-media rounded-2xl overflow-hidden"
+                data-instgrm-permalink={hero.videoUrl}
+                data-instgrm-version="14"
+                style={{ width: "150px", minWidth: "150px", height: "300px" }}
+              ></blockquote>
+            </div>
           </div>
         )}
       </div>

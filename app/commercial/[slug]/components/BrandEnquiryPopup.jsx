@@ -188,7 +188,7 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
       {/* ================= THANK YOU POPUP ================= */}
       {showThankYou && (
         <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
-          <div className="bg-white rounded-xl px-20 py-18 text-center shadow-xl animate-fadeIn">
+          <div className="bg-white rounded-xl p-20 text-center shadow-xl animate-fadeIn">
             <h3 className="text-lg font-semibold text-[#c8950a]">
               Thank You 🙌
             </h3>

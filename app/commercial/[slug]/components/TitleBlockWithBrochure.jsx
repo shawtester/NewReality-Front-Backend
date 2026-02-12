@@ -168,7 +168,7 @@ export default function TitleBlockWithBrochure({ property }) {
           {/* ✅ THANK YOU POPUP */}
           {showThankYou && (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-              <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl">
+              <div className="bg-white rounded-xl p-20 text-center shadow-xl">
                 <h3 className="text-lg font-semibold text-[#c8950a]">
                   Thank You 🙌
                 </h3>

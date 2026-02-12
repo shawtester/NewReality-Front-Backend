@@ -78,14 +78,6 @@ const filterByStatus = (list = [], status) => {
 };
 
 export default function ResidentialPage({ apartments = [] }) {
-<<<<<<< HEAD
-=======
-    const [banner, setBanner] = useState(null);
-    const [introText, setIntroText] = useState(INTRO_TEXTS.default);
-    const [pageTitleDynamic, setPageTitleDynamic] = useState("Residential Apartments Property for Sale in Gurgaon"); // 🔥 NEW STATE
-    const [pageTitle, setPageTitle] = useState("Residential Apartments Property for Sale in Gurgaon");
-
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
     const BASE_ROUTE = "/residential";
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -231,26 +223,11 @@ export default function ResidentialPage({ apartments = [] }) {
 
         const fetchBanner = async () => {
             try {
-<<<<<<< HEAD
                 const data = await getBanner(category);
                 console.log("📸 YOUR EXACT Firebase banner data:", data);
                 console.log("🔗 imageLinks:", data?.imageLinks);
                 console.log("🖼️ images:", data?.images);
                 setBanner(data);
-=======
-                const bannerData = await getBanner(category);
-                console.log('📥 Banner data loaded:', bannerData);
-
-                setBanner(bannerData);
-
-                // 🔥 CUSTOM FIRESTORE INTRO TEXT (HIGHEST PRIORITY)
-                if (bannerData?.introText) {
-                    console.log('✅ Using CUSTOM Firestore introText:', bannerData.introText);
-                    setIntroText(bannerData.introText); // ✅ OVERRIDES dynamic fallback
-                } else {
-                    console.log('ℹ️ No custom introText, using dynamic fallback');
-                }
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
 
                 if (data?.introText) setIntroText(data.introText);
                 if (data?.pageTitle) setPageTitle(data.pageTitle);
@@ -288,32 +265,9 @@ export default function ResidentialPage({ apartments = [] }) {
         [filteredApartments.length]
     );
 
-<<<<<<< HEAD
     const currentPage = Number(searchParams.get("page")) || page;
     const startIndex = (currentPage - 1) * apartmentsPerPage;
     const currentApartments = filteredApartments.slice(startIndex, startIndex + apartmentsPerPage);
-=======
-    const totalPages = useMemo(() => {
-        return Math.ceil(filteredApartments.length / apartmentsPerPage);
-    }, [filteredApartments.length]);
-
-    // ✅ LATEST CREATED FIRST SORTING
-    const sortedApartments = useMemo(() => {
-        return [...filteredApartments].sort((a, b) => {
-            const dateA = a?.timestampCreate?.seconds || 0;
-            const dateB = b?.timestampCreate?.seconds || 0;
-
-            return dateB - dateA; // 🔥 latest first
-        });
-    }, [filteredApartments]);
-
-
-    const currentPage = Number(searchParams.get('page')) || page;
-    const startIndex = (currentPage - 1) * apartmentsPerPage;
-    const endIndex = startIndex + apartmentsPerPage;
-    const currentApartments = sortedApartments.slice(startIndex, endIndex);
-
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
 
     const displayTitle = banner?.pageTitle || pageTitleDynamic;
     const totalImages = banner?.images?.length || 0;
@@ -482,9 +436,6 @@ export default function ResidentialPage({ apartments = [] }) {
 
                     {/* Desktop Search */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
-<<<<<<< HEAD
-                        <div className="bg-white relative lg:left-[44%] xl:left-[10%] 2xl:right-[28%] shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
-=======
                         <div className="
                             bg-white relative
                             lg:left-[44%]
@@ -495,7 +446,6 @@ export default function ResidentialPage({ apartments = [] }) {
                             rounded-full
                             border border-yellow-400
                         ">
->>>>>>> d624a4b3c11ed16eefac2843659fe1559f3e0e39
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>

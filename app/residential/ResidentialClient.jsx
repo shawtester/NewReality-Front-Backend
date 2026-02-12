@@ -435,6 +435,7 @@ export default function ResidentialPage({ apartments = [] }) {
                     </div>
 
                     {/* Desktop Search */}
+<<<<<<< HEAD
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
                         <div className="
                             bg-white relative
@@ -446,6 +447,10 @@ export default function ResidentialPage({ apartments = [] }) {
                             rounded-full
                             border border-yellow-400
                         ">
+=======
+                    <div className="hidden lg:block absolute bottom-[100px] left-1/2 -translate-x-[60%] w-full max-w-[950px] z-20 px-4">
+                        <div className="bg-white shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
+>>>>>>> 644b6aa576aa8b30511d63b26674e2f8a694d5c2
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>

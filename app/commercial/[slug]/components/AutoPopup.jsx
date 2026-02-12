@@ -10,7 +10,7 @@ export default function AutoPopup({ propertyTitle, notifyTimerDone }) {
     const timer = setTimeout(() => {
       setOpen(true);
       if (notifyTimerDone) notifyTimerDone();
-    }, 2500);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);

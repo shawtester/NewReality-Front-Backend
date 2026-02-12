@@ -93,6 +93,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
     "ready-to-move": "isReadyToMove",
     "under-construction": "isUnderConstruction",
     "pre-launch": "isPreLaunch",
+    "trending": "isTrending"
   };
 
   if (statusMap[normalizedSlug]) {

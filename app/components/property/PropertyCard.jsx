@@ -268,11 +268,13 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
       {/* ✅ THANK YOU POPUP */}
       {showThankYou && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl p-10 text-center shadow-xl">
-            <h3 className="text-lg font-semibold text-[#F5A300]">
-              Thank You 
+          <div className="bg-white rounded-xl px-20 py-18 text-center shadow-xl animate-fadeIn">
+            <h3 className="text-lg font-semibold text-[#c8950a]">
+              Thank You 🙌
             </h3>
-            
+            <p className="text-sm mt-1">
+              Our team will contact you shortly.
+            </p>
           </div>
         </div>
       )}

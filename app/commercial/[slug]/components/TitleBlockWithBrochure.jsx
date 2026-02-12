@@ -259,7 +259,6 @@ export default function TitleBlockWithBrochure({ property }) {
           </div>
         </div>
       )}
-
       {/* ================= MOBILE QUICK FACTS ================= */}
       <div className="lg:hidden bg-white rounded-xl p-5 shadow-sm mt-4">
         <h3 className="font-semibold mb-3 border-b pb-2">
@@ -275,6 +274,8 @@ export default function TitleBlockWithBrochure({ property }) {
           <p>Possession : {property.possession || "-"}</p>
         </div>
       </div>
+
+
     </>
   );
 }

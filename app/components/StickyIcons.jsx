@@ -93,12 +93,11 @@ export default function StickyIcons() {
       </div>
 
       {/* ================= ENQUIRY MODAL ================= */}
-      {showEnquiryPopup && (
-        <GetInTouchModal
-          open={showEnquiryPopup}
-          onClose={() => setShowEnquiryPopup(false)}
-        />
-      )}
+      <GetInTouchModal
+        open={showEnquiryPopup}
+        onClose={() => setShowEnquiryPopup(false)}
+      />
+
     </>
   );
 }

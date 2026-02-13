@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import ReactQuill from "react-quill";
+import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadBanner";
 import { updateBanner } from "@/lib/firestore/banners/write";
 import { getBanner } from "@/lib/firestore/banners/read";
+
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+});
+
 
 // ✅ COMPLETE INTRO TEXTS (PLAIN TEXT)
 const INTRO_TEXTS = {
@@ -39,7 +44,7 @@ export default function BannerUploader({ category }) {
         toolbar: [
             [{ header: [1, 2, false] }],
             ['bold', 'italic', 'underline', 'strike'],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
             ['link'],
             [{ 'color': [] }, { 'background': [] }],
             [{ 'align': [] }],
@@ -55,22 +60,25 @@ export default function BannerUploader({ category }) {
     // ✅ EXTRACT PLAIN TEXT FROM HTML
     const extractPlainText = (html) => {
         if (!html) return "";
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        return tempDiv.textContent || tempDiv.innerText || "";
+        return html.replace(/<[^>]*>/g, "").trim();
     };
+
 
     useEffect(() => {
         const fetchCurrentBanner = async () => {
             try {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
+<<<<<<< HEAD
                 
                 // ✅ Load existing links directly
+=======
+
+>>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                 if (banner?.imageLinks) {
                     setImageLinks(banner.imageLinks);
                 }
-                
+
                 const savedIntro = extractPlainText(banner?.introText || INTRO_TEXTS[category] || INTRO_TEXTS.default);
                 setCurrentIntroText(savedIntro);
                 setEditedIntroText(savedIntro);
@@ -115,7 +123,7 @@ export default function BannerUploader({ category }) {
         };
         const formatName = (v) => v?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '';
         if (cat.includes('-bhk')) return `${bhkMap[cat] || 'Properties'} Properties for Sale in Gurgaon`;
-        if (['new-launch','ready-to-move','under-construction','pre-launch'].includes(cat)) return `${formatName(cat)} Projects in Gurgaon`;
+        if (['new-launch', 'ready-to-move', 'under-construction', 'pre-launch'].includes(cat)) return `${formatName(cat)} Projects in Gurgaon`;
         return "Residential Apartments Property for Sale in Gurgaon";
     };
 
@@ -129,7 +137,7 @@ export default function BannerUploader({ category }) {
 
     const handleSave = async () => {
         setError("");
-        
+
         if (files.length === 0 && editedIntroText === currentIntroText && editedPageTitle === currentPageTitle) {
             alert("No changes detected!");
             return;
@@ -146,8 +154,12 @@ export default function BannerUploader({ category }) {
                     files.map(file => uploadToCloudinary(file, "banners"))
                 );
                 imageUrls = [...imageUrls, ...uploadedUrls];
+<<<<<<< HEAD
                 
                 // ✅ FIXED: Map preview URLs to uploaded URLs
+=======
+
+>>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                 files.forEach((file, idx) => {
                     const previewUrl = URL.createObjectURL(file);
                     if (updatedLinks[previewUrl]) {
@@ -180,7 +192,7 @@ export default function BannerUploader({ category }) {
             alert("✅ Banner Images, Links & Plain Intro Text Updated!");
             setFiles([]);
             setEditMode(false);
-            
+
             const updatedBanner = await getBanner(category);
             setCurrentBanner(updatedBanner);
             setImageLinks(updatedBanner?.imageLinks || {});
@@ -196,7 +208,7 @@ export default function BannerUploader({ category }) {
 
     const handleSaveTextOnly = async () => {
         setError("");
-        
+
         const introText = extractPlainText(editedIntroText || "").trim();
         const pageTitle = editedPageTitle.trim();
 
@@ -233,14 +245,14 @@ export default function BannerUploader({ category }) {
     return (
         <div className="space-y-6 p-6 bg-white rounded-xl shadow-lg max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold text-center text-gray-900 capitalize">
-                {category.replace(/-/g,' ')} Banner & Content
+                {category.replace(/-/g, ' ')} Banner & Content
             </h1>
 
             {/* 🔥 ERROR DISPLAY */}
             {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
                     <p className="text-sm text-red-800">{error}</p>
-                    <button 
+                    <button
                         onClick={() => setError("")}
                         className="text-red-600 text-xs hover:underline mt-1"
                     >
@@ -265,20 +277,27 @@ export default function BannerUploader({ category }) {
                         {currentBanner.images.map((img, idx) => {
                             const imageLink = imageLinks[img] || '#';
                             const hasValidLink = imageLink !== '' && imageLink !== '#';
-                            
+
                             return (
                                 <div key={`${img}-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible group">
+<<<<<<< HEAD
                                         <Link 
                                             href={hasValidLink ? imageLink : '#'} 
                                             target="_blank" 
+=======
+                                        {/* ✅ FIXED: Proper clickable Link wrapper */}
+                                        <Link
+                                            href={hasValidLink ? imageLink : '#'}
+                                            target="_blank"
+>>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                                             rel="noopener"
                                             className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
                                         >
-                                            <Image 
-                                                src={img} 
-                                                alt={`Banner ${idx+1}`} 
-                                                fill 
+                                            <Image
+                                                src={img}
+                                                alt={`Banner ${idx + 1}`}
+                                                fill
                                                 className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                                                 sizes="(max-width: 768px) 128px, 128px"
                                             />
@@ -291,7 +310,12 @@ export default function BannerUploader({ category }) {
                                             )}
                                         </Link>
                                     </div>
+<<<<<<< HEAD
                                     
+=======
+
+                                    {/* ✅ Link input in edit mode */}
+>>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                                     {editMode && (
                                         <div className="flex-1 min-w-0">
                                             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -305,7 +329,7 @@ export default function BannerUploader({ category }) {
                                                 className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
                                             />
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {hasValidLink 
+                                                {hasValidLink
                                                     ? `✅ Click image above to test: ${imageLink.slice(0, 40)}...`
                                                     : '💡 Add URL to make image clickable'
                                                 }
@@ -328,20 +352,20 @@ export default function BannerUploader({ category }) {
                             const previewUrl = URL.createObjectURL(file);
                             const imageLink = imageLinks[previewUrl] || '#';
                             const hasValidLink = imageLink !== '' && imageLink !== '#';
-                            
+
                             return (
                                 <div key={`${previewUrl}-${idx}`} className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl border border-green-200">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border-green-300 cursor-pointer group overflow-visible">
-                                        <Link 
-                                            href={hasValidLink ? imageLink : '#'} 
-                                            target="_blank" 
+                                        <Link
+                                            href={hasValidLink ? imageLink : '#'}
+                                            target="_blank"
                                             rel="noopener"
                                             className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
                                         >
-                                            <Image 
-                                                src={previewUrl} 
-                                                alt={`Preview ${idx+1}`} 
-                                                fill 
+                                            <Image
+                                                src={previewUrl}
+                                                alt={`Preview ${idx + 1}`}
+                                                fill
                                                 className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                                                 sizes="(max-width: 768px) 128px, 128px"
                                             />

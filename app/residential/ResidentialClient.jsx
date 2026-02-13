@@ -366,13 +366,8 @@ export default function ResidentialPage({ apartments = [] }) {
                     <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-<<<<<<< HEAD
 
                     <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
-=======
-                    
-                    <div className="w-full h-[180px] xs:h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] xl:h-[350px] rounded-2xl overflow-hidden shadow-2xl mx-0 relative">
->>>>>>> 9800c1b303330a8f36c09fe25a3e32d1571cbeab
                         {banner?.images && totalImages > 0 ? (
                             <>
                                 {/* Images Layer - MOBILE CENTERED */}

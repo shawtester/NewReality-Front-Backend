@@ -77,6 +77,70 @@ const filterByStatus = (list = [], status) => {
     return list.filter((item) => item[field] === true);
 };
 
+// ✅ PRO FILTER ENGINE (NEW)
+const applyAllFilters = ({
+    apartments = [],
+    keyword = "",
+    type = "",
+    status = "",
+    locality = "",
+    budget = "",
+    bhk = ""
+}) => {
+
+    let filtered = apartments.filter(
+        (item) => item.propertyType === "residential"
+    );
+
+    // 🔎 KEYWORD SEARCH
+    if (keyword) {
+        const lower = keyword.toLowerCase();
+
+        filtered = filtered.filter((item) =>
+            item.title?.toLowerCase().includes(lower) ||
+            item.location?.toLowerCase().includes(lower) ||
+            item.developer?.toLowerCase().includes(lower)
+        );
+    }
+
+    // 🏢 TYPE FILTER
+    if (type && PROPERTY_TYPE_MAP[type]) {
+        filtered = filtered.filter(
+            (item) => item[PROPERTY_TYPE_MAP[type]] === true
+        );
+    }
+
+    // 🚧 STATUS FILTER
+    if (status && STATUS_FLAG_MAP[status]) {
+        filtered = filtered.filter(
+            (item) => item[STATUS_FLAG_MAP[status]] === true
+        );
+    }
+
+    // 📍 LOCALITY
+    if (locality) {
+        filtered = filtered.filter((item) =>
+            item.location?.toLowerCase().includes(
+                locality.replace(/-/g, " ").toLowerCase()
+            )
+        );
+    }
+
+    // 🛏️ BHK
+    if (bhk) {
+        filtered = filtered.filter((item) =>
+            item.configurations?.some((c) =>
+                c.toLowerCase().includes(
+                    bhk.replace(/-/g, " ").toLowerCase()
+                )
+            )
+        );
+    }
+
+    return filtered;
+};
+
+
 export default function ResidentialPage({ apartments = [] }) {
     const BASE_ROUTE = "/residential";
     const router = useRouter();
@@ -136,7 +200,7 @@ export default function ResidentialPage({ apartments = [] }) {
     const handleBannerImageClick = useCallback(() => {
         const link = getCurrentImageLink(currentImageIndex);
         console.log("🔗 Banner click - Image index:", currentImageIndex, "Link:", link);
-        
+
         if (link) {
             window.open(link, '_blank', 'noopener,noreferrer');
         } else {
@@ -188,27 +252,19 @@ export default function ResidentialPage({ apartments = [] }) {
         }
         setPageTitleDynamic(title);
 
-        if (urlType) {
-            setFilteredApartments(
-                filterByPropertyType(
-                    filterForResidential(apartments),
-                    urlType
-                )
-            );
-            return;
-        }
+        const filtered = applyAllFilters({
+            apartments,
+            keyword: urlKeyword,
+            type: urlType,
+            status: urlStatus,
+            locality: urlLocality,
+            budget: urlBudget,
+            bhk: urlBhk
+        });
 
-        if (urlStatus) {
-            setFilteredApartments(
-                filterByStatus(
-                    filterForResidential(apartments),
-                    urlStatus
-                )
-            );
-            return;
-        }
+        setFilteredApartments(filtered);
 
-        setFilteredApartments(filterForResidential(apartments));
+
     }, [searchParams, apartments]);
 
     // ✅ BANNER FETCH
@@ -245,7 +301,7 @@ export default function ResidentialPage({ apartments = [] }) {
         if (!banner?.images || banner.images.length <= 1) return;
 
         const interval = setInterval(() => {
-            setCurrentImageIndex((prevIndex) => 
+            setCurrentImageIndex((prevIndex) =>
                 prevIndex === banner.images.length - 1 ? 0 : prevIndex + 1
             );
         }, 4000);
@@ -305,7 +361,7 @@ export default function ResidentialPage({ apartments = [] }) {
                     <h2 className="text-center text-2xl font-bold mb-6">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
-                    
+
                     <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
                         {banner?.images && totalImages > 0 ? (
                             <>
@@ -315,7 +371,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                         <div
                                             key={index}
                                             className="absolute inset-0 w-full h-full"
-                                            style={{ 
+                                            style={{
                                                 opacity: currentImageIndex === index ? 1 : 0,
                                                 transition: 'opacity 1000ms ease-in-out'
                                             }}
@@ -333,7 +389,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 </div>
 
                                 {/* ✅ CLICK OVERLAY - Gets link from YOUR imageLinks map */}
-                                <div 
+                                <div
                                     className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
                                     onClick={handleBannerImageClick}
                                     role="button"
@@ -353,11 +409,10 @@ export default function ResidentialPage({ apartments = [] }) {
                                         <button
                                             key={index}
                                             onClick={() => setCurrentImageIndex(index)}
-                                            className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
-                                                currentImageIndex === index
-                                                    ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
-                                                    : 'bg-white/80 hover:bg-white hover:scale-110'
-                                            }`}
+                                            className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${currentImageIndex === index
+                                                ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
+                                                : 'bg-white/80 hover:bg-white hover:scale-110'
+                                                }`}
                                             aria-label={`Go to slide ${index + 1}`}
                                         />
                                     ))}
@@ -377,11 +432,11 @@ export default function ResidentialPage({ apartments = [] }) {
                             />
                         )}
                     </div>
-                    
+
                     {/* Debug info (remove in production) */}
                     {process.env.NODE_ENV === 'development' && (
                         <div className="text-xs text-gray-500 mt-2 text-center">
-                        
+
                         </div>
                     )}
                 </div>
@@ -469,7 +524,7 @@ export default function ResidentialPage({ apartments = [] }) {
                             property={{
                                 title: item.title,
                                 developer: item.developer,
-                                 location: item.location,
+                                location: item.location,
                                 bhk: item.configurations?.join(", "),
                                 size: item.areaRange,
                                 price: item.priceRange,

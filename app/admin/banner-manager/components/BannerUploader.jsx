@@ -69,12 +69,8 @@ export default function BannerUploader({ category }) {
             try {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
-<<<<<<< HEAD
                 
                 // ✅ Load existing links directly
-=======
-
->>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                 if (banner?.imageLinks) {
                     setImageLinks(banner.imageLinks);
                 }
@@ -154,12 +150,8 @@ export default function BannerUploader({ category }) {
                     files.map(file => uploadToCloudinary(file, "banners"))
                 );
                 imageUrls = [...imageUrls, ...uploadedUrls];
-<<<<<<< HEAD
                 
                 // ✅ FIXED: Map preview URLs to uploaded URLs
-=======
-
->>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                 files.forEach((file, idx) => {
                     const previewUrl = URL.createObjectURL(file);
                     if (updatedLinks[previewUrl]) {
@@ -281,16 +273,9 @@ export default function BannerUploader({ category }) {
                             return (
                                 <div key={`${img}-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible group">
-<<<<<<< HEAD
                                         <Link 
                                             href={hasValidLink ? imageLink : '#'} 
                                             target="_blank" 
-=======
-                                        {/* ✅ FIXED: Proper clickable Link wrapper */}
-                                        <Link
-                                            href={hasValidLink ? imageLink : '#'}
-                                            target="_blank"
->>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                                             rel="noopener"
                                             className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
                                         >
@@ -310,12 +295,7 @@ export default function BannerUploader({ category }) {
                                             )}
                                         </Link>
                                     </div>
-<<<<<<< HEAD
                                     
-=======
-
-                                    {/* ✅ Link input in edit mode */}
->>>>>>> cec68b8054de5f70eea42e9ec75112ee527b7baa
                                     {editMode && (
                                         <div className="flex-1 min-w-0">
                                             <label className="block text-xs font-medium text-gray-600 mb-1">

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FiMapPin, FiSearch, FiPlay, FiX } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { getHero } from "@/lib/firestore/hero/read";
+import { index } from "@/lib/algoliaClient";
 
 const TAGS = [
   "Sohna Road",
@@ -95,11 +96,12 @@ export default function SearchCard() {
 
     try {
       setLoading(true);
-      const res = await fetch(
-        `/api/search?q=${text}&propertyType=${propertyType}`
-      );
-      const data = await res.json();
-      setResults(Array.isArray(data) ? data : []);
+
+      const { hits } = await index.search(text, {
+        hitsPerPage: 5,
+      });
+
+      setResults(hits);
     } catch (err) {
       console.error("Search error", err);
     } finally {
@@ -107,11 +109,12 @@ export default function SearchCard() {
     }
   };
 
+
   return (
     <section className="relative w-full">
       {/* ================= HERO ================= */}
       <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden">
-        
+
         {/* BACKGROUND SLIDER */}
         {hero?.images?.length ? (
           hero.images.map((img, index) => (
@@ -198,7 +201,7 @@ export default function SearchCard() {
               >
                 <FiX className="w-5 h-5" />
               </button>
-              
+
               <iframe
                 className="w-[280px] h-[300px] rounded-2xl shadow-2xl"
                 src={`${videoUrl}?autoplay=1&mute=1`}
@@ -223,7 +226,7 @@ export default function SearchCard() {
               >
                 <FiX className="w-5 h-5" />
               </button>
-              
+
               <blockquote
                 className="instagram-media rounded-2xl overflow-hidden"
                 data-instgrm-permalink={hero.videoUrl}
@@ -238,7 +241,7 @@ export default function SearchCard() {
       {/* ================= SEARCH CARD ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-20">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
-          
+
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">
               Find your perfect home with{" "}

@@ -186,18 +186,21 @@ export default function ResidentialPage({ apartments = [] }) {
     const formatFilterName = (value) =>
         value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 
-    // ✅ FIXED: Handles YOUR EXACT Firebase structure with imageLinks map
+    // ✅ FIXED: Matches YOUR exact Firebase structure {imageUrl: linkUrl}
     const getCurrentImageLink = useCallback((index) => {
-        // Priority 1: Check imageLinks map (your admin panel links)
-        if (banner?.imageLinks) {
-            const imageLinksArray = Object.entries(banner.imageLinks);
-            if (imageLinksArray[index]) {
-                return imageLinksArray[index][1]; // Returns the LINK
-            }
+        if (!banner?.images?.[index] || !banner?.imageLinks) {
+            console.log("❌ No image or imageLinks at index:", index);
+            return null;
         }
-        // Priority 2: Fallback to images array (no link)
-        return null;
-    }, [banner?.imageLinks]);
+
+        const currentImageUrl = banner.images[index];
+        const link = banner.imageLinks[currentImageUrl];
+        
+        console.log(`🔍 Image ${index}:`, currentImageUrl);
+        console.log(`🔗 Link found:`, link);
+        
+        return link || null;
+    }, [banner?.images, banner?.imageLinks]);
 
     const handleBannerImageClick = useCallback(() => {
         const link = getCurrentImageLink(currentImageIndex);
@@ -222,7 +225,7 @@ export default function ResidentialPage({ apartments = [] }) {
         router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
     }, [searchParams, router]);
 
-    // ✅ URL FILTER LOGIC (UNCHANGED)
+    // ✅ URL FILTER LOGIC
     useEffect(() => {
         const urlKeyword = searchParams.get("q") || "";
         const urlType = searchParams.get("type") || "";
@@ -282,7 +285,7 @@ export default function ResidentialPage({ apartments = [] }) {
         const fetchBanner = async () => {
             try {
                 const data = await getBanner(category);
-                console.log("📸 YOUR EXACT Firebase banner data:", data);
+                console.log("📸 Banner data:", data);
                 console.log("🔗 imageLinks:", data?.imageLinks);
                 console.log("🖼️ images:", data?.images);
                 setBanner(data);
@@ -357,21 +360,26 @@ export default function ResidentialPage({ apartments = [] }) {
                 </div>
             </section>
 
-            {/* ✅ FIXED BANNER - Uses YOUR imageLinks map */}
-            <section className="bg-white py-6">
-                <div className="max-w-[1440px] mx-auto px-4">
-                    <h2 className="text-center text-2xl font-bold mb-6">
+            {/* ✅ FIXED BANNER - MOBILE PERFECT CENTERED */}
+            <section className="bg-white">
+                <div className="max-w-[1440px] mx-auto px-4 py-6">
+                    <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
+<<<<<<< HEAD
 
                     <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
+=======
+                    
+                    <div className="w-full h-[180px] xs:h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] xl:h-[350px] rounded-2xl overflow-hidden shadow-2xl mx-0 relative">
+>>>>>>> 9800c1b303330a8f36c09fe25a3e32d1571cbeab
                         {banner?.images && totalImages > 0 ? (
                             <>
-                                {/* Images Layer - Uses YOUR images array */}
+                                {/* Images Layer - MOBILE CENTERED */}
                                 <div className="absolute inset-0 w-full h-full pointer-events-none">
                                     {banner.images.map((imageUrl, index) => (
                                         <div
-                                            key={index}
+                                            key={`${imageUrl}-${index}`}
                                             className="absolute inset-0 w-full h-full"
                                             style={{
                                                 opacity: currentImageIndex === index ? 1 : 0,
@@ -383,7 +391,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                                 alt={`Trending Project ${index + 1}`}
                                                 fill
                                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                                                className="object-cover"
+                                                className="object-contain sm:object-cover object-center"
                                                 priority={index === 0}
                                             />
                                         </div>
@@ -402,11 +410,11 @@ export default function ResidentialPage({ apartments = [] }) {
                                             handleBannerImageClick();
                                         }
                                     }}
-                                    title={`Click to visit ${getCurrentImageLink(currentImageIndex) || 'project page'}`}
+                                    title={`Click to visit project (Image ${currentImageIndex + 1})`}
                                 />
 
-                                {/* Dots */}
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full p-1.5">
+                                {/* Dots - RESPONSIVE & CENTERED */}
+                                <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 z-30 backdrop-blur-md bg-black/40 sm:bg-black/30 rounded-full p-1 sm:p-1.5">
                                     {banner.images.map((_, index) => (
                                         <button
                                             key={index}
@@ -420,8 +428,8 @@ export default function ResidentialPage({ apartments = [] }) {
                                     ))}
                                 </div>
 
-                                {/* Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent/0 z-20 pointer-events-none" />
+                                {/* Subtle Gradient */}
+                                {/* <div className="absolute inset-0  z-20 pointer-events-none" /> */}
                             </>
                         ) : (
                             <Image
@@ -429,7 +437,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 alt="Trending Banner"
                                 fill
                                 sizes="100vw"
-                                className="object-cover"
+                                className="object-contain sm:object-cover object-center"
                                 priority
                             />
                         )}
@@ -444,7 +452,7 @@ export default function ResidentialPage({ apartments = [] }) {
                 </div>
             </section>
 
-            {/* HERO + SEARCH (UNCHANGED) */}
+            {/* HERO + SEARCH */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 <div className="lg:hidden mb-6 text-center px-2">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">

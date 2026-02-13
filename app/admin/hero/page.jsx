@@ -11,7 +11,7 @@ import { updateHero } from "@/lib/firestore/hero/write";
 
 export default function HeroAdminPage() {
   const [data, setData] = useState({
-    images: [],
+    images: [], // ✅ Now array of objects { url, link }
     videoUrl: "",
     mediaType: "youtube",
   });
@@ -26,7 +26,6 @@ export default function HeroAdminPage() {
         const res = await getHero();
         if (!res) return;
 
-        // ✅ TERA FIRESTORE DIRECT STRUCTURE
         setData({
           images: res.images || [],
           videoUrl: res.videoUrl || "",
@@ -41,29 +40,41 @@ export default function HeroAdminPage() {
   }, []);
 
   /* ================= IMAGE UPLOAD ================= */
-  const handleImage = async (file) => {
-    if (!file) return;
-
-    if (data.images.length >= 4) {
-      toast.error("Maximum 4 images allowed");
-      return;
-    }
+  const handleImage = async (files) => {
+    if (!files || files.length === 0) return;
 
     try {
       setImgLoading(true);
-      const imageUrl = await uploadToCloudinary(file);
+
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const url = await uploadToCloudinary(file);
+        return { url, link: "" }; // ✅ Add empty link initially
+      });
+
+      const uploadedImages = await Promise.all(uploadPromises);
 
       setData((prev) => ({
         ...prev,
-        images: [...prev.images, imageUrl],
+        images: [...prev.images, ...uploadedImages],
       }));
 
-      toast.success("Image uploaded successfully!");
+      toast.success(`${uploadedImages.length} images uploaded`);
     } catch (err) {
-      toast.error(err.message);
+      toast.error("Upload failed");
     } finally {
       setImgLoading(false);
     }
+  };
+
+  /* ================= UPDATE LINK ================= */
+  const updateLink = (index, value) => {
+    const updated = [...data.images];
+    updated[index].link = value;
+
+    setData((prev) => ({
+      ...prev,
+      images: updated,
+    }));
   };
 
   /* ================= REMOVE IMAGE ================= */
@@ -78,117 +89,74 @@ export default function HeroAdminPage() {
   const submit = async () => {
     try {
       setLoading(true);
-
-      // ✅ DIRECT OBJECT SEND (NEW WRITE STRUCTURE)
       await updateHero(data);
-
       toast.success("Hero section updated!");
     } catch (err) {
-      console.error(err);
-      toast.error(err.message);
+      toast.error("Update failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-xl space-y-5">
-      <h1 className="text-xl font-semibold">Hero Section</h1>
+    <div className="p-6 max-w-6xl space-y-6">
+      <h1 className="text-2xl font-semibold">Hero Section</h1>
 
-      {/* ================= IMAGES ================= */}
-      <div>
-        <label className="text-sm">Hero Images (Max 4)</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => handleImage(e.target.files[0])}
-        />
+      {/* IMAGE UPLOAD */}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={(e) => handleImage(e.target.files)}
+        className="border p-3 rounded-lg w-full"
+      />
 
-        {imgLoading && <p className="text-xs">Uploading…</p>}
+      {imgLoading && <p className="text-sm text-blue-600">Uploading...</p>}
 
-        <div className="grid grid-cols-2 gap-3 mt-3">
-          {(data.images || []).map((img, index) => (
-            <div key={index} className="relative h-32 rounded overflow-hidden">
-              <Image
-                src={img}
-                alt={`Hero ${index + 1}`}
-                fill
-                className="object-cover"
+      {/* IMAGE GRID */}
+      {data.images.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {data.images.map((img, index) => (
+            <div
+              key={index}
+              className="p-4 border rounded-xl shadow-md space-y-3"
+            >
+              <div className="relative h-40 rounded-lg overflow-hidden">
+                <Image
+                  src={img.url}
+                  alt="Hero"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* 🔥 LINK INPUT */}
+              <input
+                type="text"
+                placeholder="Enter redirect link (e.g. /residential/project)"
+                value={img.link}
+                onChange={(e) => updateLink(index, e.target.value)}
+                className="border p-2 w-full rounded-lg"
               />
 
-              <button
+              <Button
+                size="sm"
+                color="danger"
                 onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded"
               >
-                ✕
-              </button>
+                Remove
+              </Button>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ================= MEDIA TYPE RADIO ================= */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Select Media Type</label>
-
-        <div className="flex gap-5">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="mediaType"
-              checked={data.mediaType === "youtube"}
-              onChange={() =>
-                setData((prev) => ({ ...prev, mediaType: "youtube" }))
-              }
-            />
-            YouTube
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="mediaType"
-              checked={data.mediaType === "instagram"}
-              onChange={() =>
-                setData((prev) => ({ ...prev, mediaType: "instagram" }))
-              }
-            />
-            Instagram
-          </label>
-        </div>
-      </div>
-
-      {/* ================= CONDITIONAL INPUT ================= */}
-      {data.mediaType === "youtube" && (
-        <div>
-          <label className="text-sm">YouTube Embed URL</label>
-          <input
-            value={data.videoUrl}
-            onChange={(e) =>
-              setData((prev) => ({ ...prev, videoUrl: e.target.value }))
-            }
-            placeholder="https://www.youtube.com/embed/xxxx"
-            className="border p-2 w-full rounded"
-          />
-        </div>
       )}
 
-      {data.mediaType === "instagram" && (
-        <div>
-          <label className="text-sm">Instagram Reel/Post URL</label>
-          <input
-            value={data.videoUrl}
-            onChange={(e) =>
-              setData((prev) => ({ ...prev, videoUrl: e.target.value }))
-            }
-            placeholder="https://www.instagram.com/reel/xxxx"
-            className="border p-2 w-full rounded"
-          />
-        </div>
-      )}
-
-      <Button className="bg-[#DBA40D]" isLoading={loading} onClick={submit}>
-        Update Hero
+      <Button
+        className="w-full bg-[#DBA40D] text-white"
+        isLoading={loading}
+        onClick={submit}
+      >
+        Update Hero Section
       </Button>
     </div>
   );

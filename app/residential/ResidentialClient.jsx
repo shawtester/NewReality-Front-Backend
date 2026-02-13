@@ -120,18 +120,21 @@ export default function ResidentialPage({ apartments = [] }) {
     const formatFilterName = (value) =>
         value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 
-    // ✅ FIXED: Handles YOUR EXACT Firebase structure with imageLinks map
+    // ✅ FIXED: Matches YOUR exact Firebase structure {imageUrl: linkUrl}
     const getCurrentImageLink = useCallback((index) => {
-        // Priority 1: Check imageLinks map (your admin panel links)
-        if (banner?.imageLinks) {
-            const imageLinksArray = Object.entries(banner.imageLinks);
-            if (imageLinksArray[index]) {
-                return imageLinksArray[index][1]; // Returns the LINK
-            }
+        if (!banner?.images?.[index] || !banner?.imageLinks) {
+            console.log("❌ No image or imageLinks at index:", index);
+            return null;
         }
-        // Priority 2: Fallback to images array (no link)
-        return null;
-    }, [banner?.imageLinks]);
+
+        const currentImageUrl = banner.images[index];
+        const link = banner.imageLinks[currentImageUrl];
+        
+        console.log(`🔍 Image ${index}:`, currentImageUrl);
+        console.log(`🔗 Link found:`, link);
+        
+        return link || null;
+    }, [banner?.images, banner?.imageLinks]);
 
     const handleBannerImageClick = useCallback(() => {
         const link = getCurrentImageLink(currentImageIndex);
@@ -156,7 +159,7 @@ export default function ResidentialPage({ apartments = [] }) {
         router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
     }, [searchParams, router]);
 
-    // ✅ URL FILTER LOGIC (UNCHANGED)
+    // ✅ URL FILTER LOGIC
     useEffect(() => {
         const urlKeyword = searchParams.get("q") || "";
         const urlType = searchParams.get("type") || "";
@@ -224,7 +227,7 @@ export default function ResidentialPage({ apartments = [] }) {
         const fetchBanner = async () => {
             try {
                 const data = await getBanner(category);
-                console.log("📸 YOUR EXACT Firebase banner data:", data);
+                console.log("📸 Banner data:", data);
                 console.log("🔗 imageLinks:", data?.imageLinks);
                 console.log("🖼️ images:", data?.images);
                 setBanner(data);
@@ -299,21 +302,21 @@ export default function ResidentialPage({ apartments = [] }) {
                 </div>
             </section>
 
-            {/* ✅ FIXED BANNER - Uses YOUR imageLinks map */}
-            <section className="bg-white py-6">
-                <div className="max-w-[1440px] mx-auto px-4">
-                    <h2 className="text-center text-2xl font-bold mb-6">
+            {/* ✅ FIXED BANNER - MOBILE PERFECT CENTERED */}
+            <section className="bg-white">
+                <div className="max-w-[1440px] mx-auto px-4 py-6">
+                    <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
                         Trending <span className="text-[#F5A300]">Projects</span>
                     </h2>
                     
-                    <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="w-full h-[180px] xs:h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] xl:h-[350px] rounded-2xl overflow-hidden shadow-2xl mx-0 relative">
                         {banner?.images && totalImages > 0 ? (
                             <>
-                                {/* Images Layer - Uses YOUR images array */}
+                                {/* Images Layer - MOBILE CENTERED */}
                                 <div className="absolute inset-0 w-full h-full pointer-events-none">
                                     {banner.images.map((imageUrl, index) => (
                                         <div
-                                            key={index}
+                                            key={`${imageUrl}-${index}`}
                                             className="absolute inset-0 w-full h-full"
                                             style={{ 
                                                 opacity: currentImageIndex === index ? 1 : 0,
@@ -325,16 +328,16 @@ export default function ResidentialPage({ apartments = [] }) {
                                                 alt={`Trending Project ${index + 1}`}
                                                 fill
                                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                                                className="object-cover"
+                                                className="object-contain sm:object-cover object-center"
                                                 priority={index === 0}
                                             />
                                         </div>
                                     ))}
                                 </div>
 
-                                {/* ✅ CLICK OVERLAY - Gets link from YOUR imageLinks map */}
+                                {/* ✅ CLICK OVERLAY */}
                                 <div 
-                                    className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
+                                    className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl group"
                                     onClick={handleBannerImageClick}
                                     role="button"
                                     tabIndex={0}
@@ -344,16 +347,16 @@ export default function ResidentialPage({ apartments = [] }) {
                                             handleBannerImageClick();
                                         }
                                     }}
-                                    title={`Click to visit ${getCurrentImageLink(currentImageIndex) || 'project page'}`}
+                                    title={`Click to visit project (Image ${currentImageIndex + 1})`}
                                 />
 
-                                {/* Dots */}
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full p-1.5">
+                                {/* Dots - RESPONSIVE & CENTERED */}
+                                <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 z-30 backdrop-blur-md bg-black/40 sm:bg-black/30 rounded-full p-1 sm:p-1.5">
                                     {banner.images.map((_, index) => (
                                         <button
                                             key={index}
                                             onClick={() => setCurrentImageIndex(index)}
-                                            className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
+                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 shadow-lg ${
                                                 currentImageIndex === index
                                                     ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
                                                     : 'bg-white/80 hover:bg-white hover:scale-110'
@@ -363,8 +366,8 @@ export default function ResidentialPage({ apartments = [] }) {
                                     ))}
                                 </div>
 
-                                {/* Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent/0 z-20 pointer-events-none" />
+                                {/* Subtle Gradient */}
+                                {/* <div className="absolute inset-0  z-20 pointer-events-none" /> */}
                             </>
                         ) : (
                             <Image
@@ -372,22 +375,21 @@ export default function ResidentialPage({ apartments = [] }) {
                                 alt="Trending Banner"
                                 fill
                                 sizes="100vw"
-                                className="object-cover"
+                                className="object-contain sm:object-cover object-center"
                                 priority
                             />
                         )}
                     </div>
                     
-                    {/* Debug info (remove in production) */}
-                    {process.env.NODE_ENV === 'development' && (
-                        <div className="text-xs text-gray-500 mt-2 text-center">
-                        
+                    {/* ✅ DEBUG INFO */}
+                    {process.env.NODE_ENV === 'development' && banner && (
+                        <div className="text-xs text-gray-500 mt-3 sm:mt-4 text-center space-y-1 p-3 bg-gray-50 rounded-xl">
                         </div>
                     )}
                 </div>
             </section>
 
-            {/* HERO + SEARCH (UNCHANGED) */}
+            {/* HERO + SEARCH */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 <div className="lg:hidden mb-6 text-center px-2">
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
@@ -434,8 +436,7 @@ export default function ResidentialPage({ apartments = [] }) {
                         </div>
                     </div>
 
-                    {/* Desktop Search */}
-<<<<<<< HEAD
+                    {/* Desktop Search - FIXED DUPLICATE */}
                     <div className="hidden lg:block absolute bottom-40 right-1 -translate-x-1/2 w-full max-w-[950px] z-20 px-4">
                         <div className="
                             bg-white relative
@@ -447,10 +448,6 @@ export default function ResidentialPage({ apartments = [] }) {
                             rounded-full
                             border border-yellow-400
                         ">
-=======
-                    <div className="hidden lg:block absolute bottom-[100px] left-1/2 -translate-x-[60%] w-full max-w-[950px] z-20 px-4">
-                        <div className="bg-white shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
->>>>>>> 644b6aa576aa8b30511d63b26674e2f8a694d5c2
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
                                 <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
@@ -483,7 +480,7 @@ export default function ResidentialPage({ apartments = [] }) {
                             property={{
                                 title: item.title,
                                 developer: item.developer,
-                                 location: item.location,
+                                location: item.location,
                                 bhk: item.configurations?.join(", "),
                                 size: item.areaRange,
                                 price: item.priceRange,

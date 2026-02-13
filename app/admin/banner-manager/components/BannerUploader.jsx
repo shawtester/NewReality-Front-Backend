@@ -29,9 +29,11 @@ export default function BannerUploader({ category }) {
     const [editedIntroText, setEditedIntroText] = useState("");
     const [editedPageTitle, setEditedPageTitle] = useState("");
     const [savingIntro, setSavingIntro] = useState(false);
-    const [imageLinks, setImageLinks] = useState({});
     const [error, setError] = useState("");
     const [editMode, setEditMode] = useState(false);
+
+    // ✅ SIMPLIFIED: Direct image → link mapping per category
+    const [imageLinks, setImageLinks] = useState({});
 
     const modules = {
         toolbar: [
@@ -50,7 +52,7 @@ export default function BannerUploader({ category }) {
         'link', 'color', 'background', 'align'
     ];
 
-    // ✅ EXTRACT PLAIN TEXT FROM HTML (REMOVES ALL TAGS)
+    // ✅ EXTRACT PLAIN TEXT FROM HTML
     const extractPlainText = (html) => {
         if (!html) return "";
         const tempDiv = document.createElement('div');
@@ -64,6 +66,7 @@ export default function BannerUploader({ category }) {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
                 
+                // ✅ Load existing links directly
                 if (banner?.imageLinks) {
                     setImageLinks(banner.imageLinks);
                 }
@@ -90,18 +93,19 @@ export default function BannerUploader({ category }) {
         if (category) fetchCurrentBanner();
     }, [category]);
 
+    // ✅ For new files: Create preview keys using File object reference
     useEffect(() => {
         if (files.length > 0) {
             const newLinks = { ...imageLinks };
             files.forEach((file) => {
-                const previewUrl = URL.createObjectURL(file);
-                if (!newLinks[previewUrl]) {
-                    newLinks[previewUrl] = "";
+                const previewKey = URL.createObjectURL(file);
+                if (!newLinks[previewKey]) {
+                    newLinks[previewKey] = "";
                 }
             });
             setImageLinks(newLinks);
         }
-    }, [files, imageLinks]);
+    }, [files]);
 
     const generateDynamicPageTitle = (cat) => {
         const bhkMap = {
@@ -115,10 +119,11 @@ export default function BannerUploader({ category }) {
         return "Residential Apartments Property for Sale in Gurgaon";
     };
 
-    const updateImageLink = (imageUrl, linkUrl) => {
+    // ✅ FIXED: Simple direct key-value update
+    const updateImageLink = (imageKey, linkUrl) => {
         setImageLinks(prev => ({
             ...prev,
-            [imageUrl]: linkUrl
+            [imageKey]: linkUrl  // ✅ Direct key (no double suffix)
         }));
     };
 
@@ -142,11 +147,12 @@ export default function BannerUploader({ category }) {
                 );
                 imageUrls = [...imageUrls, ...uploadedUrls];
                 
+                // ✅ FIXED: Map preview URLs to uploaded URLs
                 files.forEach((file, idx) => {
                     const previewUrl = URL.createObjectURL(file);
                     if (updatedLinks[previewUrl]) {
                         updatedLinks[uploadedUrls[idx]] = updatedLinks[previewUrl];
-                        delete updatedLinks[previewUrl];
+                        delete updatedLinks[previewUrl]; // Clean up preview URL
                     }
                 });
             }
@@ -251,7 +257,7 @@ export default function BannerUploader({ category }) {
                 {editMode ? 'Cancel Edit' : '✏️ Edit Mode'}
             </button>
 
-            {/* 🔥 FIXED CURRENT BANNERS - CLICKABLE LINKS */}
+            {/* 🔥 CURRENT BANNERS */}
             {currentBanner?.images?.length > 0 && (
                 <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Current Banners:</h3>
@@ -261,9 +267,8 @@ export default function BannerUploader({ category }) {
                             const hasValidLink = imageLink !== '' && imageLink !== '#';
                             
                             return (
-                                <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                <div key={`${img}-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible group">
-                                        {/* ✅ FIXED: Proper clickable Link wrapper */}
                                         <Link 
                                             href={hasValidLink ? imageLink : '#'} 
                                             target="_blank" 
@@ -277,7 +282,6 @@ export default function BannerUploader({ category }) {
                                                 className="object-cover rounded-lg transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                                                 sizes="(max-width: 768px) 128px, 128px"
                                             />
-                                            {/* ✅ Visual link indicator */}
                                             {hasValidLink && (
                                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
                                                     <span className="text-white text-xs font-medium px-2 py-1 bg-black/50 rounded-full">
@@ -288,7 +292,6 @@ export default function BannerUploader({ category }) {
                                         </Link>
                                     </div>
                                     
-                                    {/* ✅ Link input in edit mode */}
                                     {editMode && (
                                         <div className="flex-1 min-w-0">
                                             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -297,7 +300,7 @@ export default function BannerUploader({ category }) {
                                             <input
                                                 type="url"
                                                 value={imageLinks[img] || ''}
-                                                onChange={(e) => updateImageLink(img, e.target.value)}
+                                                onChange={(e) => updateImageLink(img, e.target.value)}  // ✅ FIXED: Direct key
                                                 placeholder="https://your-site.com/project-page"
                                                 className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
                                             />
@@ -316,7 +319,7 @@ export default function BannerUploader({ category }) {
                 </div>
             )}
 
-            {/* 🔥 FIXED NEW BANNER PREVIEW - CLICKABLE LINKS */}
+            {/* 🔥 NEW BANNER PREVIEW */}
             {files.length > 0 && (
                 <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">New Images Preview:</h3>
@@ -327,7 +330,7 @@ export default function BannerUploader({ category }) {
                             const hasValidLink = imageLink !== '' && imageLink !== '#';
                             
                             return (
-                                <div key={idx} className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl border border-green-200">
+                                <div key={`${previewUrl}-${idx}`} className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl border border-green-200">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border-green-300 cursor-pointer group overflow-visible">
                                         <Link 
                                             href={hasValidLink ? imageLink : '#'} 
@@ -356,7 +359,7 @@ export default function BannerUploader({ category }) {
                                         <input
                                             type="url"
                                             value={imageLinks[previewUrl] || ''}
-                                            onChange={(e) => updateImageLink(previewUrl, e.target.value)}
+                                            onChange={(e) => updateImageLink(previewUrl, e.target.value)}  // ✅ FIXED: Direct preview URL
                                             placeholder="https://your-site.com/project-page"
                                             className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
                                         />
@@ -368,7 +371,7 @@ export default function BannerUploader({ category }) {
                 </div>
             )}
 
-            {/* 🔥 PAGE TITLE & REST OF FORM - UNCHANGED */}
+            {/* 🔥 PAGE TITLE & EDITOR - UNCHANGED */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Page Title</label>
                 <input

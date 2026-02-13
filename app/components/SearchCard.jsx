@@ -6,6 +6,7 @@ import { FiMapPin, FiSearch, FiX } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { getHero } from "@/lib/firestore/hero/read";
 import { index } from "@/lib/algoliaClient";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TAGS = [
   "Sohna Road",
@@ -79,6 +80,22 @@ export default function SearchCard() {
     return () => clearInterval(interval);
   }, [hero?.images?.length]);
 
+
+
+  const goNext = () => {
+    if (!hero?.images?.length) return;
+    setCurrentSlide((prev) =>
+      prev === hero.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const goPrev = () => {
+    if (!hero?.images?.length) return;
+    setCurrentSlide((prev) =>
+      prev === 0 ? hero.images.length - 1 : prev - 1
+    );
+  };
+
   /* ================= MEDIA URL ================= */
   let videoUrl = DEFAULT_VIDEO;
 
@@ -132,10 +149,10 @@ export default function SearchCard() {
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === currentSlide
-                  ? "opacity-100 z-10"
-                  : "opacity-0 z-0"
-              }`}
+              index === currentSlide
+                ? "opacity-100 z-10"
+                : "opacity-0 z-0"
+                }`}
             >
               <Image
                 src={img}
@@ -155,10 +172,30 @@ export default function SearchCard() {
           />
         )}
 
+        {/* buttons for slider navigation */}
+        <button
+          onClick={goPrev}
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60]
+  text-white/70 hover:text-white transition"
+        >
+          <ChevronLeft size={40} />
+        </button>
+
+        <button
+          onClick={goNext}
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60]
+  text-white/70 hover:text-white transition"
+        >
+          <ChevronRight size={40} />
+        </button>
+
+
+
+
         {/* ================= DESKTOP YOUTUBE - SMALLER & MORE ROUNDED ================= */}
         {hero?.videoUrl && hero?.mediaType === "youtube" && (
           <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-30 pt-14 right-40 bottom-20">
-            <div 
+            <div
               className="relative group rounded-3xl overflow-hidden bg-black/30 backdrop-blur-md shadow-2xl border border-white/20"
               style={{
                 width: VIDEO_SIZES.desktop.width,
@@ -186,7 +223,7 @@ export default function SearchCard() {
         {/* ================= DESKTOP INSTAGRAM - SMALLER & MORE ROUNDED ================= */}
         {hero?.videoUrl && hero?.mediaType === "instagram" && (
           <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-30 right-20 bottom-10 group">
-            <div 
+            <div
               className="relative rounded-3xl  overflow-hidden bg-white/10 backdrop-blur-md shadow-2xl border-2 border-white/30"
               style={{
                 width: "320px",
@@ -239,7 +276,7 @@ export default function SearchCard() {
               ✕
             </button>
 
-            <div 
+            <div
               className="rounded-3xl overflow-hidden bg-black shadow-2xl border-4 border-white/20"
               style={{
                 width: `min(90vw, ${VIDEO_SIZES.mobile.maxWidth})`,
@@ -284,11 +321,10 @@ export default function SearchCard() {
                       router.push("/commercial");
                     }
                   }}
-                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${
-                    propertyType === tab.value
-                      ? "bg-white shadow-md text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className={`rounded-full px-4 text-xs sm:text-sm font-medium transition ${propertyType === tab.value
+                    ? "bg-white shadow-md text-gray-900"
+                    : "text-gray-500 hover:text-gray-700"
+                    }`}
                 >
                   {tab.label}
                 </button>

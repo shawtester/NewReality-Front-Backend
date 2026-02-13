@@ -72,9 +72,9 @@ export default function Navbar() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white w-full">
+    <header className="fixed  top-0 z-50 bg-white w-full">
       <nav className="mx-auto flex items-center justify-between px-4 sm:px-6 py-3 max-w-[1212px] h-[102px]">
-        
+
         {/* LOGO */}
         <Link href="/" className="flex items-center">
           <Image
@@ -98,10 +98,9 @@ export default function Navbar() {
                 <Link
                   href={item.href}
                   className={`flex items-center gap-1 pb-2 transition-all
-                    ${
-                      isActive
-                        ? "text-[#DBA40D] border-b-2 border-[#DBA40D]"
-                        : "text-gray-700 hover:text-[#DBA40D]"
+                    ${isActive
+                      ? "text-[#DBA40D] border-b-2 border-[#DBA40D]"
+                      : "text-gray-700 hover:text-[#DBA40D]"
                     }`}
                 >
                   {item.label}
@@ -115,10 +114,9 @@ export default function Navbar() {
                         <Link
                           href={child.href}
                           className={`block px-4 py-3 text-sm transition
-                            ${
-                              pathname === child.href
-                                ? "text-[#DBA40D] bg-[#DBA40D]/10"
-                                : "hover:bg-gray-50"
+                            ${pathname === child.href
+                              ? "text-[#DBA40D] bg-[#DBA40D]/10"
+                              : "hover:bg-gray-50"
                             }`}
                         >
                           {child.label}
@@ -134,7 +132,7 @@ export default function Navbar() {
 
         {/* ================= RIGHT ACTIONS (DESKTOP) ================= */}
         <div className="hidden min-[800px]:flex items-center gap-2">
-          
+
           <AuthContextProvider>
             <AdminButton />
           </AuthContextProvider>
@@ -191,11 +189,10 @@ export default function Navbar() {
                   <Link
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`font-medium ${
-                      pathname.startsWith(item.href)
+                    className={`font-medium ${pathname.startsWith(item.href)
                         ? "text-[#DBA40D]"
                         : "text-gray-800"
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </Link>

@@ -15,7 +15,7 @@ const countries = [
   { code: "+971", label: "🇦🇪 UAE" },
 ];
 
-export default function PropertyCard({ property = {}, baseRoute = "residential"}) {
+export default function PropertyCard({ property = {}, baseRoute = "residential" }) {
   const [open, setOpen] = useState(false);
   const [countryCode, setCountryCode] = useState("+91");
 
@@ -33,7 +33,8 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
   const {
     title = "",
     builder = "",
-    location = "",
+    locationName = "",
+    sector = "",
     bhk = "",
     size = "",
     price = "",
@@ -120,7 +121,7 @@ export default function PropertyCard({ property = {}, baseRoute = "residential"}
             </p>
 
             <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
-              {location}
+               {[sector, locationName].filter(Boolean).join(", ")}
             </p>
 
             <div className="mt-2 flex items-center justify-between text-[11px] md:text-xs lg:text-sm text-gray-500">

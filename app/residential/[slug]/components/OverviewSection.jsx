@@ -69,15 +69,15 @@ export default function OverviewSection({ overview, propertyTitle }) {
     <>
       {/* ================= OVERVIEW ================= */}
       <section id="overview" className="max-w-[1240px] mx-auto px-4 mt-12">
-        <h3 className="text-xl font-semibold mb-4">Overview</h3>
+        <h2 className="text-xl font-semibold mb-4">Overview</h2>
 
         <div className="bg-white rounded-xl shadow-sm px-0 py-4 ">
           {/* TITLE (LEFT ALIGNED) */}
           <div className="mb-5 text-left">
             {overview.title && (
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
+              <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
                 {overview.title}
-              </h3>
+              </h2>
             )}
           </div>
 

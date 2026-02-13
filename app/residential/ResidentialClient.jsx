@@ -99,6 +99,7 @@ const applyAllFilters = ({
         filtered = filtered.filter((item) =>
             item.title?.toLowerCase().includes(lower) ||
             item.location?.toLowerCase().includes(lower) ||
+            item.sector?.toLowerCase().includes(lower) ||
             item.developer?.toLowerCase().includes(lower)
         );
     }
@@ -123,6 +124,7 @@ const applyAllFilters = ({
             item.location?.toLowerCase().includes(
                 locality.replace(/-/g, " ").toLowerCase()
             )
+
         );
     }
 
@@ -524,7 +526,8 @@ export default function ResidentialPage({ apartments = [] }) {
                             property={{
                                 title: item.title,
                                 developer: item.developer,
-                                location: item.location,
+                                locationName: item.location,
+                                sector: item.sector,
                                 bhk: item.configurations?.join(", "),
                                 size: item.areaRange,
                                 price: item.priceRange,

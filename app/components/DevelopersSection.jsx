@@ -140,7 +140,7 @@ export default function DevelopersSection() {
               </p>
 
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
-                {b.totalProjects}+ Projects
+                {(b.totalProjects ?? 0)}+ Projects
               </p>
             </div>
           ))}
@@ -174,7 +174,7 @@ export default function DevelopersSection() {
               </p>
 
               <p className="mt-1 text-xs text-gray-500">
-                {b.totalProjects}+ Projects
+                {(b.totalProjects ?? 0)}+ Projects
               </p>
             </div>
           ))}

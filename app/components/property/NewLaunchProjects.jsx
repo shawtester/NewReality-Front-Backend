@@ -52,7 +52,8 @@ export default function NewLaunchProjects({ properties = [] }) {
               property={{
                 title: p.title,
                 builder: p.developer,
-                location: p.location,
+                locationName: p.location,
+                sector: p.sector,
                 bhk: p.configurations?.join(", "),
                 size: p.areaRange,
                 price: p.priceRange,

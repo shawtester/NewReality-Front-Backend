@@ -22,6 +22,7 @@ export default function CreateBuilderPage() {
   const [establishedYear, setEstablishedYear] = useState("");
   const [ongoingProjects, setOngoingProjects] = useState("");
   const [citiesPresent, setCitiesPresent] = useState("");
+  const [manualTotalProjects, setManualTotalProjects] = useState(""); // 🔥 NEW
 
   const [logo, setLogo] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -60,7 +61,8 @@ export default function CreateBuilderPage() {
             : null,
           ongoingProjects: Number(ongoingProjects) || 0,
           citiesPresent: Number(citiesPresent) || 0,
-          totalProjects: 0,
+          totalProjects: 0, // 🔥 AUTO
+          manualTotalProjects: Number(manualTotalProjects) || 0, // 🔥 ADMIN EDITABLE
         },
       });
 
@@ -108,13 +110,13 @@ export default function CreateBuilderPage() {
             placeholder="About the builder..."
             modules={modules}
             formats={formats}
-            bounds="body"   // ✅ MOST IMPORTANT
+            bounds="body"
             className="bg-white"
           />
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             type="number"
             placeholder="Established Year"
@@ -134,6 +136,17 @@ export default function CreateBuilderPage() {
             placeholder="Cities Present"
             value={citiesPresent}
             onChange={(e) => setCitiesPresent(e.target.value)}
+            className="border rounded-lg px-3 py-2 text-sm"
+          />
+
+          {/* 🔥 NEW FIELD */}
+          <input
+            type="number"
+            placeholder="Manual Total Projects"
+            value={manualTotalProjects}
+            onChange={(e) =>
+              setManualTotalProjects(e.target.value)
+            }
             className="border rounded-lg px-3 py-2 text-sm"
           />
         </div>

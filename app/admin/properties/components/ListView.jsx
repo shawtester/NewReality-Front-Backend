@@ -6,40 +6,54 @@ import {
   CircularProgress,
   Badge,
   Input,
+  Tabs,
+  Tab,
 } from "@nextui-org/react";
 import { Edit2, MapPin, Search, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { deleteProperty } from "@/lib/firestore/products/write"; // ✅ IMPORTANT
+import { deleteProperty } from "@/lib/firestore/products/write";
 
 export default function ListView() {
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all"); // 🔥 NEW FILTER STATE
 
   const { data, isLoading, error } = useProperties({
-    pageLimit: 9999, // 🔥 load all
+    pageLimit: 9999,
   });
 
+  /* ================= FILTER LOGIC ================= */
   const filteredData = useMemo(() => {
     if (!data) return [];
 
-    const sorted = [...data].sort(
+    let list = [...data].sort(
       (a, b) =>
         (b.timestampCreate?.seconds || 0) -
         (a.timestampCreate?.seconds || 0)
     );
 
-    if (!search.trim()) return sorted;
+    /* 🔥 ACTIVE / DRAFT FILTER */
+    if (filter === "active") {
+      list = list.filter((item) => item.isActive === true);
+    }
+
+    if (filter === "draft") {
+      list = list.filter((item) => !item.isActive);
+    }
+
+    /* 🔎 SEARCH */
+    if (!search.trim()) return list;
 
     const q = search.toLowerCase();
 
-    return sorted.filter((item) =>
+    return list.filter((item) =>
       [item.title, item.location, item.developer]
         .join(" ")
         .toLowerCase()
         .includes(q)
     );
-  }, [data, search]);
+  }, [data, search, filter]);
 
   if (isLoading)
     return (
@@ -52,6 +66,21 @@ export default function ListView() {
 
   return (
     <div className="space-y-6">
+
+      {/* 🔥 ACTIVE / DRAFT TABS */}
+      <Tabs
+        selectedKey={filter}
+        onSelectionChange={setFilter}
+        aria-label="Property Filter"
+        color="warning"
+        variant="underlined"
+      >
+        <Tab key="all" title="All" />
+        <Tab key="active" title="Active" />
+        <Tab key="draft" title="Draft" />
+      </Tabs>
+
+      {/* SEARCH */}
       <Input
         placeholder="Search by project, location or developer..."
         startContent={<Search size={16} />}
@@ -73,8 +102,8 @@ export default function ListView() {
 function PropertyCard({ item }) {
   const router = useRouter();
 
-  const mainImage = 
-    item.mainImage?.url || 
+  const mainImage =
+    item.mainImage?.url ||
     item.images?.[0] ||
     item.gallery?.[0]?.url ||
     "/placeholder.jpg";
@@ -84,7 +113,6 @@ function PropertyCard({ item }) {
     Date.now() - item.timestampCreate.seconds * 1000 <
       3 * 24 * 60 * 60 * 1000;
 
-  /* ✅ FINAL DELETE FIX */
   const handleDelete = async () => {
     const ok = window.confirm(
       "Are you sure you want to delete this property?"
@@ -92,7 +120,7 @@ function PropertyCard({ item }) {
     if (!ok) return;
 
     try {
-      await deleteProperty({ id: item.id }); // 🔥 YOUR WRITE.JS FUNCTION
+      await deleteProperty({ id: item.id });
     } catch (err) {
       console.error(err);
       alert("Delete Failed");
@@ -109,8 +137,13 @@ function PropertyCard({ item }) {
           className="w-full h-full object-cover"
         />
 
-        <span className="absolute top-2 left-2 bg-green-600 text-white text-[10px] px-2 py-[2px] rounded-md">
-          {item.status || "Active"}
+        {/* 🔥 ACTIVE / DRAFT BADGE */}
+        <span
+          className={`absolute top-2 left-2 text-white text-[10px] px-2 py-[2px] rounded-md
+            ${item.isActive ? "bg-green-600" : "bg-gray-500"}
+          `}
+        >
+          {item.isActive ? "Active" : "Draft"}
         </span>
 
         {isRecent && (
@@ -132,11 +165,6 @@ function PropertyCard({ item }) {
             {item.location}
           </p>
 
-          <p className="text-[13px] font-medium text-black">
-            ₹ {item.minPrice?.toLocaleString()} – ₹{" "}
-            {item.maxPrice?.toLocaleString()}
-          </p>
-
           {item.developer && (
             <p className="text-[11px] text-gray-500 truncate">
               {item.developer}
@@ -154,9 +182,8 @@ function PropertyCard({ item }) {
           )}
         </div>
 
-        {/* 🔥 FOOTER BUTTONS */}
+        {/* ACTION BUTTONS */}
         <div className="flex justify-between items-center mt-3">
-          {/* EDIT */}
           <Button
             isIconOnly
             size="sm"
@@ -168,7 +195,6 @@ function PropertyCard({ item }) {
             <Edit2 size={12} />
           </Button>
 
-          {/* DELETE RED */}
           <Button
             isIconOnly
             size="sm"
@@ -183,4 +209,3 @@ function PropertyCard({ item }) {
     </div>
   );
 }
-

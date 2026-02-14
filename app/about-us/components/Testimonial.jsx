@@ -42,15 +42,24 @@ export default function Testimonial({ testimonials = [] }) {
           </button>
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-1 px-2"
+            className="flex gap-6 overflow-x-auto scroll-smooth
+           snap-x snap-mandatory
+           sm:snap-none
+           scrollbar-hide pb-1"
+
+
+
           >
 
             {testimonials.map((item) => (
               <article
                 key={item.id}
-                className="w-[85%] sm:w-[70%] lg:w-[32%] flex-shrink-0
-                         bg-white rounded-2xl border border-gray-200
-                         shadow-sm p-6 flex flex-col"
+                className="w-full sm:w-[70%] lg:w-[32%]
+
+           snap-center flex-shrink-0
+           bg-white rounded-2xl border border-gray-200
+           shadow-sm p-6 flex flex-col"
+
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100">

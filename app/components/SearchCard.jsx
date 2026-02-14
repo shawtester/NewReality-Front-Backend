@@ -100,8 +100,8 @@ export default function SearchCard() {
       return hero.videoUrl;
     } else {
       const idMatch = hero.videoUrl.match(/embed\/([^?]+)/) ||
-        hero.videoUrl.match(/v=([^&]+)/) ||
-        hero.videoUrl.match(/youtu\.be\/([^?]+)/);
+                     hero.videoUrl.match(/v=([^&]+)/) ||
+                     hero.videoUrl.match(/youtu\.be\/([^?]+)/);
       const videoId = idMatch?.[1];
       return videoId
         ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&start=0`
@@ -151,8 +151,6 @@ export default function SearchCard() {
     return () => clearInterval(interval);
   }, [hero?.images?.length]);
 
-
-
   const goNext = () => {
     if (!hero?.images?.length) return;
     setCurrentSlide((prev) =>
@@ -166,25 +164,6 @@ export default function SearchCard() {
       prev === 0 ? hero.images.length - 1 : prev - 1
     );
   };
-
-  /* ================= MEDIA URL ================= */
-  let videoUrl = DEFAULT_VIDEO;
-
-  if (hero?.videoUrl) {
-    if (hero?.mediaType === "instagram") {
-      videoUrl = hero.videoUrl;
-    } else {
-      const idMatch =
-        hero.videoUrl.match(/embed\/([^?]+)/) ||
-        hero.videoUrl.match(/v=([^&]+)/) ||
-        hero.videoUrl.match(/youtu\.be\/([^?]+)/);
-
-      const videoId = idMatch?.[1];
-      videoUrl = videoId
-        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`
-        : `${hero.videoUrl}?autoplay=1&mute=1`;
-    }
-  }
 
   /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
@@ -205,10 +184,10 @@ export default function SearchCard() {
     }
   };
 
-  /* ================= HERO BACKGROUND RENDER - NO FALLBACK ================= */
+  /* ================= HERO BACKGROUND RENDER ================= */
   const renderHeroBackground = () => {
     if (!hero?.images?.length) {
-      return null; // 🔥 NO FALLBACK IMAGE
+      return null; 
     }
 
     return hero.images.map((img, index) => {
@@ -217,8 +196,7 @@ export default function SearchCard() {
       return (
         <div
           key={`${imageUrl}-${index}`}
-          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"
-            }`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"}`}
         >
           {imageUrl ? (
             <Image
@@ -238,9 +216,9 @@ export default function SearchCard() {
 
   return (
     <section className="relative w-full">
-      {/* ================= HERO CONTAINER ================= */}
-      <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden">
-        {/* 🔥 FIXED CLICK LAYER - z-[25] (LOWER THAN VIDEO BUTTONS) */}
+      {/* ================= HERO CONTAINER - ORIGINAL LAYOUT + STICKY VIDEOS ================= */}
+      <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
+        {/* 🔥 FIXED CLICK LAYER */}
         <div
           className="absolute inset-0 z-[25] cursor-pointer group hover:scale-[1.02] transition-all duration-500 pointer-events-auto"
           onClick={handleHeroImageClick}
@@ -258,56 +236,25 @@ export default function SearchCard() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 z-[30] pointer-events-none flex items-end pb-8 px-6" />
         </div>
 
-        {/* BACKGROUND SLIDER */}
-        {hero?.images?.length ? (
-          hero.images.map((img, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide
-                ? "opacity-100 z-10"
-                : "opacity-0 z-0"
-                }`}
-            >
-              <Image
-                src={img}
-                alt={`Hero ${index + 1}`}
-                fill
-                className="object-cover"
-                priority={index === 0}
-              />
-            </div>
-          ))
-        ) : (
-          <Image
-            src="/images/heroimg.png"
-            alt="Hero"
-            fill
-            className="object-cover"
-          />
-        )}
-
-        {/* buttons for slider navigation */}
+        {/* 🔥 NAVIGATION BUTTONS - STICKY */}
         <button
           onClick={goPrev}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60]
-  text-white/70 hover:text-white transition"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60] text-white/70 hover:text-white transition pointer-events-auto"
         >
           <ChevronLeft size={40} />
         </button>
 
         <button
           onClick={goNext}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60]
-  text-white/70 hover:text-white transition"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60] text-white/70 hover:text-white transition pointer-events-auto"
         >
           <ChevronRight size={40} />
         </button>
 
-
-
-        {/* ================= DESKTOP YOUTUBE VIDEO ================= */}
+        {/* 🔥 ALL VIDEO ELEMENTS - HIGH Z-INDEX INSIDE HERO */}
+        {/* DESKTOP YOUTUBE VIDEO */}
         {hero?.videoUrl && hero?.mediaType === "youtube" && desktopVideoPlaying && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[60] pt-14 right-10 bottom-20 pointer-events-none">
+          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[65] pt-14 right-10 bottom-20 pointer-events-none">
             <div
               className="relative group rounded-3xl overflow-hidden bg-black/30 backdrop-blur-md shadow-2xl border border-white/20"
               style={{ width: VIDEO_SIZES.desktop.width, height: VIDEO_SIZES.desktop.height }}
@@ -335,9 +282,9 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* ================= DESKTOP INSTAGRAM VIDEO ================= */}
+        {/* DESKTOP INSTAGRAM VIDEO */}
         {hero?.videoUrl && hero?.mediaType === "instagram" && desktopVideoPlaying && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[60] right-20 bottom-10 group pointer-events-none">
+          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[65] right-20 bottom-10 group pointer-events-none">
             <div
               className="relative rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md shadow-2xl border-2 border-white/30"
               style={{ width: "320px", height: "280px" }}
@@ -363,7 +310,7 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* 🔥 DESKTOP PLAY ICON - FULLY CLICKABLE z-[70] */}
+        {/* DESKTOP PLAY BUTTON */}
         {hero?.videoUrl && !desktopVideoPlaying && (
           <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[70] pt-14 right-10 bottom-20 pointer-events-none">
             <button
@@ -383,7 +330,7 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* ================= MOBILE PLAY BUTTON ================= */}
+        {/* MOBILE PLAY BUTTON */}
         {!playMobileVideo && hero?.videoUrl && (
           <div className="md:hidden absolute right-4 bottom-40 z-[65] pointer-events-auto">
             <button
@@ -401,7 +348,7 @@ export default function SearchCard() {
           </div>
         )}
 
-        {/* ================= MOBILE VIDEO ================= */}
+        {/* MOBILE VIDEO MODAL */}
         {playMobileVideo && hero?.videoUrl && (
           <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-center justify-center px-4">
             <button
@@ -427,7 +374,7 @@ export default function SearchCard() {
         )}
       </div>
 
-      {/* ================= SEARCH BAR ================= */}
+      {/* ================= ORIGINAL SEARCH BAR POSITION ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-30">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">

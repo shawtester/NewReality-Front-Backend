@@ -6,13 +6,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadBanner";
-import { updateBanner } from "@/lib/firestore/banners/write";
+import { updateBanner, deleteBannerImage } from "@/lib/firestore/banners/write";
 import { getBanner } from "@/lib/firestore/banners/read";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
 });
-
 
 // ✅ COMPLETE INTRO TEXTS (PLAIN TEXT)
 const INTRO_TEXTS = {
@@ -36,8 +35,6 @@ export default function BannerUploader({ category }) {
     const [savingIntro, setSavingIntro] = useState(false);
     const [error, setError] = useState("");
     const [editMode, setEditMode] = useState(false);
-
-    // ✅ SIMPLIFIED: Direct image → link mapping per category
     const [imageLinks, setImageLinks] = useState({});
 
     const modules = {
@@ -63,6 +60,39 @@ export default function BannerUploader({ category }) {
         return html.replace(/<[^>]*>/g, "").trim();
     };
 
+    // 🔥 DELETE BANNER IMAGE
+    const handleDeleteImage = async (imageUrl) => {
+        if (!window.confirm(`Delete this banner image?\n${imageUrl}`)) return;
+
+        try {
+            setLoading(true);
+            // Remove from local state first
+            const updatedImages = currentBanner.images.filter(img => img !== imageUrl);
+            const updatedLinks = { ...imageLinks };
+            delete updatedLinks[imageUrl];
+
+            // Update Firestore
+            await updateBanner({
+                category,
+                images: updatedImages,
+                imageLinks: updatedLinks,
+                introText: currentIntroText,
+                pageTitle: currentPageTitle
+            });
+
+            // Refresh data
+            const updatedBanner = await getBanner(category);
+            setCurrentBanner(updatedBanner);
+            setImageLinks(updatedBanner?.imageLinks || {});
+            
+            alert("🗑️ Banner image deleted successfully!");
+        } catch (err) {
+            console.error("Delete error:", err);
+            setError(`Delete failed: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchCurrentBanner = async () => {
@@ -70,7 +100,6 @@ export default function BannerUploader({ category }) {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
                 
-                // ✅ Load existing links directly
                 if (banner?.imageLinks) {
                     setImageLinks(banner.imageLinks);
                 }
@@ -97,7 +126,6 @@ export default function BannerUploader({ category }) {
         if (category) fetchCurrentBanner();
     }, [category]);
 
-    // ✅ For new files: Create preview keys using File object reference
     useEffect(() => {
         if (files.length > 0) {
             const newLinks = { ...imageLinks };
@@ -123,11 +151,10 @@ export default function BannerUploader({ category }) {
         return "Residential Apartments Property for Sale in Gurgaon";
     };
 
-    // ✅ FIXED: Simple direct key-value update
     const updateImageLink = (imageKey, linkUrl) => {
         setImageLinks(prev => ({
             ...prev,
-            [imageKey]: linkUrl  // ✅ Direct key (no double suffix)
+            [imageKey]: linkUrl
         }));
     };
 
@@ -151,12 +178,11 @@ export default function BannerUploader({ category }) {
                 );
                 imageUrls = [...imageUrls, ...uploadedUrls];
                 
-                // ✅ FIXED: Map preview URLs to uploaded URLs
                 files.forEach((file, idx) => {
                     const previewUrl = URL.createObjectURL(file);
                     if (updatedLinks[previewUrl]) {
                         updatedLinks[uploadedUrls[idx]] = updatedLinks[previewUrl];
-                        delete updatedLinks[previewUrl]; // Clean up preview URL
+                        delete updatedLinks[previewUrl];
                     }
                 });
             }
@@ -261,7 +287,7 @@ export default function BannerUploader({ category }) {
                 {editMode ? 'Cancel Edit' : '✏️ Edit Mode'}
             </button>
 
-            {/* 🔥 CURRENT BANNERS */}
+            {/* 🔥 CURRENT BANNERS WITH DELETE */}
             {currentBanner?.images?.length > 0 && (
                 <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Current Banners:</h3>
@@ -271,8 +297,8 @@ export default function BannerUploader({ category }) {
                             const hasValidLink = imageLink !== '' && imageLink !== '#';
 
                             return (
-                                <div key={`${img}-${idx}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                                    <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible group">
+                                <div key={`${img}-${idx}`} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl group">
+                                    <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible">
                                         <Link 
                                             href={hasValidLink ? imageLink : '#'} 
                                             target="_blank" 
@@ -296,6 +322,16 @@ export default function BannerUploader({ category }) {
                                         </Link>
                                     </div>
                                     
+                                    {/* 🔥 DELETE BUTTON */}
+                                    <button
+                                        onClick={() => handleDeleteImage(img)}
+                                        className="ml-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex-shrink-0 opacity-0 group-hover:opacity-100 ml-auto"
+                                        title="Delete this image"
+                                        disabled={loading}
+                                    >
+                                        🗑️
+                                    </button>
+
                                     {editMode && (
                                         <div className="flex-1 min-w-0">
                                             <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -304,7 +340,7 @@ export default function BannerUploader({ category }) {
                                             <input
                                                 type="url"
                                                 value={imageLinks[img] || ''}
-                                                onChange={(e) => updateImageLink(img, e.target.value)}  // ✅ FIXED: Direct key
+                                                onChange={(e) => updateImageLink(img, e.target.value)}
                                                 placeholder="https://your-site.com/project-page"
                                                 className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
                                             />
@@ -363,7 +399,7 @@ export default function BannerUploader({ category }) {
                                         <input
                                             type="url"
                                             value={imageLinks[previewUrl] || ''}
-                                            onChange={(e) => updateImageLink(previewUrl, e.target.value)}  // ✅ FIXED: Direct preview URL
+                                            onChange={(e) => updateImageLink(previewUrl, e.target.value)}
                                             placeholder="https://your-site.com/project-page"
                                             className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F5A300] focus:border-transparent"
                                         />
@@ -375,7 +411,7 @@ export default function BannerUploader({ category }) {
                 </div>
             )}
 
-            {/* 🔥 PAGE TITLE & EDITOR - UNCHANGED */}
+            {/* 🔥 PAGE TITLE & EDITOR */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Page Title</label>
                 <input

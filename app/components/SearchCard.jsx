@@ -196,7 +196,7 @@ export default function SearchCard() {
       return (
         <div
           key={`${imageUrl}-${index}`}
-          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"}`}
+          className={`absolute inset-0  duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"}`}
         >
           {imageUrl ? (
             <Image
@@ -204,7 +204,8 @@ export default function SearchCard() {
               alt={`Hero ${index + 1}`}
               fill
               sizes="100vw"
-              className="object-cover"
+              className="object-contain md:object-cover object-center"
+
               priority={index === 0}
               onLoad={() => console.log(`✅ Hero image loaded: ${safeSlice(imageUrl)}`)}
             />
@@ -217,7 +218,7 @@ export default function SearchCard() {
   return (
     <section className="relative w-full">
       {/* ================= HERO CONTAINER - ORIGINAL LAYOUT + STICKY VIDEOS ================= */}
-      <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
+      <div className="relative w-full h-[360px] sm:h-[430px]  md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
         {/* 🔥 FIXED CLICK LAYER */}
         <div
           className="absolute inset-0 z-[25] cursor-pointer group hover:scale-[1.02] transition-all duration-500 pointer-events-auto"

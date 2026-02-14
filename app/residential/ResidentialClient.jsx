@@ -195,10 +195,10 @@ export default function ResidentialPage({ apartments = [] }) {
 
         const currentImageUrl = banner.images[index];
         const link = banner.imageLinks[currentImageUrl];
-        
+
         console.log(`🔍 Image ${index}:`, currentImageUrl);
         console.log(`🔗 Link found:`, link);
-        
+
         return link || null;
     }, [banner?.images, banner?.imageLinks]);
 
@@ -476,46 +476,134 @@ export default function ResidentialPage({ apartments = [] }) {
                         <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
                             <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
+                                <option value="" disabled hidden>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
                             </select>
                             <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
+                                <option value="" disabled hidden>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
                             </select>
                             <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
+                                <option value="" disabled hidden>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
                             </select>
                             <select value={budget} onChange={(e) => handleFilterChange('budget', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
+                                <option value="" disabled hidden>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
                             </select>
                             <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option value="">BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
+                                <option value="" disabled hidden>BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
                             </select>
                             <button onClick={() => handleFilterChange('q', keyword || null)} className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">Search</button>
                         </div>
                     </div>
 
                     {/* Desktop Search */}
-                    <div className="hidden lg:block absolute bottom-[100px] left-1/2 -translate-x-[60%] w-full max-w-[950px] z-20 px-4">
-                        <div className="bg-white shadow-2xl px-5 py-3 flex items-center gap-3 rounded-full border border-yellow-400">
-                            <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm flex-shrink-0 min-w-0" />
-                            <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
-                            </select>
-                            <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
-                            </select>
-                            <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
-                            </select>
-                            <select value={budget} onChange={(e) => handleFilterChange('budget', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
-                            </select>
-                            <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-28 px-3 py-3 rounded-full bg-gray-50 text-sm flex-shrink-0">
-                                <option value="">BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
-                            </select>
-                            <button onClick={() => handleFilterChange('q', keyword || null)} className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0">Search</button>
+                    <div className="hidden lg:block absolute bottom-[100px] left-0 right-0 mx-auto w-full max-w-[950px] z-20 px-4">
+                        <div className="bg-white shadow-2xl px-4 py-3 flex flex-wrap lg:flex-nowrap items-center justify-center gap-2 rounded-3xl border border-yellow-400">
+
+                            <input
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
+                                placeholder="Enter Keyword"
+                                className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm min-w-0"
+                            />
+
+                            {/* TYPE */}
+                            <div className="relative flex-1 min-w-[110px]">
+                                <select
+                                    value={type}
+                                    onChange={(e) => handleFilterChange('type', e.target.value)}
+                                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                                >
+                                    <option value="" disabled hidden>Type</option>
+                                    <option value="apartment">Apartments</option>
+                                    <option value="builder-floor">Builder Floor</option>
+                                    <option value="villa">Villas</option>
+                                    <option value="plot">Plots</option>
+                                </select>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
+                            </div>
+
+                            {/* STATUS */}
+                            <div className="relative flex-1 min-w-[110px]">
+                                <select
+                                    value={status}
+                                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                                >
+                                    <option value="" disabled hidden>Status</option>
+                                    <option value="new-launch">New Launch</option>
+                                    <option value="ready-to-move">Ready to Move</option>
+                                    <option value="under-construction">Under Construction</option>
+                                    <option value="pre-launch">Pre Launch</option>
+                                </select>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
+                            </div>
+
+                            {/* LOCALITY */}
+                            <div className="relative flex-1 min-w-[110px]">
+                                <select
+                                    value={locality}
+                                    onChange={(e) => handleFilterChange('locality', e.target.value)}
+                                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                                >
+                                    <option value="" disabled hidden>Localities</option>
+                                    <option value="dwarka-expressway">Dwarka Expressway</option>
+                                    <option value="golf-course-road">Golf Course Road</option>
+                                    <option value="golf-course-extension-road">Golf Course Extension Road</option>
+                                    <option value="sohna-road">Sohna Road</option>
+                                    <option value="new-gurgaon">New Gurgaon</option>
+                                    <option value="old-gurgaon">Old Gurgaon</option>
+                                    <option value="spr">SPR</option>
+                                    <option value="nh8">NH8</option>
+                                </select>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
+                            </div>
+
+                            {/* BUDGET */}
+                            <div className="relative flex-1 min-w-[110px]">
+                                <select
+                                    value={budget || ""}
+                                    onChange={(e) => handleFilterChange('budget', e.target.value)}
+                                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                                >
+                                    <option value="" disabled hidden>Budget</option>
+                                    <option value="1-2-cr">1 – 2 Cr</option>
+                                    <option value="2-3-cr">2 – 3 Cr</option>
+                                    <option value="3-4-cr">3 – 4 Cr</option>
+                                    <option value="4-5-cr">4 – 5 Cr</option>
+                                    <option value="5-6-cr">5 – 6 Cr</option>
+                                    <option value="6-7-cr">6 – 7 Cr</option>
+                                    <option value="7-8-cr">7 – 8 Cr</option>
+                                    <option value="above-8-cr">Above 8 Cr</option>
+                                </select>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
+                            </div>
+
+                            {/* BHK */}
+                            <div className="relative flex-1 min-w-[110px]">
+                                <select
+                                    value={bhk}
+                                    onChange={(e) => handleFilterChange('bhk', e.target.value)}
+                                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                                >
+                                    <option value="" disabled hidden>BHK</option>
+                                    <option value="1-bhk">1 BHK</option>
+                                    <option value="2-bhk">2 BHK</option>
+                                    <option value="3-bhk">3 BHK</option>
+                                    <option value="4-bhk">4 BHK</option>
+                                    <option value="5-bhk">5 BHK</option>
+                                </select>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
+                            </div>
+
+                            <button
+                                onClick={() => handleFilterChange('q', keyword || null)}
+                                className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm"
+                            >
+                                Search
+                            </button>
+
                         </div>
                     </div>
+
                 </div>
             </section>
 

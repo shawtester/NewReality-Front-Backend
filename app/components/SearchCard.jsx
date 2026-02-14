@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -18,11 +19,11 @@ const TAGS = [
   "New Gurgaon",
 ];
 
-const DEFAULT_VIDEO = "https://www.youtube.com/embed/4jnzf1yj48M?autoplay=1&mute=1";
+const DEFAULT_VIDEO = "https://www.youtube.com/embed/4jnzf1yj48M?autoplay=1&mute=0";
 
 const VIDEO_SIZES = {
   desktop: { width: "172px", height: "300px" },
-  mobile: { maxWidth: "174px", height: "300px" }
+  mobile: { maxWidth: "174px", height: "260px" }
 };
 
 export default function SearchCard() {
@@ -38,131 +39,74 @@ export default function SearchCard() {
   const [playMobileVideo, setPlayMobileVideo] = useState(false);
   const [desktopVideoPlaying, setDesktopVideoPlaying] = useState(true);
   const [videoKey, setVideoKey] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
 
   /* ================= FETCH HERO ================= */
   useEffect(() => {
     const fetchHero = async () => {
       try {
         const res = await getHero();
-        console.log("🔍 Hero data:", res);
         if (res) {
-          if (res.images && Array.isArray(res.images)) {
-            res.images = res.images.filter(img => {
-              if (typeof img === 'string') return img.trim() !== '';
-              return img?.url && typeof img.url === 'string';
-            });
-            console.log("🖼️ Valid images:", res.images.length);
-          } else {
-            res.images = [];
-          }
+          res.images = Array.isArray(res.images)
+            ? res.images.filter(img =>
+              typeof img === "string"
+                ? img.trim() !== ""
+                : img?.url
+            )
+            : [];
           setHero(res);
-          setDesktopVideoPlaying(true);
           setVideoKey(0);
         }
       } catch (error) {
-        console.error(" Hero fetch failed:", error);
+        console.error("Hero fetch failed:", error);
       }
     };
     fetchHero();
   }, []);
 
-  /* ================= HERO IMAGE CLICK HANDLER ================= */
+  /* ================= HERO IMAGE CLICK ================= */
   const handleHeroImageClick = useCallback(() => {
-    console.log("🖱️ HERO CLICKED!");
     const currentImage = hero?.images?.[currentSlide];
     let link;
 
-    if (typeof currentImage === 'string') {
+    if (typeof currentImage === "string") {
       link = hero?.imageLinks?.[currentImage];
     } else {
       link = currentImage?.link;
     }
 
-    console.log("🔗 Current slide:", currentSlide, "Image:", currentImage);
-    console.log("🔗 Link:", link);
-
     if (link) {
-      window.open(link, '_blank', 'noopener,noreferrer');
+      window.open(link, "_blank", "noopener,noreferrer");
     }
   }, [hero, currentSlide]);
-
-  /* ================= SAFE STRING HELPER ================= */
-  const safeSlice = (value) => {
-    if (typeof value !== 'string') return 'Not a string';
-    return value.slice(-50);
-  };
 
   /* ================= VIDEO URL ================= */
   const getVideoUrl = () => {
     if (!hero?.videoUrl) return DEFAULT_VIDEO;
 
     if (hero?.mediaType === "instagram") {
-      return hero.videoUrl;
+      const match = hero.videoUrl.match(/(reel|p)\/([^/?]+)/);
+      return match
+        ? `https://www.instagram.com/p/${match[2]}/embed`
+        : "";
     } else {
-      const idMatch = hero.videoUrl.match(/embed\/([^?]+)/) ||
-                     hero.videoUrl.match(/v=([^&]+)/) ||
-                     hero.videoUrl.match(/youtu\.be\/([^?]+)/);
+      const idMatch =
+        hero.videoUrl.match(/embed\/([^?]+)/) ||
+        hero.videoUrl.match(/v=([^&]+)/) ||
+        hero.videoUrl.match(/youtu\.be\/([^?]+)/);
+
       const videoId = idMatch?.[1];
+
       return videoId
-        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&start=0`
-        : `${hero.videoUrl}?autoplay=1&mute=1&start=0`;
+        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}`
+        : DEFAULT_VIDEO;
     }
   };
 
-  /* ================= INSTAGRAM RELOAD ================= */
-  const reloadInstagram = () => {
-    if (window?.instgrm) {
-      setTimeout(() => {
-        window.instgrm.Embeds.process();
-      }, 500);
-    } else {
-      const script = document.createElement("script");
-      script.src = "https://www.instagram.com/embed.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  };
-
-  /* ================= TOGGLE VIDEO ================= */
   const toggleDesktopVideo = () => {
-    if (desktopVideoPlaying) {
-      setDesktopVideoPlaying(false);
-    } else {
-      setVideoKey(prev => prev + 1);
-      setDesktopVideoPlaying(true);
-      setTimeout(() => {
-        if (hero?.mediaType === "instagram") {
-          reloadInstagram();
-        }
-      }, 100);
-    }
-  };
-
-  /* ================= AUTO SLIDER ================= */
-  useEffect(() => {
-    if (!hero?.images?.length || hero.images.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) =>
-        prev === hero.images.length - 1 ? 0 : prev + 1
-      );
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [hero?.images?.length]);
-
-  const goNext = () => {
-    if (!hero?.images?.length) return;
-    setCurrentSlide((prev) =>
-      prev === hero.images.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const goPrev = () => {
-    if (!hero?.images?.length) return;
-    setCurrentSlide((prev) =>
-      prev === 0 ? hero.images.length - 1 : prev - 1
-    );
+    setDesktopVideoPlaying(prev => !prev);
+    setIsMuted(false);
+    setVideoKey(prev => prev + 1);
   };
 
   /* ================= SEARCH ================= */
@@ -174,7 +118,9 @@ export default function SearchCard() {
 
     try {
       setLoading(true);
-      const res = await fetch(`/api/search?q=${text}&propertyType=${propertyType}`);
+      const res = await fetch(
+        `/api/search?q=${text}&propertyType=${propertyType}`
+      );
       const data = await res.json();
       setResults(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -184,31 +130,54 @@ export default function SearchCard() {
     }
   };
 
-  /* ================= HERO BACKGROUND RENDER ================= */
+
+  /* ================= AUTO SLIDER ================= */
+  useEffect(() => {
+    if (!hero?.images?.length || hero.images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide(prev =>
+        prev === hero.images.length - 1 ? 0 : prev + 1
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [hero?.images?.length]);
+
+  const goNext = () => {
+    if (!hero?.images?.length) return;
+    setCurrentSlide(prev =>
+      prev === hero.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const goPrev = () => {
+    if (!hero?.images?.length) return;
+    setCurrentSlide(prev =>
+      prev === 0 ? hero.images.length - 1 : prev - 1
+    );
+  };
+
+  /* ================= HERO BACKGROUND ================= */
   const renderHeroBackground = () => {
-    if (!hero?.images?.length) {
-      return null; 
-    }
+    if (!hero?.images?.length) return null;
 
     return hero.images.map((img, index) => {
-      const imageUrl = typeof img === 'string' ? img : img?.url;
+      const imageUrl = typeof img === "string" ? img : img?.url;
 
       return (
         <div
           key={`${imageUrl}-${index}`}
-          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"}`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"
+            }`}
         >
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={`Hero ${index + 1}`}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority={index === 0}
-              onLoad={() => console.log(`✅ Hero image loaded: ${safeSlice(imageUrl)}`)}
-            />
-          ) : null}
+          <Image
+            src={imageUrl}
+            alt="Hero"
+            fill
+            className="object-cover"
+            priority={index === 0}
+          />
         </div>
       );
     });
@@ -216,95 +185,58 @@ export default function SearchCard() {
 
   return (
     <section className="relative w-full">
-      {/* ================= HERO CONTAINER - ORIGINAL LAYOUT + STICKY VIDEOS ================= */}
+
+      {/* HERO */}
       <div className="relative w-full h-[360px] sm:h-[400px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
-        {/* 🔥 FIXED CLICK LAYER */}
+
         <div
-          className="absolute inset-0 z-[25] cursor-pointer group hover:scale-[1.02] transition-all duration-500 pointer-events-auto"
+          className="absolute inset-0 z-[25] cursor-pointer"
           onClick={handleHeroImageClick}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleHeroImageClick();
-            }
-          }}
-          title="Click to visit project"
         >
           {renderHeroBackground()}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 z-[30] pointer-events-none flex items-end pb-8 px-6" />
         </div>
 
-        {/* 🔥 NAVIGATION BUTTONS - STICKY */}
         <button
           onClick={goPrev}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60] text-white/70 hover:text-white transition pointer-events-auto"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60] text-white"
         >
           <ChevronLeft size={40} />
         </button>
 
         <button
           onClick={goNext}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60] text-white/70 hover:text-white transition pointer-events-auto"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60] text-white"
         >
           <ChevronRight size={40} />
         </button>
 
-        {/* 🔥 ALL VIDEO ELEMENTS - HIGH Z-INDEX INSIDE HERO */}
-        {/* DESKTOP YOUTUBE VIDEO */}
-        {hero?.videoUrl && hero?.mediaType === "youtube" && desktopVideoPlaying && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[65] pt-14 right-10 bottom-20 pointer-events-none">
+        {/* ================= DESKTOP VIDEO ================= */}
+        {hero?.videoUrl && desktopVideoPlaying && (
+          <div className="absolute hidden md:flex items-center justify-end pr-8 z-[200] pt-14 right-10 bottom-20">
             <div
-              className="relative group rounded-3xl overflow-hidden bg-black/30 backdrop-blur-md shadow-2xl border border-white/20"
+              className="relative rounded-3xl overflow-hidden bg-black shadow-2xl"
               style={{ width: VIDEO_SIZES.desktop.width, height: VIDEO_SIZES.desktop.height }}
             >
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  toggleDesktopVideo();
-                }}
-                className="absolute -top-1 -right-1 z-[75] bg-white/90 hover:bg-white text-gray-800 p-1.5 rounded-2xl shadow-2xl border border-white/50 opacity-0 group-hover:opacity-100 transition-all duration-300 w-9 h-9 flex items-center justify-center hover:scale-105 pointer-events-auto"
-                title="Close video"
+                onClick={toggleDesktopVideo}
+                className="absolute top-2 right-2 z-50 bg-white p-2 rounded-xl"
               >
-                <FiX className="w-4 h-4" />
+                <FiX />
               </button>
-              <iframe
-                key={`youtube-${videoKey}`}
-                className="w-full h-full rounded-3xl"
-                src={getVideoUrl()}
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-                title="Desktop Video"
-              />
-            </div>
-          </div>
-        )}
 
-        {/* DESKTOP INSTAGRAM VIDEO */}
-        {hero?.videoUrl && hero?.mediaType === "instagram" && desktopVideoPlaying && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[65] right-20 bottom-10 group pointer-events-none">
-            <div
-              className="relative rounded-3xl overflow-hidden bg-white/10 backdrop-blur-md shadow-2xl border-2 border-white/30"
-              style={{ width: "320px", height: "280px" }}
-            >
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  toggleDesktopVideo();
-                }}
-                className="absolute top-2 right-2 z-[75] bg-white hover:bg-gray-50 text-gray-800 p-1.5 rounded-2xl shadow-xl border border-white/50 opacity-0 group-hover:opacity-100 transition-all duration-300 w-8 h-8 flex items-center justify-center hover:scale-105 pointer-events-auto"
-                title="Close video"
+                onClick={() => setIsMuted(prev => !prev)}
+                className="absolute bottom-2 left-2 z-50 bg-white px-2 py-1 text-xs rounded-lg"
               >
-                <FiX className="w-4 h-4" />
+                {isMuted ? "Unmute 🔊" : "Mute 🔇"}
               </button>
-              <blockquote
-                key={`insta-${videoKey}`}
-                className="instagram-media w-full h-full rounded-3xl overflow-hidden"
-                data-instgrm-permalink={hero.videoUrl}
-                data-instgrm-version="14"
+
+              <iframe
+                key={videoKey}
+                className="w-full h-full"
+                src={getVideoUrl()}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
               />
             </div>
           </div>
@@ -312,67 +244,79 @@ export default function SearchCard() {
 
         {/* DESKTOP PLAY BUTTON */}
         {hero?.videoUrl && !desktopVideoPlaying && (
-          <div className="absolute inset-0 hidden md:flex items-center justify-end pr-8 z-[70] pt-14 right-10 bottom-20 pointer-events-none">
+          <div className="absolute hidden md:flex items-center justify-end pr-8 z-[200] pt-14 right-10 bottom-20">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                toggleDesktopVideo();
+              onClick={() => {
+                setDesktopVideoPlaying(true);
+                setVideoKey(prev => prev + 1);
               }}
-              className="h-14 w-14 rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl flex items-center justify-center hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 border-4 border-white/50 group z-[75] pointer-events-auto"
-              aria-label="Play video"
-              title="Play video"
+              className="h-14 w-14 rounded-2xl bg-white shadow-2xl flex items-center justify-center hover:scale-105 transition"
             >
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-red-600 group-hover:scale-110 transition-transform duration-200" fill="currentColor">
-                <path d="M23.5 6.2s-.2-1.7-.9-2.4c-.8-.9-1.7-.9-2.1-1C17.7 2.5 12 2.5 12 2.5s-5.7 0-8.5.3c-.4.1-1.3.1-2.1 1C.7 4.5.5 6.2.5 6.2S0 8.1 0 10v1.9c0 1.9.5 3.8.5 3.8s.2 1.7.9 2.4c-.8-.9 1.9.9 2.4 1 1.7.2 7.2.3 7.2.3s5.7 0 8.5-.3c-.4-.1 1.3-.1 2.1-1 .7-.7.9-2.4.9-2.4s.5-1.9.5-3.8V10c0-1.9-.5-3.8-.5-3.8zM9.5 13.5V7.5l6 3-6 3z" />
+              <svg
+                viewBox="0 0 24 24"
+                className="h-7 w-7 text-red-600"
+                fill="currentColor"
+              >
+                <path d="M8 5v14l11-7z" />
               </svg>
             </button>
           </div>
         )}
 
-        {/* MOBILE PLAY BUTTON */}
-        {!playMobileVideo && hero?.videoUrl && (
-          <div className="md:hidden absolute right-4 bottom-40 z-[65] pointer-events-auto">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setPlayMobileVideo(true);
-              }}
-              className="h-12 w-12 rounded-2xl bg-white shadow-2xl flex items-center justify-center hover:shadow-3xl transition-all duration-200 hover:-translate-y-1"
-              aria-label="Play video"
-            >
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-red-600" fill="currentColor">
-                <path d="M23.5 6.2s-.2-1.7-.9-2.4c-.8-.9-1.7-.9-2.1-1C17.7 2.5 12 2.5 12 2.5s-5.7 0-8.5.3c-.4.1-1.3.1-2.1 1C.7 4.5.5 6.2.5 6.2S0 8.1 0 10v1.9c0 1.9.5 3.8.5 3.8s.2 1.7.9 2.4c-.8-.9 1.9.9 2.4 1 1.7.2 7.2.3 7.2.3s5.7 0 8.5-.3c-.4-.1 1.3-.1 2.1-1 .7-.7.9-2.4.9-2.4s.5-1.9.5-3.8V10c0-1.9-.5-3.8-.5-3.8zM9.5 13.5V7.5l6 3-6 3z" />
-              </svg>
-            </button>
-          </div>
-        )}
 
-        {/* MOBILE VIDEO MODAL */}
+        {/* ================= MOBILE VIDEO ================= */}
         {playMobileVideo && hero?.videoUrl && (
-          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-center justify-center px-4">
+          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center py-2 ">
             <button
-              onClick={() => setPlayMobileVideo(false)}
-              className="absolute top-6 right-16 z-[85] h-8 w-8 rounded-2xl bg-black/90 text-white flex items-center justify-center shadow-2xl hover:bg-white hover:text-black transition-all duration-200 hover:scale-110 text-xl font-bold pointer-events-auto"
-              aria-label="Close video"
+              onClick={() => {
+                setPlayMobileVideo(false);
+                setIsMuted(false);
+              }}
+              className="absolute top-4 right-4 text-white text-2xl z-[90]"
             >
               ✕
             </button>
+
             <div
-              className="rounded-3xl overflow-hidden bg-black shadow-2xl border-4 border-white/30"
-              style={{ width: `min(90vw, ${VIDEO_SIZES.mobile.maxWidth})`, height: VIDEO_SIZES.mobile.height }}
+              className="relative"
+              style={{
+                width: "85%",
+                maxWidth: VIDEO_SIZES.mobile.maxWidth,
+                height: VIDEO_SIZES.mobile.height,
+              }}
             >
+              <button
+                onClick={() => setIsMuted(prev => !prev)}
+                className="absolute bottom-2 left-2 z-[90] bg-white px-2 py-1 text-xs rounded-lg"
+              >
+                {isMuted ? "Unmute 🔊" : "Mute 🔇"}
+              </button>
+
               <iframe
-                className="w-full h-full rounded-3xl"
+                key={videoKey}
+                className="w-full h-full rounded-2xl"
                 src={getVideoUrl()}
                 allow="autoplay; encrypted-media"
                 allowFullScreen
-                title="Mobile Hero Video"
               />
             </div>
           </div>
         )}
+
+
+        {!playMobileVideo && hero?.videoUrl && (
+          <div className="md:hidden absolute right-4 bottom-20 z-[100] mb-5">
+            <button
+              onClick={() => setPlayMobileVideo(true)}
+              className="h-12 w-12 rounded-2xl bg-white shadow-2xl flex items-center justify-center"
+            >
+              ▶
+            </button>
+          </div>
+        )}
       </div>
+
+
 
       {/* ================= ORIGINAL SEARCH BAR POSITION ================= */}
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-30">
@@ -394,8 +338,8 @@ export default function SearchCard() {
                     router.push(tab.value === "residential" ? "/residential" : "/commercial");
                   }}
                   className={`rounded-full px-4 py-1 text-xs sm:text-sm font-medium transition-all ${propertyType === tab.value
-                      ? "bg-white shadow-md text-gray-900"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
+                    ? "bg-white shadow-md text-gray-900"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200"
                     }`}
                 >
                   {tab.label}
@@ -411,9 +355,17 @@ export default function SearchCard() {
             <input
               value={query}
               onChange={(e) => {
-                setQuery(e.target.value);
-                handleSearch(e.target.value);
+                const value = e.target.value;
+                setQuery(value);
+
+                if (value.trim() === "") {
+                  setResults([]);   // 🔥 immediately clear
+                  return;
+                }
+
+                handleSearch(value);
               }}
+
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="flex-1 bg-transparent text-xs sm:text-sm outline-none placeholder-gray-500"
               placeholder="Search by City, Locality, or Project"
@@ -476,6 +428,6 @@ export default function SearchCard() {
           })}
         </div>
       </div>
-    </section>
+    </section >
   );
 }

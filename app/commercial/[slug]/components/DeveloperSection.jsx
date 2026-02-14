@@ -44,7 +44,7 @@ export default function DeveloperSection({ builder }) {
         {/* STATS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-8 text-center">
           <Stat label="Established" value={builder.establishedYear} icon="🏛️" />
-          <Stat label="Total Projects" value={builder.totalProjects} icon="🏗️" />
+          <Stat label="Total Projects" value={builder.manualTotalProjects} icon="🏗️" />
           <Stat label="Ongoing Projects" value={builder.ongoingProjects} icon="🏢" />
           <Stat label="Cities Present" value={builder.citiesPresent} icon="📍" />
         </div>

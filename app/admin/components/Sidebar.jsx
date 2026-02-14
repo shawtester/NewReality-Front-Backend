@@ -30,16 +30,7 @@ export default function Sidebar() {
       link: "/admin/properties",
       icon: <PackageOpen className="h-5 w-5" />,
     },
-    {
-      name: "Developers",
-      link: "/admin/developers",
-      icon: <User className="h-5 w-5" />,
-    },
-    {
-      name: "Hero Section",
-      link: "/admin/hero",
-      icon: <LayoutDashboard className="h-5 w-5" />,
-    },
+    
     {
       name: "Blogs",
       link: "/admin/blog",
@@ -88,9 +79,14 @@ export default function Sidebar() {
       icon: <Star className="h-5 w-5" />,
     },
     {
+      name: "Location Manager",
+      link: "/admin/locations",
+      icon: <User className="h-5 w-5" />,
+    },
+    {
       name: "Builders Manager",
       link: "/admin/builders",
-      icon: <LibraryBig className="h-5 w-5" />,
+      icon: <User className="h-5 w-5" />,
     },
     {
       name: "Amenities Manager",

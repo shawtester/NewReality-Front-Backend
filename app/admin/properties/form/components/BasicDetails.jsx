@@ -4,9 +4,31 @@ import { useState, useMemo, useEffect } from "react";
 import { uploadBrochureToCloudinary } from "@/lib/cloudinary/uploadBrochure";
 import { useBuilders } from "@/lib/firestore/builders/read";
 import { uploadVideoToCloudinary } from "@/lib/cloudinary/uploadVideo";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
+
 
 
 export default function BasicDetails({ data, handleData }) {
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    const loadLocations = async () => {
+      const snap = await getDocs(collection(db, "locations"));
+      setLocations(
+        snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
+    };
+
+    loadLocations();
+  }, []);
+
+
+
   const [bhkInput, setBhkInput] = useState("");
 
   /* 🔥 BUILDER SEARCH STATES (MISSING THE) */
@@ -75,6 +97,7 @@ export default function BasicDetails({ data, handleData }) {
 
   return (
     <div className="bg-white rounded-xl p-6 space-y-6 shadow-sm">
+
       <h2 className="text-lg font-semibold">
         Basic Details of Property
       </h2>
@@ -189,14 +212,38 @@ export default function BasicDetails({ data, handleData }) {
 
       </div>
 
+      <select
+        value={data.locationId || ""}
+        onChange={(e) => {
+          const selected = locations.find(
+            (l) => l.id === e.target.value
+          );
 
+          handleData("locationId", selected?.id || "");
+          handleData("location", selected?.name || "");
+        }}
+        className="border px-3 py-2 rounded w-full"
+      >
+        <option value="">Select Location</option>
 
+        {locations.map((loc) => (
+          <option key={loc.id} value={loc.id}>
+            {loc.name}
+          </option>
+        ))}
+      </select>
 
-      <Input
-        label="Location"
-        value={data.location}
-        onChange={(v) => handleData("location", v)}
+      <input
+        placeholder="Enter Sector (e.g. Sector 63A)"
+        value={data.sector || ""}
+        onChange={(e) =>
+          handleData("sector", e.target.value)
+        }
+        className="border px-3 py-2 rounded w-full mt-3"
       />
+
+
+
 
       {/* 🔥 DEVELOPER (SEARCHABLE + TYPEABLE DROPDOWN) */}
       <div className="relative">

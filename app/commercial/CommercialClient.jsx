@@ -72,6 +72,63 @@ const filterCommercialByType = (list = [], type) => {
   );
 };
 
+// ✅ COMMERCIAL PRO FILTER ENGINE
+const applyCommercialFilters = ({
+  apartments = [],
+  keyword = "",
+  type = "",
+  status = "",
+  locality = "",
+  budget = "",
+  bhk = ""
+}) => {
+
+  let filtered = apartments.filter(
+    (item) => !item.propertyType || item.propertyType === "commercial"
+  );
+
+  // 🔎 KEYWORD SEARCH
+  if (keyword) {
+    const lower = keyword.toLowerCase();
+
+    filtered = filtered.filter((item) =>
+      item.title?.toLowerCase().includes(lower) ||
+      item.location?.toLowerCase().includes(lower) ||
+      item.developer?.toLowerCase().includes(lower)
+    );
+  }
+
+  // 🏢 TYPE
+  if (type && COMMERCIAL_TYPE_MAP[type]) {
+    filtered = filtered.filter(
+      (item) => item[COMMERCIAL_TYPE_MAP[type]] === true
+    );
+  }
+
+  // 🚧 STATUS
+  if (status) {
+    filtered = filtered.filter(
+      (item) =>
+        item.isNewLaunch && status === "new-launch" ||
+        item.isReadyToMove && status === "ready-to-move" ||
+        item.isUnderConstruction && status === "under-construction" ||
+        item.isPreLaunch && status === "pre-launch"
+    );
+  }
+
+  // 📍 LOCALITY
+  if (locality) {
+    filtered = filtered.filter((item) =>
+      item.location?.toLowerCase().includes(
+        locality.replace(/-/g, " ").toLowerCase()
+      )
+    );
+  }
+
+  return filtered;
+};
+
+
 /* ================= PAGE ================= */
 export default function CommercialPage({ apartments = [] }) {
   const BASE_ROUTE = "/commercial";
@@ -173,11 +230,18 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     }
     setPageTitleDynamic(title);
 
-    if (urlType) {
-      setFilteredApartments(filterCommercialByType(apartments, urlType));
-    } else {
-      setFilteredApartments(filterForCommercial(apartments));
-    }
+    const filtered = applyCommercialFilters({
+      apartments,
+      keyword: urlKeyword,
+      type: urlType,
+      status: urlStatus,
+      locality: urlLocality,
+      budget: urlBudget,
+      bhk: urlBhk
+    });
+
+    setFilteredApartments(filtered);
+
   }, [searchParams, apartments]);
 
   /* ================= BANNER FETCH ================= */
@@ -335,8 +399,8 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${currentImageIndex === index
-                          ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
-                          : 'bg-white/80 hover:bg-white hover:scale-110'
+                        ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
+                        : 'bg-white/80 hover:bg-white hover:scale-110'
                         }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />

@@ -9,7 +9,10 @@ export const defaultProperty = {
     // 🔹 BASIC
     title: "",
     slug: "",
-    location: "",
+    locationName: "",
+    locationId: "",
+    sector: "",
+
     developer: "",
     areaRange: "",
     priceRange: "",

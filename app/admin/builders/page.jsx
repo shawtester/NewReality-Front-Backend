@@ -68,9 +68,8 @@ export default function BuildersPage() {
               <th className="p-3 text-left">Established</th>
               <th className="p-3 text-left">Ongoing</th>
               <th className="p-3 text-left">Cities</th>
-              <th className="p-3 text-left">
-                Total Projects
-              </th>
+              <th className="p-3 text-left">Auto Total</th>
+              <th className="p-3 text-left">Manual Total</th> {/* 🔥 NEW */}
               <th className="p-3 text-left">Logo</th>
               <th className="p-3 text-left">Actions</th>
             </tr>
@@ -120,9 +119,14 @@ export default function BuildersPage() {
                   {b.citiesPresent ?? 0}
                 </td>
 
-                {/* TOTAL PROJECTS */}
+                {/* AUTO TOTAL */}
                 <td className="p-3 font-semibold">
                   {b.totalProjects ?? 0}
+                </td>
+
+                {/* 🔥 MANUAL TOTAL */}
+                <td className="p-3 font-semibold">
+                  {b.manualTotalProjects ?? 0}
                 </td>
 
                 {/* LOGO */}
@@ -165,7 +169,7 @@ export default function BuildersPage() {
               filteredBuilders.length === 0 && (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={10} // 🔥 updated colspan
                     className="p-6 text-center text-gray-400"
                   >
                     No builders found

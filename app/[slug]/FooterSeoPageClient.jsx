@@ -71,7 +71,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
     fetchSeoData();
   }, [slug]);
 
-  let filtered = [...properties];
+  /* ================= ONLY ACTIVE PROPERTIES ================= */
+  let filtered = [...properties].filter((p) => p.isActive === true);
 
   /* ================= SIZE FILTER ================= */
   if (normalizedSlug.includes("bhk")) {
@@ -93,7 +94,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
     "ready-to-move": "isReadyToMove",
     "under-construction": "isUnderConstruction",
     "pre-launch": "isPreLaunch",
-    "trending": "isTrending"
+    "trending": "isTrending",
   };
 
   if (statusMap[normalizedSlug]) {
@@ -152,7 +153,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
     });
   }
 
-  /* ================= LOCATION FILTER ================= */
+  /* ================= LOCATION FILTER (🔥 FIXED) ================= */
   const locationSlugs = [
     "dwarka-expressway",
     "golf-course-road",
@@ -174,7 +175,6 @@ export default function FooterSeoPage({ params, properties = [] }) {
   const finalFiltered = useMemo(() => {
     let result = [...filtered];
 
-    // 🔎 SEARCH FILTER
     if (search) {
       const keyword = search.toLowerCase();
 
@@ -182,27 +182,25 @@ export default function FooterSeoPage({ params, properties = [] }) {
         (p) =>
           p.title?.toLowerCase().includes(keyword) ||
           p.developer?.toLowerCase().includes(keyword) ||
-          p.location?.toLowerCase().includes(keyword)
+          p.location?.toLowerCase().includes(keyword) ||
+          p.sector?.toLowerCase().includes(keyword)
       );
     }
 
-    // 🔥 LATEST CREATED FIRST (Firestore timestamp)
     result.sort((a, b) => {
       const dateA = a?.timestampCreate?.seconds || 0;
       const dateB = b?.timestampCreate?.seconds || 0;
-
       return dateB - dateA;
     });
 
     return result;
   }, [search, filtered]);
 
-
   return (
     <>
       <Header />
 
-      {/* ================= INTRO SECTION ================= */}
+      {/* INTRO */}
       <section className="bg-[#F6FBFF]">
         <div className="max-w-[1240px] mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
@@ -225,7 +223,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
         </div>
       </section>
 
-      {/* ================= LISTING ================= */}
+      {/* LISTING */}
       <section className="max-w-[1240px] mx-auto px-4 py-16">
         <div className="mb-8 flex justify-center">
           <input
@@ -233,14 +231,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
             placeholder="Search property, developer or location..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="
-              w-full max-w-xl
-              border rounded-full
-              px-5 py-3
-              text-sm
-              outline-none
-              focus:ring-2 focus:ring-[#F5A300]
-            "
+            className="w-full max-w-xl border rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#F5A300]"
           />
         </div>
 
@@ -254,7 +245,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
                 property={{
                   title: p.title,
                   builder: p.developer,
-                  location: p.location,
+                  locationName: p.location, // ✅ FIXED
+                  sector: p.sector,        // ✅ FIXED
                   bhk: p.configurations?.join(", "),
                   size: p.areaRange,
                   price: p.priceRange,

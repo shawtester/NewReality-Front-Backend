@@ -20,7 +20,7 @@ export default function LocationSection({
       <h2 className="text-xl font-semibold mb-8">Location</h2>
 
       {/* WRAPPER */}
-      <div className="flex flex-col md:flex-row items-start gap-6 lg:gap-10">
+      <div className="flex flex-col md:flex-row items-start gap-2 lg:gap-5">
 
         {/* ================= LEFT CARD ================= */}
         {(mapQuery || locationImage) && (

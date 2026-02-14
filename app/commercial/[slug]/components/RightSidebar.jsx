@@ -86,7 +86,7 @@ export default function RightSidebar({ property }) {
         {/* 🔥 MOBILE SHARE BOX */}
         <div className="bg-white rounded-xl p-5 text-center shadow-sm">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <p className="font-medium">Share</p>
+            <p className="font-medium">Copy</p>
 
             <button
               onClick={copyPropertyLink}
@@ -211,7 +211,7 @@ export default function RightSidebar({ property }) {
 
           <div className="bg-white rounded-xl p-5 text-center shadow-sm">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <p className="font-medium">Share</p>
+              <p className="font-medium">Copy</p>
 
               <button
                 onClick={copyPropertyLink}

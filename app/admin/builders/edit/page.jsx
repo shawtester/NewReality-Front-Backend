@@ -30,6 +30,7 @@ export default function EditBuilderPage() {
   const [ongoingProjects, setOngoingProjects] = useState("");
   const [citiesPresent, setCitiesPresent] = useState("");
   const [totalProjects, setTotalProjects] = useState(0);
+  const [manualTotalProjects, setManualTotalProjects] = useState(""); // 🔥 NEW
 
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -51,13 +52,14 @@ export default function EditBuilderPage() {
         const data = snap.data();
 
         setName(data.name || "");
-        setDescription(data.description || ""); // 🔥 HTML
+        setDescription(data.description || "");
         setLogo(data.logo || null);
 
         setEstablishedYear(data.establishedYear || "");
         setOngoingProjects(data.ongoingProjects || 0);
         setCitiesPresent(data.citiesPresent || 0);
         setTotalProjects(data.totalProjects || 0);
+        setManualTotalProjects(data.manualTotalProjects || 0); // 🔥 NEW
       } catch {
         toast.error("Failed to load builder");
       }
@@ -99,13 +101,15 @@ export default function EditBuilderPage() {
         id,
         data: {
           name: name.trim(),
-          description, // 🔥 HTML save
+          description,
           logo: logo || null,
           establishedYear: establishedYear
             ? Number(establishedYear)
             : null,
           ongoingProjects: Number(ongoingProjects) || 0,
           citiesPresent: Number(citiesPresent) || 0,
+          manualTotalProjects:
+            Number(manualTotalProjects) || 0, // 🔥 NEW
         },
       });
 
@@ -161,13 +165,13 @@ export default function EditBuilderPage() {
             onChange={setDescription}
             modules={modules}
             formats={formats}
-            bounds="body"      
+            bounds="body"
             className="bg-white"
           />
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="number"
             placeholder="Established Year"
@@ -198,11 +202,23 @@ export default function EditBuilderPage() {
             className="border rounded-lg px-3 py-2 text-sm"
           />
 
+          {/* 🔥 AUTO TOTAL (DISABLED) */}
           <input
             type="number"
             value={totalProjects}
             disabled
             className="border rounded-lg px-3 py-2 text-sm bg-gray-100"
+          />
+
+          {/* 🔥 NEW ADMIN EDITABLE */}
+          <input
+            type="number"
+            placeholder="Manual Total Projects"
+            value={manualTotalProjects}
+            onChange={(e) =>
+              setManualTotalProjects(e.target.value)
+            }
+            className="border rounded-lg px-3 py-2 text-sm"
           />
         </div>
 

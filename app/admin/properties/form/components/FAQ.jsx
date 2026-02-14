@@ -38,6 +38,21 @@ export default function FAQ({ data, handleData }) {
           {f.question} — {f.answer}
         </div>
       ))}
+      <div className="flex items-center gap-3 mt-4">
+        <input
+          type="checkbox"
+          checked={data.isActive}
+          onChange={(e) =>
+            handleData("isActive", e.target.checked)
+          }
+          className="w-4 h-4 accent-[#DBA40D]"
+        />
+
+        <label className="text-sm text-gray-700">
+          Show on Website (Active Property)
+        </label>
+      </div>
+
     </div>
   );
 }

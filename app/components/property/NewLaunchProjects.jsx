@@ -60,11 +60,29 @@ export default function NewLaunchProjects({ properties = [] }) {
         {/* LEFT BUTTON */}
         <button
           onClick={scrollLeft}
-          className="absolute -left-6 top-1/2 -translate-y-1/2 z-20
+          className="hidden sm:block absolute -left-6 top-1/2 -translate-y-1/2 z-20
   text-gray-400 hover:text-gray-800 transition"
         >
           <ChevronLeft size={40} />
         </button>
+
+
+        {/* MOBILE ARROWS */}
+        <div className="flex sm:hidden justify-center gap-44 mb-4">
+          <button
+            onClick={scrollLeft}
+            className="bg-gray-200 rounded-full w-9 h-9 flex items-center justify-center"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <button
+            onClick={scrollRight}
+            className="bg-gray-200 rounded-full w-9 h-9 flex items-center justify-center"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
 
 
         {/* SCROLL CONTAINER */}
@@ -75,7 +93,7 @@ export default function NewLaunchProjects({ properties = [] }) {
           {newLaunch.map((p) => (
             <div
               key={p.id}
-              className="min-w-[320px] max-w-[320px] flex-shrink-0"
+              className="w-full sm:min-w-[320px] sm:max-w-[320px] flex-shrink-0"
             >
               <PropertyCard
                 property={{
@@ -94,14 +112,16 @@ export default function NewLaunchProjects({ properties = [] }) {
           ))}
         </div>
 
+
         {/* RIGHT BUTTON */}
         <button
           onClick={scrollRight}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 z-20
+          className="hidden sm:block absolute -right-6 top-1/2 -translate-y-1/2 z-20
   text-gray-400 hover:text-gray-800 transition"
         >
           <ChevronRight size={40} />
         </button>
+
 
 
       </div>

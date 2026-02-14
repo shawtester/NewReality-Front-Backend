@@ -1,11 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import Link from "next/link";
 import PropertyCard from "./PropertyCard";
 import slugify from "slugify";
 
 export default function TrendingProjects({ properties = [] }) {
+
+  const scrollRef = useRef(null);
+
+  const scrollLeft = () => {
+    scrollRef.current?.scrollBy({ left: -340, behavior: "smooth" });
+  };
+
+  const scrollRight = () => {
+    scrollRef.current?.scrollBy({ left: 340, behavior: "smooth" });
+  };
+
   //  Filter + Latest First Sorting
   const trending = properties
     .filter((p) => p?.isTrending)
@@ -43,31 +56,51 @@ export default function TrendingProjects({ properties = [] }) {
       </div>
 
       {/* CARDS */}
-      <div className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth p-2 pb-8 mt-6">
-        {trending.map((p) => (
-          <div
-            key={p.id}
-            className="min-w-[320px] max-w-[320px] flex-shrink-0"
-          >
-            <PropertyCard
-              property={{
-                title: p.title,
-                builder: p.developer,
-                locationName: p.location,
-                sector: p.sector,
-                bhk: p.configurations?.join(", "),
-                size: p.areaRange,
-                price: p.priceRange,
-                img: p.mainImage?.url || "/placeholder.png",
+      {/* CARDS */}
+      <div className="relative mt-6 px-6">
 
-                //  SLUG FIRST ELSE ID
-                slug: p.slug || p.id,
-                isRera: p.isRera,
-              }}
-            />
-          </div>
-        ))}
+        <button
+          onClick={scrollLeft}
+          className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 text-gray-400 hover:text-gray-800 transition"
+        >
+          <ChevronLeft size={40} />
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth p-2 pb-8"
+        >
+          {trending.map((p) => (
+            <div
+              key={p.id}
+              className="min-w-[320px] max-w-[320px] flex-shrink-0"
+            >
+              <PropertyCard
+                property={{
+                  title: p.title,
+                  builder: p.developer,
+                  location: p.location,
+                  bhk: p.configurations?.join(", "),
+                  size: p.areaRange,
+                  price: p.priceRange,
+                  img: p.mainImage?.url || "/placeholder.png",
+                  slug: p.slug || p.id,
+                  isRera: p.isRera,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={scrollRight}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 text-gray-400 hover:text-gray-800 transition"
+        >
+          <ChevronRight size={40} />
+        </button>
+
       </div>
+
     </section>
   );
 }

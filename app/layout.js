@@ -29,7 +29,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster />
-        <NextUIProvider>{children}</NextUIProvider>
+        <NextUIProvider>
+          {/* global offset for fixed navbar */}
+          <main className="pt-[102px] min-h-screen">
+            {children}
+          </main>
+</NextUIProvider>
         <StickyIcons />
       </body>
     </html>

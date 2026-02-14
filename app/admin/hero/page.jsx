@@ -121,6 +121,12 @@ export default function HeroAdminPage() {
       {/* 🔥 VIDEO SECTION */}
       <div className="space-y-4 p-6 border rounded-xl bg-gray-50">
         <h2 className="text-lg font-medium">Video Settings</h2>
+        <h4 className="text-sm text-gray-600 mt-2">
+          example of links:
+          YouTube Example: https://www.youtube.com/watch?v=abcd1234 <br />
+          Instagram Reel Example: https://www.instagram.com/reel/ABC123XYZ/
+        </h4>
+
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Video URL */}

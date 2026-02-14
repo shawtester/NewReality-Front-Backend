@@ -8,6 +8,14 @@ import BrandEnquiryPopup from "./BrandEnquiryPopup";
 export default function BrandCTA({ propertyTitle }) {
   const [openEnquiry, setOpenEnquiry] = useState(false);
 
+  // 🔥 DYNAMIC WHATSAPP MESSAGE WITH PROPERTY NAME
+  const getWhatsAppLink = () => {
+    const encodedMessage = encodeURIComponent(
+      `Hi Neev Realty, I would like to schedule a site visit for ${propertyTitle}.`
+    );
+    return `https://wa.me/918368607767?text=${encodedMessage}`;
+  };
+
   return (
     <>
       <div className="bg-white rounded-xl p-5 text-center shadow-sm">
@@ -40,11 +48,13 @@ export default function BrandCTA({ propertyTitle }) {
         <p className="mt-4 text-sm text-gray-500">Connect us via</p>
 
         <div className="flex justify-center mt-2">
+          {/* ✅ DYNAMIC PROPERTY NAME IN WHATSAPP */}
           <a
-            href="https://wa.me/918824966669"
+            href={getWhatsAppLink()}
             target="_blank"
             rel="noreferrer"
             className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition"
+            title={`Message about ${propertyTitle}`}
           >
             <FaWhatsapp className="text-xl" />
           </a>

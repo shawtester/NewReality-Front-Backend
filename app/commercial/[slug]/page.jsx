@@ -137,7 +137,7 @@ export default async function PropertyPage({ params }) {
     <ApartmentClient>
       <AutoPopup propertyTitle={cleanProperty.title} />
 
-      <section className="max-w-[1240px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
+      <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
           <MobileGallery
@@ -181,6 +181,7 @@ export default async function PropertyPage({ params }) {
           <SimilarProjectsSection
             projects={allProjects}
             currentSlug={cleanProperty.slug}
+            currentDeveloper={cleanProperty.builderName}
           />
 
           <DisclaimerSection text={cleanProperty.disclaimer} />

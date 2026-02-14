@@ -53,7 +53,7 @@ export default function Image({ data, handleData }) {
 
       {/* 🔹 MAIN IMAGE */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">Main Image (Primary Banner  820x437)</p>
+        <p className="text-sm font-medium">Main Image (Primary Banner  Dimension:1640 × 772 px)</p>
         <input
           type="file"
           accept="image/*"

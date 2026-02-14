@@ -355,104 +355,103 @@ export default function ResidentialPage({ apartments = [] }) {
             </section>
 
             {/* ✅ FIXED BANNER - EXACT REFERENCE SIZING */}
-            <section className="bg-white">
-                <div className="max-w-[1440px] mx-auto px-4 py-6">
-                    <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
-                        Trending <span className="text-[#F5A300]">Projects</span>
-                    </h2>
+           {/* ✅ FIXED BANNER - FULL IMAGE VISIBLE (NO CROPPING) */}
+<section className="bg-white">
+    <div className="max-w-[1440px] mx-auto px-4 ">
+        <h2 className="text-center text-3xl sm:text-2xl font-bold ">
+            Trending <span className="text-[#F5A300]">Projects</span>
+        </h2>
 
-                    <div className="
-                        relative w-full 
-                        h-[220px] 
-                        sm:h-[260px] 
-                        md:h-[300px] 
-                        lg:h-[420px] 
-                        xl:h-[480px] 
-                        rounded-2xl 
-                        overflow-hidden 
-                        shadow-2xl
-                    ">
-                        {banner?.images && totalImages > 0 ? (
-                            <>
-                                {/* Images Layer */}
-                                <div className="absolute inset-0 w-full h-full pointer-events-none">
-                                    {banner.images.map((imageUrl, index) => (
-                                        <div
-                                            key={`${imageUrl}-${index}`}
-                                            className="absolute inset-0 w-full h-full"
-                                            style={{
-                                                opacity: currentImageIndex === index ? 1 : 0,
-                                                transition: "opacity 1000ms ease-in-out"
-                                            }}
-                                        >
-                                            <Image
-                                                src={imageUrl}
-                                                alt={`Trending Project ${index + 1}`}
-                                                fill
-                                                sizes="100vw"
-                                                className="
-                                                    object-contain 
-                                                    lg:object-cover 
-                                                    object-center 
-                                                    w-full 
-                                                    h-full
-                                                "
-                                                priority={index === 0}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Click Overlay */}
-                                <div
-                                    className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
-                                    onClick={handleBannerImageClick}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter" || e.key === " ") {
-                                            e.preventDefault();
-                                            handleBannerImageClick();
-                                        }
-                                    }}
-                                    title={`Click to visit project (Image ${currentImageIndex + 1})`}
+        <div className="
+            relative w-full 
+            h-[120px] 
+            sm:h-[180px] 
+            md:h-[210px] 
+            lg:h-[280px] 
+            xl:h-[360px] 
+            rounded-2xl 
+            overflow-hidden 
+           bg-transparent
+         
+            
+        ">
+            {banner?.images && totalImages > 0 ? (
+                <>
+                    {/* Images Layer */}
+                    <div className="absolute inset-0 w-full h-full pointer-events-none">
+                        {banner.images.map((imageUrl, index) => (
+                            <div
+                                key={`${imageUrl}-${index}`}
+                                className="absolute inset-0 w-full h-full flex items-center justify-center"
+                                style={{
+                                    opacity: currentImageIndex === index ? 1 : 0,
+                                    transition: "opacity 1000ms ease-in-out"
+                                }}
+                            >
+                                <Image
+                                    src={imageUrl}
+                                    alt={`Trending Project ${index + 1}`}
+                                    fill
+                                    sizes="120vw"
+                                    className="
+                                        object-contain 
+                                        object-center 
+                                        w-full 
+                                        h-full
+                                    "
+                                    priority={index === 0}
                                 />
-
-                                {/* Dots */}
-                                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full px-3 py-1.5">
-                                    {banner.images.map((_, index) => (
-                                        <button
-                                            key={index}
-                                            onClick={() => setCurrentImageIndex(index)}
-                                            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                                                currentImageIndex === index
-                                                    ? "bg-[#F5A300] scale-125"
-                                                    : "bg-white/80 hover:bg-white"
-                                            }`}
-                                            aria-label={`Go to slide ${index + 1}`}
-                                        />
-                                    ))}
-                                </div>
-                            </>
-                        ) : (
-                            <Image
-                                src={banner?.image || "/default-banner.jpg"}
-                                alt="Trending Banner"
-                                fill
-                                sizes="100vw"
-                                className="object-contain lg:object-cover object-center w-full h-full"
-                                priority
-                            />
-                        )}
+                            </div>
+                        ))}
                     </div>
 
-                    {/* Debug info (remove in production) */}
-                    {process.env.NODE_ENV === 'development' && (
-                        <div className="text-xs text-gray-500 mt-2 text-center">
-                        </div>
-                    )}
+                    {/* Click Overlay */}
+                    <div
+                        className="absolute inset-0 w-full h-full z-20 bg-transparent  transition-all duration-300 cursor-pointer rounded-2xl"
+                        onClick={handleBannerImageClick}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleBannerImageClick();
+                            }
+                        }}
+                        title={`Click to visit project (Image ${currentImageIndex + 1})`}
+                    />
+
+                    {/* Dots */}
+                    {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
+                        {banner.images.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentImageIndex(index)}
+                                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                    currentImageIndex === index
+                                        ? "bg-[#F5A300] scale-125"
+                                        : "bg-white/80 hover:bg-white"
+                                }`}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
+                    </div> */}
+                </>
+            ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                        src={banner?.image || "/default-banner.jpg"}
+                        alt="Trending Banner"
+                        fill
+                        sizes="100vw"
+                        className="object-contain object-center w-full h-full"
+                        priority
+                    />
                 </div>
-            </section>
+            )}
+        </div>
+    </div>
+</section>
+
 
             {/* HERO + SEARCH */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">

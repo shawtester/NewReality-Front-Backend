@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -20,6 +20,14 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   /* ✅ NEW STATES */
   const [errors, setErrors] = useState({});
   const [showThankYou, setShowThankYou] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = showLoanPopup ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showLoanPopup]);
+
 
   /* ================= EMI CALC ================= */
   const { emi, totalInterest, totalPayment } = useMemo(() => {
@@ -97,28 +105,30 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
         createdAt: serverTimestamp(),
       });
 
-      /* THANK YOU POPUP */
-      setShowThankYou(true);
-
-      setTimeout(() => {
-        setShowThankYou(false);
-        setShowLoanPopup(false);
-      }, 2000);
-
+      // Clear form
       setName("");
       setPhone("");
       setEmail("");
+
+      // 🔥 CLOSE FORM FIRST
+      setShowLoanPopup(false);
+
+      // 🔥 SHOW THANK YOU AFTER CLOSE
+      setTimeout(() => setShowThankYou(true), 150);
+      setTimeout(() => setShowThankYou(false), 2200);
 
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
     <>
       {/* ================= EMI CALCULATOR ================= */}
       <section id="emi" className="max-w-[1240px] mx-auto px-4 mt-14">
         <h2 className="text-xl font-semibold mb-6">EMI Calculator</h2>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-[#F6FAFF] p-6 rounded-xl">
 
@@ -209,19 +219,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       {showLoanPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
 
-          {showThankYou && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-              <div className="bg-white rounded-xl px-6 py-5 text-center shadow-xl">
-                <h3 className="text-lg font-semibold text-[#c8950a]">
-                  Thank You 🙌
-                </h3>
-                <p className="text-sm mt-1">
-                  Our team will contact you shortly.
-                </p>
-              </div>
-            </div>
-          )}
-
           <div className="bg-white w-full max-w-md rounded-xl p-6 relative">
 
             <button
@@ -232,6 +229,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
             </button>
 
             <h3 className="text-xl font-semibold mb-1">Apply for Loan</h3>
+            <p className="py-2">Our loan expert will contact you shortly</p>
 
             <div className="space-y-3">
               <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
@@ -254,6 +252,20 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
           </div>
         </div>
       )}
+      {/* ================= THANK YOU POPUP ================= */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-xl p-20 text-center shadow-xl animate-fadeIn">
+            <h3 className="text-lg font-semibold text-[#c8950a]">
+              Thank You 🙌
+            </h3>
+            <p className="text-sm mt-1">
+              Our team will contact you shortly.
+            </p>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }

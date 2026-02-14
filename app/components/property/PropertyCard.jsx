@@ -121,7 +121,7 @@ export default function PropertyCard({ property = {}, baseRoute = "residential" 
             </p>
 
             <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
-               {[sector, locationName].filter(Boolean).join(", ")}
+              {[sector, locationName].filter(Boolean).join(", ")}
             </p>
 
             <div className="mt-2 flex items-center justify-between text-[11px] md:text-xs lg:text-sm text-gray-500">
@@ -268,8 +268,8 @@ export default function PropertyCard({ property = {}, baseRoute = "residential" 
 
       {/* ✅ THANK YOU POPUP */}
       {showThankYou && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl px-20 py-18 text-center shadow-xl animate-fadeIn">
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-xl px-20 py-16 text-center shadow-xl animate-fadeIn">
             <h3 className="text-lg font-semibold text-[#c8950a]">
               Thank You 🙌
             </h3>
@@ -279,6 +279,7 @@ export default function PropertyCard({ property = {}, baseRoute = "residential" 
           </div>
         </div>
       )}
+
     </>
   );
 }

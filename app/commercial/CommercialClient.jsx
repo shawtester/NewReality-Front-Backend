@@ -345,21 +345,21 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
       {/* ✅ FIXED BANNER - CLICK WORKS EVERYWHERE */}
      <section className="bg-white">
-         <div className="max-w-[1440px] mx-auto px-4 py-6">
-             <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
+         <div className="max-w-[1440px] mx-auto px-4 ">
+             <h2 className="text-center text-xl sm:text-2xl font-bold">
                  Trending <span className="text-[#F5A300]">Projects</span>
              </h2>
      
              <div className="
-                 relative w-full 
-                 h-[220px] 
-                 sm:h-[140px] 
-                 md:h-[240px] 
-                 lg:h-[340px] 
-                 xl:h-[420px] 
-                 rounded-2xl 
-                 overflow-hidden 
-                bg-transparent
+                   relative w-full 
+            h-[120px] 
+            sm:h-[180px] 
+            md:h-[210px] 
+            lg:h-[280px] 
+            xl:h-[360px] 
+            rounded-2xl 
+            overflow-hidden 
+           bg-transparent
              ">
                  {banner?.images && totalImages > 0 ? (
                      <>
@@ -407,7 +407,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                          />
      
                          {/* Dots */}
-                         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
+                         {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
                              {banner.images.map((_, index) => (
                                  <button
                                      key={index}
@@ -420,7 +420,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                                      aria-label={`Go to slide ${index + 1}`}
                                  />
                              ))}
-                         </div>
+                         </div> */}
                      </>
                  ) : (
                      <div className="absolute inset-0 flex items-center justify-center">

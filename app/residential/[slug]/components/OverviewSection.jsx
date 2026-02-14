@@ -75,7 +75,7 @@ export default function OverviewSection({ overview, propertyTitle }) {
           {/* TITLE (LEFT ALIGNED) */}
           <div className="mb-5 text-left">
             {overview.title && (
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
+              <h2 className="text-xl md:text-xl font-semibold text-gray-900">
                 {overview.title}
               </h2>
             )}

@@ -35,6 +35,7 @@ export default function SimilarProjectsSection({
           <div
             key={p.slug || p.id}
             className="
+              group
               min-w-[220px] max-w-[220px]
               sm:min-w-[240px] sm:max-w-[240px]
               md:min-w-[260px] md:max-w-[260px]
@@ -44,14 +45,9 @@ export default function SimilarProjectsSection({
             <PropertyCard
               property={{
                 title: p.title,
-
-                // ✅ PropertyCard expects builder
                 builder: p.developer,
-
-                // ✅ FIXED LOCATION STRUCTURE
                 locationName: p.location,
                 sector: p.sector,
-
                 bhk: p.configurations?.join(", "),
                 size: p.areaRange,
                 price: p.priceRange,

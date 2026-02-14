@@ -162,7 +162,7 @@ export default function RightSidebar({ property }) {
             </div>
 
             {/* VIDEO / IMAGE */}
-            <div className="relative flex-1 bg-black m-2 rounded-lg overflow-hidden">
+            <div className="relative bg-black m-2 rounded-lg overflow-hidden h-[235px]">
               {videoUrl ? (
                 videoUrl.includes("youtu") ? (
                   <iframe
@@ -180,7 +180,7 @@ export default function RightSidebar({ property }) {
               ) : (
                 mainImage && (
                   <Image
-                    src={galleryImages[3]}
+                    src={galleryImages[3] || mainImage}
                     alt=""
                     fill
                     className="object-cover"

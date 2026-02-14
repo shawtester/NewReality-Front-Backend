@@ -23,7 +23,7 @@ export default function MobileGallery({ images = [], title = "" }) {
         className="
           relative w-full
           max-w-[380px] md:max-w-[750px] lg:max-w-[820px]
-          aspect-[15/8]
+          aspect-[17/8]
           mx-auto rounded-xl overflow-hidden
           cursor-pointer
         "

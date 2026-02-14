@@ -82,7 +82,6 @@ const applyCommercialFilters = ({
   budget = "",
   bhk = ""
 }) => {
-
   let filtered = apartments.filter(
     (item) => !item.propertyType || item.propertyType === "commercial"
   );
@@ -90,7 +89,6 @@ const applyCommercialFilters = ({
   // 🔎 KEYWORD SEARCH
   if (keyword) {
     const lower = keyword.toLowerCase();
-
     filtered = filtered.filter((item) =>
       item.title?.toLowerCase().includes(lower) ||
       item.location?.toLowerCase().includes(lower) ||
@@ -128,7 +126,6 @@ const applyCommercialFilters = ({
   return filtered;
 };
 
-
 /* ================= PAGE ================= */
 export default function CommercialPage({ apartments = [] }) {
   const BASE_ROUTE = "/commercial";
@@ -165,18 +162,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   const formatFilterName = (value) =>
     value?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 
-  /* ================= BANNER UTILITIES - IDENTICAL TO RESIDENTIAL ================= */
+  /* ================= BANNER UTILITIES - FIXED ✅ ================= */
   const getCurrentImageLink = useCallback((index) => {
-    // Priority 1: Check imageLinks map (your admin panel links)
-    if (banner?.imageLinks) {
+    // ✅ PRIORITY 1: Check imageLinks Object (main commercial page)
+    if (banner?.imageLinks && typeof banner.imageLinks === 'object') {
       const imageLinksArray = Object.entries(banner.imageLinks);
-      if (imageLinksArray[index]) {
-        return imageLinksArray[index][1]; // Returns the LINK
-      }
+      return imageLinksArray[index]?.[1] || null;
     }
-    // Priority 2: Fallback to images array (no link)
-    return null;
-  }, [banner?.imageLinks]);
+    
+    // ✅ PRIORITY 2: Check images array (retail/sco banners)
+    if (banner?.images && Array.isArray(banner.images)) {
+      return banner.images[index] || null;
+    }
+    
+    // ✅ PRIORITY 3: Fallback single image
+    return banner?.image || null;
+  }, [banner]);
 
   const handleBannerImageClick = useCallback(() => {
     const link = getCurrentImageLink(currentImageIndex);
@@ -185,9 +186,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     } else {
-      console.warn("⚠️ No link found for image at index:", currentImageIndex);
+      console.warn("⚠️ No link found for image at index:", currentImageIndex, "Banner:", banner);
     }
-  }, [currentImageIndex, getCurrentImageLink]);
+  }, [currentImageIndex, getCurrentImageLink, banner]);
 
   /* ================= FILTER HANDLER ================= */
   const handleFilterChange = useCallback((filterName, value) => {
@@ -241,10 +242,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     });
 
     setFilteredApartments(filtered);
-
   }, [searchParams, apartments]);
 
-  /* ================= BANNER FETCH ================= */
+  /* ================= BANNER FETCH - ROBUST ✅ ================= */
   useEffect(() => {
     let category = "commercial";
     const urlType = searchParams.get("type");
@@ -255,7 +255,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     const fetchBanner = async () => {
       try {
         const data = await getBanner(category);
-        console.log("📸 Commercial banner data:", data);
+        console.log("📸", category, "banner data:", data);
         setBanner(data);
 
         if (data?.introText) setIntroText(data.introText);
@@ -264,7 +264,8 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
         if (data?.pageTitle) setPageTitle(data.pageTitle);
         else setPageTitle(pageTitleDynamic);
       } catch (err) {
-        console.error('Banner fetch failed:', err);
+        console.error('Banner fetch failed:', category, err);
+        setBanner(null);
       }
     };
 
@@ -289,11 +290,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     return [...filteredApartments].sort((a, b) => {
       const dateA = a?.timestampCreate?.seconds || 0;
       const dateB = b?.timestampCreate?.seconds || 0;
-
       return dateB - dateA; // 🔥 Latest first
     });
   }, [filteredApartments]);
-
 
   /* ================= PAGINATION ================= */
   const handlePageChange = useCallback((newPage) => {
@@ -344,71 +343,85 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
         </div>
       </section>
 
-      {/* ✅ COMPLETE BANNER - IDENTICAL TO RESIDENTIAL */}
-      <section className="bg-white py-6">
-        <div className="max-w-[1440px] mx-auto px-4">
-          <h2 className="text-center text-2xl font-bold mb-6">
+      {/* ✅ FIXED BANNER - CLICK WORKS EVERYWHERE */}
+      <section className="bg-white">
+        <div className="max-w-[1440px] mx-auto px-4 py-6">
+          <h2 className="text-center text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
             Trending <span className="text-[#F5A300]">Projects</span>
           </h2>
 
-          <div className="relative w-full h-[220px] xs:h-[240px] sm:h-[260px] md:h-[300px] lg:h-[350px] rounded-2xl overflow-hidden shadow-2xl">
+          <div className="
+            relative w-full 
+            h-[220px] 
+            sm:h-[260px] 
+            md:h-[300px] 
+            lg:h-[420px] 
+            xl:h-[480px] 
+            rounded-2xl 
+            overflow-hidden 
+            shadow-2xl
+          ">
             {banner?.images && totalImages > 0 ? (
               <>
-                {/* Images Layer - Uses YOUR images array */}
+                {/* Images Layer */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none">
                   {banner.images.map((imageUrl, index) => (
                     <div
-                      key={index}
+                      key={`${imageUrl}-${index}`}
                       className="absolute inset-0 w-full h-full"
                       style={{
                         opacity: currentImageIndex === index ? 1 : 0,
-                        transition: 'opacity 1000ms ease-in-out'
+                        transition: "opacity 1000ms ease-in-out"
                       }}
                     >
                       <Image
                         src={imageUrl}
                         alt={`Trending Commercial Project ${index + 1}`}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                        className="object-cover"
+                        sizes="100vw"
+                        className="
+                          object-contain 
+                          lg:object-cover 
+                          object-center 
+                          w-full 
+                          h-full
+                        "
                         priority={index === 0}
                       />
                     </div>
                   ))}
                 </div>
 
-                {/* ✅ CLICK OVERLAY - Gets link from YOUR imageLinks map */}
+                {/* ✅ CLICK OVERLAY - NOW WORKS ON ALL PAGES */}
                 <div
                   className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-black/20 transition-all duration-300 cursor-pointer rounded-2xl"
                   onClick={handleBannerImageClick}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       handleBannerImageClick();
                     }
                   }}
-                  title={`Click to visit ${getCurrentImageLink(currentImageIndex) || 'project page'}`}
+                  title={`Click to visit project (Image ${currentImageIndex + 1})`}
                 />
 
                 {/* Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full p-1.5">
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/30 rounded-full px-3 py-1.5">
                   {banner.images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${currentImageIndex === index
-                        ? 'bg-[#F5A300] scale-125 shadow-[#F5A300]/50'
-                        : 'bg-white/80 hover:bg-white hover:scale-110'
-                        }`}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        currentImageIndex === index
+                          ? "bg-[#F5A300] scale-125"
+                          : "bg-white/80 hover:bg-white"
+                      }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
                   ))}
                 </div>
-
-                {/* Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent/0 z-20 pointer-events-none" />
               </>
             ) : (
               <Image
@@ -416,7 +429,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 alt="Trending Commercial Banner"
                 fill
                 sizes="100vw"
-                className="object-cover"
+                className="object-contain lg:object-cover object-center w-full h-full"
                 priority
               />
             )}

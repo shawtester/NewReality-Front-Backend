@@ -30,6 +30,11 @@ export default function Sidebar() {
       link: "/admin/properties",
       icon: <PackageOpen className="h-5 w-5" />,
     },
+    {
+      name: "Hero section",
+      link: "/admin/hero",
+      icon: <PackageOpen className="h-5 w-5" />,
+    },
     
     {
       name: "Blogs",

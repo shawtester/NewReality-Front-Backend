@@ -217,15 +217,16 @@ export default function SearchCard() {
   };
 
   return (
-    <section className="relative w-full   ">
+    <section className="relative w-full ">
       {/* HERO CONTAINER */}
       <div className="relative w-full h-[304px] sm:h-[304px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
-        <div
-          className="absolute inset-0 z-[25] cursor-pointer "
-          onClick={handleHeroImageClick}
-        >
-          {renderHeroBackground()}
-        </div>
+       <div 
+  className="absolute inset-0 z-[25] cursor-pointer max-md:bottom-20"
+  onClick={handleHeroImageClick}
+>
+  {renderHeroBackground()}
+</div>
+
 
         <button
           onClick={goPrev}

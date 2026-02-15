@@ -157,8 +157,10 @@ export default function FooterSeoPage({ params, properties = [] }) {
   const locationSlugs = [
     "dwarka-expressway",
     "golf-course-road",
+    "golf-course-extension",
     "sohna-road",
     "new-gurgaon",
+    "old-gurgaon",
     "spr",
     "nh8",
   ];

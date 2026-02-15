@@ -78,13 +78,19 @@ export default async function PropertyPage({ params }) {
     property.amenities || []
   );
 
+  const locationString =
+    [property.sector, property.locationName]
+      .filter(Boolean)
+      .join(", ") || property.location || "";
+
   /* ================= CLEAN PROPERTY ================= */
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
     title: property.title,
-    location: property.location,
-
+    location: locationString,
+    sector: property.sector || "",
+    locationName: property.locationName || "",
     builderId: property.builderId || null,
     builderName: property.developer || "",
     configurations: property.configurations || [],

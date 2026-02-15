@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -20,6 +21,14 @@ export default function TitleBlockWithBrochure({ property }) {
   /* ✅ NEW — ERRORS */
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    document.body.style.overflow = showBrochurePopup ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showBrochurePopup]);
+
+
   const validate = () => {
     const newErrors = {};
 
@@ -38,9 +47,7 @@ export default function TitleBlockWithBrochure({ property }) {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   async function handleSubmit() {
-    /* ✅ VALIDATION */
     if (!validate()) return;
 
     try {
@@ -50,31 +57,41 @@ export default function TitleBlockWithBrochure({ property }) {
         propertyTitle: property.title,
         createdAt: serverTimestamp(),
       });
-      /* ✅ THANK YOU POPUP */
-      setShowThankYou(true);
 
+      // Clear form
+      setLead({ name: "", email: "", phone: "" });
+
+      // 🔥 CLOSE FORM FIRST
+      setShowBrochurePopup(false);
+
+      // 🔥 SHOW THANK YOU AFTER CLOSE
+      setTimeout(() => setShowThankYou(true), 150);
+
+      // 🔥 Download brochure
       if (property?.brochure?.url) {
         setTimeout(() => {
           window.open(property.brochure.url, "_blank");
-        }, 1800);
-      } else {
-        alert("Brochure not available");
+        }, 400);
       }
 
+      // 🔥 Hide thank you after 2 sec
+      setTimeout(() => setShowThankYou(false), 2200);
 
-      setTimeout(() => {
-        setShowThankYou(false);
-        setShowBrochurePopup(false);
-      }, 2000);
-
-      setLead({ name: "", email: "", phone: "" });
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
     }
   }
 
+
+
   if (!property || typeof property !== "object") return null;
+
+  const {
+    sector = "",
+    locationName = "",
+  } = property;
+
 
   return (
     <>
@@ -87,7 +104,11 @@ export default function TitleBlockWithBrochure({ property }) {
               {property.title}
             </h1>
 
-            <p className="text-sm text-[#F5A300]">{property.location}</p>
+            <p className="text-sm text-[#F5A300]">
+              {property.location}
+            </p>
+
+
 
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
               {typeof property.builderName === "string" && (
@@ -165,19 +186,6 @@ export default function TitleBlockWithBrochure({ property }) {
       {showBrochurePopup && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
 
-          {/* ✅ THANK YOU POPUP */}
-          {showThankYou && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-              <div className="bg-white rounded-xl p-20 text-center shadow-xl">
-                <h3 className="text-lg font-semibold text-[#c8950a]">
-                  Thank You 🙌
-                </h3>
-                <p className="text-sm mt-1">
-                  Your brochure is downloading.
-                </p>
-              </div>
-            </div>
-          )}
 
 
           <div className="relative w-full max-w-md bg-white rounded-xl p-6">
@@ -256,6 +264,19 @@ export default function TitleBlockWithBrochure({ property }) {
             >
               Download Brochure
             </button>
+          </div>
+        </div>
+      )}
+      {/* ✅ THANK YOU POPUP */}
+      {showThankYou && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+          <div className="bg-white rounded-xl p-20 text-center shadow-xl">
+            <h3 className="text-lg font-semibold text-[#c8950a]">
+              Thank You 🙌
+            </h3>
+            <p className="text-sm mt-1">
+              Your brochure is downloading.
+            </p>
           </div>
         </div>
       )}

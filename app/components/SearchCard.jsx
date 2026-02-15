@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { FiMapPin, FiSearch, FiX } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -33,6 +33,8 @@ export default function SearchCard() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const controllerRef = useRef(null);
+
 
   const [hero, setHero] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -111,24 +113,51 @@ export default function SearchCard() {
 
   /* ================= SEARCH ================= */
   const handleSearch = async (text = query) => {
-    if (!text.trim()) {
+    const trimmed = text.trim();
+
+    // 🔥 If empty → clear and stop everything
+    if (!trimmed) {
+      if (controllerRef.current) {
+        controllerRef.current.abort();
+      }
       setResults([]);
       return;
     }
 
+    // 🔥 Cancel previous request
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
     try {
       setLoading(true);
+
       const res = await fetch(
-        `/api/search?q=${text}&propertyType=${propertyType}`
+        `/api/search?q=${trimmed}&propertyType=${propertyType}`,
+        { signal: controller.signal }
       );
+
       const data = await res.json();
-      setResults(Array.isArray(data) ? data : []);
+
+      // 🔥 Double check input still same
+      if (trimmed === query.trim()) {
+        setResults(Array.isArray(data) ? data : []);
+      }
+
     } catch (err) {
-      console.error("Search error", err);
+      if (err.name !== "AbortError") {
+        console.error("Search error", err);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+
+
 
 
   /* ================= AUTO SLIDER ================= */
@@ -274,7 +303,9 @@ export default function SearchCard() {
               onClick={() => {
                 setPlayMobileVideo(false);
                 setIsMuted(false);
+                setVideoKey(prev => prev + 1);   // 🔥 force iframe reload
               }}
+
               className="absolute top-4 right-4 text-white text-2xl z-[90]"
             >
               ✕
@@ -360,12 +391,6 @@ export default function SearchCard() {
               onChange={(e) => {
                 const value = e.target.value;
                 setQuery(value);
-
-                if (value.trim() === "") {
-                  setResults([]);   // 🔥 immediately clear
-                  return;
-                }
-
                 handleSearch(value);
               }}
 

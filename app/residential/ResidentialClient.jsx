@@ -519,10 +519,8 @@ export default function ResidentialPage({ apartments = [] }) {
                                     className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
                                 >
                                     <option value="" disabled hidden>Type</option>
-                                    <option value="apartment">Apartments</option>
+                                    <option value="apartment">Luxury Apartments</option>
                                     <option value="builder-floor">Builder Floor</option>
-                                    <option value="villa">Villas</option>
-                                    <option value="plot">Plots</option>
                                 </select>
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
                             </div>

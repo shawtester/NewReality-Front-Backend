@@ -11,7 +11,8 @@ import { updateHero } from "@/lib/firestore/hero/write";
 
 export default function HeroAdminPage() {
   const [data, setData] = useState({
-    images: [], // ✅ Array of objects { url, link }
+    mobileImages: [],
+    desktopImages: [],
     videoUrl: "",
     mediaType: "youtube",
   });
@@ -19,47 +20,49 @@ export default function HeroAdminPage() {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
 
-  /* ================= FETCH EXISTING HERO ================= */
+  /* ================= FETCH HERO ================= */
+  const fetchHeroData = async () => {
+    try {
+      const res = await getHero();
+      if (!res) return;
+
+      setData({
+        mobileImages: res.mobileImages || [],
+        desktopImages: res.desktopImages || [],
+        videoUrl: res.videoUrl || "",
+        mediaType: res.mediaType || "youtube",
+      });
+    } catch (err) {
+      console.error("Fetch failed:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getHero();
-        if (!res) return;
-
-        setData({
-          images: res.images || [],
-          videoUrl: res.videoUrl || "",
-          mediaType: res.mediaType || "youtube",
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchData();
+    fetchHeroData();
   }, []);
 
   /* ================= IMAGE UPLOAD ================= */
-  const handleImage = async (files) => {
-    if (!files || files.length === 0) return;
+  const handleUpload = async (files, type) => {
+    if (!files?.length) return;
 
     try {
       setImgLoading(true);
 
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const url = await uploadToCloudinary(file);
-        return { url, link: "" }; // ✅ Add empty link initially
-      });
-
-      const uploadedImages = await Promise.all(uploadPromises);
+      const uploadedImages = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const url = await uploadToCloudinary(file);
+          return { url, link: "" };
+        })
+      );
 
       setData((prev) => ({
         ...prev,
-        images: [...prev.images, ...uploadedImages],
+        [type]: [...prev[type], ...uploadedImages],
       }));
 
-      toast.success(`${uploadedImages.length} images uploaded`);
+      toast.success("Images uploaded");
     } catch (err) {
+      console.error(err);
       toast.error("Upload failed");
     } finally {
       setImgLoading(false);
@@ -67,47 +70,46 @@ export default function HeroAdminPage() {
   };
 
   /* ================= UPDATE LINK ================= */
-  const updateLink = (index, value) => {
-    const updated = [...data.images];
-    updated[index].link = value;
-
-    setData((prev) => ({
-      ...prev,
-      images: updated,
-    }));
+  const updateLink = (type, index, value) => {
+    setData((prev) => {
+      const updated = [...prev[type]];
+      updated[index] = { ...updated[index], link: value };
+      return { ...prev, [type]: updated };
+    });
   };
 
   /* ================= REMOVE IMAGE ================= */
-  const removeImage = (index) => {
+  const removeImage = (type, index) => {
     setData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      [type]: prev[type].filter((_, i) => i !== index),
     }));
   };
 
-  /* ================= UPDATE VIDEO URL ================= */
-  const updateVideoUrl = (value) => {
-    setData((prev) => ({
-      ...prev,
-      videoUrl: value,
-    }));
-  };
-
-  /* ================= UPDATE MEDIA TYPE ================= */
-  const updateMediaType = (value) => {
-    setData((prev) => ({
-      ...prev,
-      mediaType: value,
-    }));
-  };
-
-  /* ================= SUBMIT ================= */
+  /* ================= SAVE ================= */
   const submit = async () => {
     try {
       setLoading(true);
-      await updateHero(data);
-      toast.success("Hero section updated!");
+
+      const payload = {
+        mobileImages: data.mobileImages,
+        desktopImages: data.desktopImages,
+        videoUrl: data.videoUrl,
+        mediaType: data.mediaType,
+        updatedAt: new Date().toISOString(),
+      };
+
+      console.log("Saving:", payload);
+
+      await updateHero(payload);
+
+      toast.success("Hero updated successfully");
+
+      // ✅ REFRESH AFTER SAVE
+      await fetchHeroData();
+
     } catch (err) {
+      console.error(err);
       toast.error("Update failed");
     } finally {
       setLoading(false);
@@ -115,139 +117,142 @@ export default function HeroAdminPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-10">
       <h1 className="text-2xl font-semibold">Hero Section Admin</h1>
 
-      {/* 🔥 VIDEO SECTION */}
+      {/* VIDEO SETTINGS */}
       <div className="space-y-4 p-6 border rounded-xl bg-gray-50">
         <h2 className="text-lg font-medium">Video Settings</h2>
-        <h4 className="text-sm text-gray-600 mt-2">
-          example of links:
-          YouTube Example: https://www.youtube.com/embed/watch?v=abcd1234 <br />
-          Instagram Reel Example: https://www.instagram.com/reel/ABC123XYZ/
-        </h4>
 
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Video URL */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Video URL</label>
-            <Input
-              type="url"
-              placeholder="https://www.youtube.com/watch?v=..."
-              value={data.videoUrl}
-              onChange={(e) => updateVideoUrl(e.target.value)}
-              className="w-full"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              YouTube: paste full URL or embed link
-            </p>
-          </div>
+          <Input
+            type="url"
+            label="Video URL"
+            value={data.videoUrl}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, videoUrl: e.target.value }))
+            }
+          />
 
-          {/* Media Type */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Media Type</label>
-            <Select
-              selectedKeys={data.mediaType}
-              onSelectionChange={(keys) => updateMediaType(Array.from(keys)[0])}
-              className="w-full"
-            >
-              <SelectItem key="youtube" value="youtube">YouTube</SelectItem>
-              <SelectItem key="instagram" value="instagram">Instagram</SelectItem>
-            </Select>
-          </div>
+          <Select
+            label="Media Type"
+            selectedKeys={[data.mediaType]}
+            onSelectionChange={(keys) =>
+              setData((prev) => ({
+                ...prev,
+                mediaType: Array.from(keys)[0],
+              }))
+            }
+          >
+            <SelectItem key="youtube">YouTube</SelectItem>
+            <SelectItem key="instagram">Instagram</SelectItem>
+          </Select>
         </div>
-
-        {data.videoUrl && (
-          <div className="mt-4 p-4 bg-white rounded-lg border">
-            <p className="text-sm font-medium mb-2">Preview:</p>
-            {data.mediaType === "youtube" ? (
-              <iframe
-                width="100%"
-                height="200"
-                src={data.videoUrl.includes("youtube.com") 
-                  ? data.videoUrl.replace("watch?v=", "embed/") + "?autoplay=0"
-                  : data.videoUrl}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                className="rounded-lg"
-              />
-            ) : (
-              <blockquote
-                className="instagram-media w-full h-[200px] rounded-lg overflow-hidden"
-                data-instgrm-permalink={data.videoUrl}
-                data-instgrm-version="14"
-              />
-            )}
-          </div>
-        )}
       </div>
 
-      {/* IMAGE UPLOAD */}
+      {/* MOBILE IMAGES */}
       <div>
-        <label className="block text-sm font-medium mb-3">Upload Hero Images</label>
+        <h2 className="text-xl font-semibold text-blue-600 mb-4">
+          📱 Mobile Images
+        </h2>
+
         <input
           type="file"
           multiple
           accept="image/*"
-          onChange={(e) => handleImage(e.target.files)}
-          className="border p-3 rounded-lg w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#DBA40D] file:text-white hover:file:bg-yellow-500"
+          onChange={(e) => handleUpload(e.target.files, "mobileImages")}
+          className="border p-3 rounded-lg w-full mb-6"
         />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {data.mobileImages.map((img, index) => (
+            <div key={index} className="p-4 border rounded-xl bg-white">
+              <div className="relative h-48 rounded-lg overflow-hidden">
+                <Image
+                  src={img.url}
+                  alt="Mobile"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <Input
+                label="Redirect Link"
+                value={img.link || ""}
+                onChange={(e) =>
+                  updateLink("mobileImages", index, e.target.value)
+                }
+                className="mt-3"
+              />
+
+              <Button
+                color="danger"
+                variant="flat"
+                className="w-full mt-2"
+                onClick={() => removeImage("mobileImages", index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {imgLoading && <p className="text-sm text-blue-600">Uploading images...</p>}
+      {/* DESKTOP IMAGES */}
+      <div>
+        <h2 className="text-xl font-semibold text-emerald-600 mb-4">
+          💻 Desktop Images
+        </h2>
 
-      {/* IMAGE GRID */}
-      {data.images.length > 0 && (
-        <div>
-          <h2 className="text-lg font-medium mb-4">Hero Images ({data.images.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.images.map((img, index) => (
-              <div
-                key={index}
-                className="p-4 border rounded-xl shadow-md space-y-3 bg-white"
-              >
-                <div className="relative h-48 md:h-52 rounded-lg overflow-hidden">
-                  <Image
-                    src={img.url}
-                    alt={`Hero ${index + 1}`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-200"
-                  />
-                </div>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => handleUpload(e.target.files, "desktopImages")}
+          className="border p-3 rounded-lg w-full mb-6"
+        />
 
-                {/* 🔥 LINK INPUT */}
-                <Input
-                  type="url"
-                  label="Redirect Link"
-                  placeholder="https://yoursite.com/project or /residential/project"
-                  value={img.link || ""}
-                  onChange={(e) => updateLink(index, e.target.value)}
-                  className="w-full"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {data.desktopImages.map((img, index) => (
+            <div key={index} className="p-4 border rounded-xl bg-white">
+              <div className="relative h-56 rounded-lg overflow-hidden">
+                <Image
+                  src={img.url}
+                  alt="Desktop"
+                  fill
+                  className="object-cover"
                 />
-
-                <Button
-                  size="sm"
-                  color="danger"
-                  variant="flat"
-                  onClick={() => removeImage(index)}
-                  className="w-full"
-                >
-                  🗑️ Remove Image
-                </Button>
               </div>
-            ))}
-          </div>
+
+              <Input
+                label="Redirect Link"
+                value={img.link || ""}
+                onChange={(e) =>
+                  updateLink("desktopImages", index, e.target.value)
+                }
+                className="mt-3"
+              />
+
+              <Button
+                color="danger"
+                variant="flat"
+                className="w-full mt-2"
+                onClick={() => removeImage("desktopImages", index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* SAVE BUTTON */}
       <Button
-        className="w-full bg-[#DBA40D] text-white text-lg py-8 rounded-xl shadow-lg hover:bg-yellow-500 transition-all duration-200"
+        className="w-full bg-[#DBA40D] text-white text-lg py-8 rounded-xl"
         isLoading={loading}
         onClick={submit}
-        size="lg"
       >
-        💾 Save All Changes (Images + Video)
+        💾 Save All Changes
       </Button>
     </div>
   );

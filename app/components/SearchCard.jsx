@@ -4,10 +4,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { FiMapPin, FiSearch, FiX } from "react-icons/fi";
-import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getHero } from "@/lib/firestore/hero/read";
-import { index } from "@/lib/algoliaClient";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TAGS = [
@@ -19,11 +17,12 @@ const TAGS = [
   "New Gurgaon",
 ];
 
-const DEFAULT_VIDEO = "https://www.youtube.com/embed/4jnzf1yj48M?autoplay=1&mute=0";
+const DEFAULT_VIDEO =
+  "https://www.youtube.com/embed/4jnzf1yj48M?autoplay=1&mute=0";
 
 const VIDEO_SIZES = {
   desktop: { width: "172px", height: "300px" },
-  mobile: { maxWidth: "174px", height: "260px" }
+  mobile: { maxWidth: "174px", height: "260px" },
 };
 
 export default function SearchCard() {
@@ -48,34 +47,37 @@ export default function SearchCard() {
     const fetchHero = async () => {
       try {
         const res = await getHero();
-        if (res) {
-          res.images = Array.isArray(res.images)
-            ? res.images.filter(img =>
-              typeof img === "string"
-                ? img.trim() !== ""
-                : img?.url
-            )
-            : [];
-          setHero(res);
-          setVideoKey(0);
-        }
+        if (!res) return;
+
+        const updateImages = () => {
+          const isMobile = window.innerWidth < 768;
+
+          const images = isMobile
+            ? res.mobileImages || []
+            : res.desktopImages || [];
+
+          setHero({
+            ...res,
+            images,
+          });
+        };
+
+        updateImages();
+        window.addEventListener("resize", updateImages);
+
+        return () => window.removeEventListener("resize", updateImages);
       } catch (error) {
         console.error("Hero fetch failed:", error);
       }
     };
+
     fetchHero();
   }, []);
 
   /* ================= HERO IMAGE CLICK ================= */
   const handleHeroImageClick = useCallback(() => {
     const currentImage = hero?.images?.[currentSlide];
-    let link;
-
-    if (typeof currentImage === "string") {
-      link = hero?.imageLinks?.[currentImage];
-    } else {
-      link = currentImage?.link;
-    }
+    const link = currentImage?.link;
 
     if (link) {
       window.open(link, "_blank", "noopener,noreferrer");
@@ -100,15 +102,17 @@ export default function SearchCard() {
       const videoId = idMatch?.[1];
 
       return videoId
-        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0}`
+        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${
+            isMuted ? 1 : 0
+          }`
         : DEFAULT_VIDEO;
     }
   };
 
   const toggleDesktopVideo = () => {
-    setDesktopVideoPlaying(prev => !prev);
+    setDesktopVideoPlaying((prev) => !prev);
     setIsMuted(false);
-    setVideoKey(prev => prev + 1);
+    setVideoKey((prev) => prev + 1);
   };
 
   /* ================= SEARCH ================= */
@@ -156,33 +160,29 @@ export default function SearchCard() {
     }
   };
 
-
-
-
-
   /* ================= AUTO SLIDER ================= */
   useEffect(() => {
     if (!hero?.images?.length || hero.images.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide(prev =>
+      setCurrentSlide((prev) =>
         prev === hero.images.length - 1 ? 0 : prev + 1
       );
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [hero?.images?.length]);
+  }, [hero?.images]);
 
   const goNext = () => {
     if (!hero?.images?.length) return;
-    setCurrentSlide(prev =>
+    setCurrentSlide((prev) =>
       prev === hero.images.length - 1 ? 0 : prev + 1
     );
   };
 
   const goPrev = () => {
     if (!hero?.images?.length) return;
-    setCurrentSlide(prev =>
+    setCurrentSlide((prev) =>
       prev === 0 ? hero.images.length - 1 : prev - 1
     );
   };
@@ -192,37 +192,36 @@ export default function SearchCard() {
     if (!hero?.images?.length) return null;
 
     return hero.images.map((img, index) => {
-      const imageUrl = typeof img === "string" ? img : img?.url;
+      const imageUrl = img?.url;
 
       return (
         <div
           key={`${imageUrl}-${index}`}
-          className={`absolute inset-0  duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"}`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"
+          }`}
         >
-          {imageUrl ? (
+          {imageUrl && (
             <Image
               src={imageUrl}
               alt={`Hero ${index + 1}`}
               fill
               sizes="100vw"
               className="object-contain md:object-cover object-center"
-
               priority={index === 0}
-              onLoad={() => console.log(`✅ Hero image loaded: ${safeSlice(imageUrl)}`)}
             />
-          ) : null}
+          )}
         </div>
       );
     });
   };
 
   return (
-    <section className="relative w-full">
-      {/* ================= HERO CONTAINER - ORIGINAL LAYOUT + STICKY VIDEOS ================= */}
-      <div className="relative w-full h-[360px] sm:h-[430px]  md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
-        {/* 🔥 FIXED CLICK LAYER */}
+    <section className="relative w-full   ">
+      {/* HERO CONTAINER */}
+      <div className="relative w-full h-[304px] sm:h-[304px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
         <div
-          className="absolute inset-0 z-[25] cursor-pointer"
+          className="absolute inset-0 z-[25] cursor-pointer "
           onClick={handleHeroImageClick}
         >
           {renderHeroBackground()}
@@ -242,8 +241,8 @@ export default function SearchCard() {
           <ChevronRight size={40} />
         </button>
 
-        {/* ================= DESKTOP VIDEO ================= */}
-        {hero?.videoUrl && desktopVideoPlaying && (
+        {/* DESKTOP VIDEO */}
+           {hero?.videoUrl && desktopVideoPlaying && (
           <div className="absolute hidden md:flex items-center justify-end pr-8 z-[200] pt-14 right-10 bottom-20">
             <div
               className="relative rounded-3xl overflow-hidden bg-black shadow-2xl"
@@ -296,16 +295,11 @@ export default function SearchCard() {
         )}
 
 
-        {/* ================= MOBILE VIDEO ================= */}
+        {/* MOBILE VIDEO */}
         {playMobileVideo && hero?.videoUrl && (
-          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center py-2 ">
+          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center py-2">
             <button
-              onClick={() => {
-                setPlayMobileVideo(false);
-                setIsMuted(false);
-                setVideoKey(prev => prev + 1);   // 🔥 force iframe reload
-              }}
-
+              onClick={() => setPlayMobileVideo(false)}
               className="absolute top-4 right-4 text-white text-2xl z-[90]"
             >
               ✕
@@ -319,13 +313,6 @@ export default function SearchCard() {
                 height: VIDEO_SIZES.mobile.height,
               }}
             >
-              <button
-                onClick={() => setIsMuted(prev => !prev)}
-                className="absolute bottom-2 left-2 z-[90] bg-white px-2 py-1 text-xs rounded-lg"
-              >
-                {isMuted ? "Unmute 🔊" : "Mute 🔇"}
-              </button>
-
               <iframe
                 key={videoKey}
                 className="w-full h-full rounded-2xl"
@@ -336,7 +323,6 @@ export default function SearchCard() {
             </div>
           </div>
         )}
-
 
         {!playMobileVideo && hero?.videoUrl && (
           <div className="md:hidden absolute right-4 bottom-20 z-[100] mb-5">
@@ -350,10 +336,8 @@ export default function SearchCard() {
         )}
       </div>
 
-
-
-      {/* ================= ORIGINAL SEARCH BAR POSITION ================= */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[280px] w-full max-w-[990px] px-4 z-30">
+      {/* SEARCH BAR */}
+       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[200px] w-full max-w-[990px] px-4 z-30">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">
@@ -456,6 +440,6 @@ export default function SearchCard() {
           })}
         </div>
       </div>
-    </section >
+    </section>
   );
 }

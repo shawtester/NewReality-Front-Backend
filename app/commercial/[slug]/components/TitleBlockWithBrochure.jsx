@@ -87,6 +87,12 @@ export default function TitleBlockWithBrochure({ property }) {
 
   if (!property || typeof property !== "object") return null;
 
+  const {
+    sector = "",
+    locationName = "",
+  } = property;
+
+
   return (
     <>
       {/* ================= TITLE BLOCK ================= */}
@@ -98,7 +104,11 @@ export default function TitleBlockWithBrochure({ property }) {
               {property.title}
             </h1>
 
-            <p className="text-sm text-[#F5A300]">{property.location}</p>
+            <p className="text-sm text-[#F5A300]">
+              {property.location}
+            </p>
+
+
 
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
               {typeof property.builderName === "string" && (

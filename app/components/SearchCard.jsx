@@ -21,8 +21,8 @@ const DEFAULT_VIDEO =
   "https://www.youtube.com/embed/4jnzf1yj48M?autoplay=1&mute=0";
 
 const VIDEO_SIZES = {
-  desktop: { width: "172px", height: "300px" },
-  mobile: { maxWidth: "174px", height: "190px" },
+  desktop: { width: "168px", height: "300px" },
+  mobile: { maxWidth: "105px", height: "190px" },
 };
 
 export default function SearchCard() {

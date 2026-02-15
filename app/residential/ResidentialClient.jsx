@@ -159,6 +159,14 @@ export default function ResidentialPage({ apartments = [] }) {
     const [page, setPage] = useState(1);
     const [filteredApartments, setFilteredApartments] = useState([]);
     const [loading, setLoading] = useState(false);
+    const isFilterApplied =
+        searchParams.get("type") ||
+        searchParams.get("status") ||
+        searchParams.get("locality") ||
+        searchParams.get("budget") ||
+        searchParams.get("bhk") ||
+        searchParams.get("q");
+
 
     const apartmentsPerPage = 12;
 
@@ -220,6 +228,11 @@ export default function ResidentialPage({ apartments = [] }) {
         params.set('page', '1');
         router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
     }, [searchParams, router]);
+
+    const handleClearFilters = () => {
+        router.push(BASE_ROUTE, { scroll: false });
+    };
+
 
     // ✅ URL FILTER LOGIC
     useEffect(() => {
@@ -355,14 +368,14 @@ export default function ResidentialPage({ apartments = [] }) {
             </section>
 
             {/* ✅ FIXED BANNER - EXACT REFERENCE SIZING */}
-           {/* ✅ FIXED BANNER - FULL IMAGE VISIBLE (NO CROPPING) */}
-<section className="bg-white">
-    <div className="max-w-[1440px] mx-auto px-4 ">
-        <h2 className="text-center text-3xl sm:text-2xl font-bold ">
-            Trending <span className="text-[#F5A300]">Projects</span>
-        </h2>
+            {/* ✅ FIXED BANNER - FULL IMAGE VISIBLE (NO CROPPING) */}
+            <section className="bg-white">
+                <div className="max-w-[1440px] mx-auto px-4 ">
+                    <h2 className="text-center text-3xl sm:text-2xl font-bold ">
+                        Trending <span className="text-[#F5A300]">Projects</span>
+                    </h2>
 
-        <div className="
+                    <div className="
             relative w-full 
             h-[120px] 
             sm:h-[180px] 
@@ -375,53 +388,53 @@ export default function ResidentialPage({ apartments = [] }) {
          
             
         ">
-            {banner?.images && totalImages > 0 ? (
-                <>
-                    {/* Images Layer */}
-                    <div className="absolute inset-0 w-full h-full pointer-events-none">
-                        {banner.images.map((imageUrl, index) => (
-                            <div
-                                key={`${imageUrl}-${index}`}
-                                className="absolute inset-0 w-full h-full flex items-center justify-center"
-                                style={{
-                                    opacity: currentImageIndex === index ? 1 : 0,
-                                    transition: "opacity 1000ms ease-in-out"
-                                }}
-                            >
-                                <Image
-                                    src={imageUrl}
-                                    alt={`Trending Project ${index + 1}`}
-                                    fill
-                                    sizes="120vw"
-                                    className="
+                        {banner?.images && totalImages > 0 ? (
+                            <>
+                                {/* Images Layer */}
+                                <div className="absolute inset-0 w-full h-full pointer-events-none">
+                                    {banner.images.map((imageUrl, index) => (
+                                        <div
+                                            key={`${imageUrl}-${index}`}
+                                            className="absolute inset-0 w-full h-full flex items-center justify-center"
+                                            style={{
+                                                opacity: currentImageIndex === index ? 1 : 0,
+                                                transition: "opacity 1000ms ease-in-out"
+                                            }}
+                                        >
+                                            <Image
+                                                src={imageUrl}
+                                                alt={`Trending Project ${index + 1}`}
+                                                fill
+                                                sizes="120vw"
+                                                className="
                                         object-contain 
                                         object-center 
                                         w-full 
                                         h-full
                                     "
-                                    priority={index === 0}
+                                                priority={index === 0}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Click Overlay */}
+                                <div
+                                    className="absolute inset-0 w-full h-full z-20 bg-transparent  transition-all duration-300 cursor-pointer rounded-2xl"
+                                    onClick={handleBannerImageClick}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            e.preventDefault();
+                                            handleBannerImageClick();
+                                        }
+                                    }}
+                                    title={`Click to visit project (Image ${currentImageIndex + 1})`}
                                 />
-                            </div>
-                        ))}
-                    </div>
 
-                    {/* Click Overlay */}
-                    <div
-                        className="absolute inset-0 w-full h-full z-20 bg-transparent  transition-all duration-300 cursor-pointer rounded-2xl"
-                        onClick={handleBannerImageClick}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handleBannerImageClick();
-                            }
-                        }}
-                        title={`Click to visit project (Image ${currentImageIndex + 1})`}
-                    />
-
-                    {/* Dots */}
-                    {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
+                                {/* Dots */}
+                                {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
                         {banner.images.map((_, index) => (
                             <button
                                 key={index}
@@ -435,22 +448,22 @@ export default function ResidentialPage({ apartments = [] }) {
                             />
                         ))}
                     </div> */}
-                </>
-            ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <Image
-                        src={banner?.image || "/default-banner.jpg"}
-                        alt="Trending Banner"
-                        fill
-                        sizes="100vw"
-                        className="object-contain object-center w-full h-full"
-                        priority
-                    />
+                            </>
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Image
+                                    src={banner?.image || "/default-banner.jpg"}
+                                    alt="Trending Banner"
+                                    fill
+                                    sizes="100vw"
+                                    className="object-contain object-center w-full h-full"
+                                    priority
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
-        </div>
-    </div>
-</section>
+            </section>
 
 
             {/* HERO + SEARCH */}
@@ -480,7 +493,11 @@ export default function ResidentialPage({ apartments = [] }) {
                     {/* Mobile Search */}
                     <div className="lg:hidden mt-8 mb-12">
                         <div className="bg-white shadow-2xl p-3 w-full flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-2 md:p-4 rounded-2xl max-w-full">
-                            <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
+                            <input value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleFilterChange("q", keyword || null);
+                                }
+                            }} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option value="" disabled hidden>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
                             </select>
@@ -496,7 +513,22 @@ export default function ResidentialPage({ apartments = [] }) {
                             <select value={bhk} onChange={(e) => handleFilterChange('bhk', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option value="" disabled hidden>BHK</option><option value="1-bhk">1 BHK</option><option value="1.5-bhk">1.5 BHK</option><option value="2-bhk">2 BHK</option><option value="2.5-bhk">2.5 BHK</option><option value="3-bhk">3 BHK</option><option value="3.5-bhk">3.5 BHK</option><option value="4-bhk">4 BHK</option><option value="4.5-bhk">4.5 BHK</option><option value="5-bhk">5 BHK</option><option value="above-5-bhk">Above 5 BHK</option>
                             </select>
-                            <button onClick={() => handleFilterChange('q', keyword || null)} className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0">Search</button>
+                            {isFilterApplied ? (
+                                <button
+                                    onClick={handleClearFilters}
+                                    className="w-full px-4 py-2.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm md:w-24 flex-shrink-0"
+                                >
+                                    Clear
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => handleFilterChange('q', keyword || null)}
+                                    className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0"
+                                >
+                                    Search
+                                </button>
+                            )}
+
                         </div>
                     </div>
 
@@ -507,6 +539,11 @@ export default function ResidentialPage({ apartments = [] }) {
                             <input
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleFilterChange("q", keyword || null);
+                                    }
+                                }}
                                 placeholder="Enter Keyword"
                                 className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm min-w-0"
                             />
@@ -598,12 +635,22 @@ export default function ResidentialPage({ apartments = [] }) {
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
                             </div>
 
-                            <button
-                                onClick={() => handleFilterChange('q', keyword || null)}
-                                className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm"
-                            >
-                                Search
-                            </button>
+                            {isFilterApplied ? (
+                                <button
+                                    onClick={handleClearFilters}
+                                    className="w-24 px-4 py-3 rounded-full bg-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-300 transition"
+                                >
+                                    Clear
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => handleFilterChange('q', keyword || null)}
+                                    className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm"
+                                >
+                                    Search
+                                </button>
+                            )}
+
 
                         </div>
                     </div>

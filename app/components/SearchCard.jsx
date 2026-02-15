@@ -22,7 +22,7 @@ const DEFAULT_VIDEO =
 
 const VIDEO_SIZES = {
   desktop: { width: "172px", height: "300px" },
-  mobile: { maxWidth: "174px", height: "260px" },
+  mobile: { maxWidth: "174px", height: "190px" },
 };
 
 export default function SearchCard() {
@@ -207,7 +207,7 @@ export default function SearchCard() {
               alt={`Hero ${index + 1}`}
               fill
               sizes="100vw"
-              className="object-contain md:object-cover object-center"
+              className="object-cover object-center"
               priority={index === 0}
             />
           )}
@@ -219,7 +219,7 @@ export default function SearchCard() {
   return (
     <section className="relative w-full ">
       {/* HERO CONTAINER */}
-      <div className="relative w-full h-[304px] sm:h-[304px] md:h-[450px] sm:mb-20 overflow-hidden sticky top-0 z-[20]">
+      <div className="relative w-full h-[304px] sm:h-[304px] md:h-[450px] overflow-hidden z-[10]">
        <div 
   className="absolute inset-0 z-[25] cursor-pointer max-md:bottom-20"
   onClick={handleHeroImageClick}
@@ -230,14 +230,14 @@ export default function SearchCard() {
 
         <button
           onClick={goPrev}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-[60] text-white"
+          className="absolute left-4 top-[30%] md:top-1/2 md:-translate-y-1/2 z-[60] text-white"
         >
           <ChevronLeft size={40} />
         </button>
 
         <button
           onClick={goNext}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-[60] text-white"
+          className="absolute right-4 top-[30%] md:top-1/2 md:-translate-y-1/2 z-[60] text-white"
         >
           <ChevronRight size={40} />
         </button>
@@ -298,7 +298,7 @@ export default function SearchCard() {
 
         {/* MOBILE VIDEO */}
         {playMobileVideo && hero?.videoUrl && (
-          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center py-2">
+          <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center pt-1 pb-10">
             <button
               onClick={() => setPlayMobileVideo(false)}
               className="absolute top-4 right-4 text-white text-2xl z-[90]"
@@ -326,7 +326,7 @@ export default function SearchCard() {
         )}
 
         {!playMobileVideo && hero?.videoUrl && (
-          <div className="md:hidden absolute right-4 bottom-20 z-[100] mb-5">
+          <div className="md:hidden absolute right-4 bottom-20 z-[100] mb-10">
             <button
               onClick={() => setPlayMobileVideo(true)}
               className="h-12 w-12 rounded-2xl bg-white shadow-2xl flex items-center justify-center"

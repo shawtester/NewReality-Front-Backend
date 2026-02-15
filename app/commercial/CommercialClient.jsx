@@ -155,6 +155,14 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [filteredApartments, setFilteredApartments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const isFilterApplied = Boolean(
+    searchParams.get("type") ||
+    searchParams.get("status") ||
+    searchParams.get("locality") ||
+    searchParams.get("budget") ||
+    searchParams.get("bhk") ||
+    searchParams.get("q")
+  );
 
   const apartmentsPerPage = 12;
 
@@ -169,12 +177,12 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
       const imageLinksArray = Object.entries(banner.imageLinks);
       return imageLinksArray[index]?.[1] || null;
     }
-    
+
     // ✅ PRIORITY 2: Check images array (retail/sco banners)
     if (banner?.images && Array.isArray(banner.images)) {
       return banner.images[index] || null;
     }
-    
+
     // ✅ PRIORITY 3: Fallback single image
     return banner?.image || null;
   }, [banner]);
@@ -201,6 +209,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     params.set('page', '1');
     router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
   }, [searchParams, router]);
+
+  const handleClearFilters = () => {
+    router.push(BASE_ROUTE, { scroll: false });
+  };
+
 
   /* ================= URL FILTER LOGIC ================= */
   useEffect(() => {
@@ -344,13 +357,13 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
       </section>
 
       {/* ✅ FIXED BANNER - CLICK WORKS EVERYWHERE */}
-     <section className="bg-white">
-         <div className="max-w-[1440px] mx-auto px-4 ">
-             <h2 className="text-center text-xl sm:text-2xl font-bold">
-                 Trending <span className="text-[#F5A300]">Projects</span>
-             </h2>
-     
-             <div className="
+      <section className="bg-white">
+        <div className="max-w-[1440px] mx-auto px-4 ">
+          <h2 className="text-center text-xl sm:text-2xl font-bold">
+            Trending <span className="text-[#F5A300]">Projects</span>
+          </h2>
+
+          <div className="
                    relative w-full 
             h-[120px] 
             sm:h-[180px] 
@@ -361,53 +374,53 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
             overflow-hidden 
            bg-transparent
              ">
-                 {banner?.images && totalImages > 0 ? (
-                     <>
-                         {/* Images Layer */}
-                         <div className="absolute inset-0 w-full h-full pointer-events-none">
-                             {banner.images.map((imageUrl, index) => (
-                                 <div
-                                     key={`${imageUrl}-${index}`}
-                                     className="absolute inset-0 w-full h-full flex items-center justify-center"
-                                     style={{
-                                         opacity: currentImageIndex === index ? 1 : 0,
-                                         transition: "opacity 1000ms ease-in-out"
-                                     }}
-                                 >
-                                     <Image
-                                         src={imageUrl}
-                                         alt={`Trending Project ${index + 1}`}
-                                         fill
-                                         sizes="120vw"
-                                         className="
+            {banner?.images && totalImages > 0 ? (
+              <>
+                {/* Images Layer */}
+                <div className="absolute inset-0 w-full h-full pointer-events-none">
+                  {banner.images.map((imageUrl, index) => (
+                    <div
+                      key={`${imageUrl}-${index}`}
+                      className="absolute inset-0 w-full h-full flex items-center justify-center"
+                      style={{
+                        opacity: currentImageIndex === index ? 1 : 0,
+                        transition: "opacity 1000ms ease-in-out"
+                      }}
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={`Trending Project ${index + 1}`}
+                        fill
+                        sizes="120vw"
+                        className="
                                              object-contain 
                                              object-center 
                                              w-full 
                                              h-full
                                          "
-                                         priority={index === 0}
-                                     />
-                                 </div>
-                             ))}
-                         </div>
-     
-                         {/* Click Overlay */}
-                         <div
-                             className="absolute inset-0 w-full h-full z-20 bg-transparent  transition-all duration-300 cursor-pointer rounded-2xl"
-                             onClick={handleBannerImageClick}
-                             role="button"
-                             tabIndex={0}
-                             onKeyDown={(e) => {
-                                 if (e.key === "Enter" || e.key === " ") {
-                                     e.preventDefault();
-                                     handleBannerImageClick();
-                                 }
-                             }}
-                             title={`Click to visit project (Image ${currentImageIndex + 1})`}
-                         />
-     
-                         {/* Dots */}
-                         {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
+                        priority={index === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Click Overlay */}
+                <div
+                  className="absolute inset-0 w-full h-full z-20 bg-transparent  transition-all duration-300 cursor-pointer rounded-2xl"
+                  onClick={handleBannerImageClick}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleBannerImageClick();
+                    }
+                  }}
+                  title={`Click to visit project (Image ${currentImageIndex + 1})`}
+                />
+
+                {/* Dots */}
+                {/* <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-30 backdrop-blur-md bg-black/40 rounded-full px-3 py-1.5">
                              {banner.images.map((_, index) => (
                                  <button
                                      key={index}
@@ -421,22 +434,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                                  />
                              ))}
                          </div> */}
-                     </>
-                 ) : (
-                     <div className="absolute inset-0 flex items-center justify-center">
-                         <Image
-                             src={banner?.image || "/default-banner.jpg"}
-                             alt="Trending Banner"
-                             fill
-                             sizes="100vw"
-                             className="object-contain object-center w-full h-full"
-                             priority
-                         />
-                     </div>
-                 )}
-             </div>
-         </div>
-     </section>
+              </>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Image
+                  src={banner?.image || "/default-banner.jpg"}
+                  alt="Trending Banner"
+                  fill
+                  sizes="100vw"
+                  className="object-contain object-center w-full h-full"
+                  priority
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* HERO + SEARCH */}
       <section className="lg:bg-[#F6FBFF] pt-4 relative">
@@ -469,6 +482,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleFilterChange("q", keyword || null);
+                  }
+                }}
                 placeholder="Enter Keyword"
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0"
               />
@@ -530,12 +548,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 <option value="" disabled hidden>Size</option>
                 <option value="above-5-bhk">Large Spaces</option>
               </select>
-              <button
-                onClick={() => handleFilterChange('q', keyword || null)}
-                className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0"
-              >
-                Search
-              </button>
+              {isFilterApplied ? (
+                <button
+                  onClick={handleClearFilters}
+                  className="w-full px-4 py-2.5 rounded-full bg-gray-200 text-gray-700 font-medium text-sm md:w-24 flex-shrink-0"
+                >
+                  Clear
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleFilterChange('q', keyword || null)}
+                  className="w-full px-4 py-2.5 rounded-full bg-[#F5A300] text-white font-medium text-sm md:w-24 flex-shrink-0"
+                >
+                  Search
+                </button>
+              )}
+
             </div>
           </div>
 
@@ -547,6 +575,12 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleFilterChange("q", keyword || null);
+                  }
+                }}
+
                 placeholder="Enter Keyword"
                 className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm min-w-0"
               />
@@ -630,12 +664,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 </select>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
               </div>
-              <button
-                onClick={() => handleFilterChange('q', keyword || null)}
-                className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0"
-              >
-                Search
-              </button>
+              {isFilterApplied ? (
+                <button
+                  onClick={handleClearFilters}
+                  className="w-24 px-4 py-3 rounded-full bg-gray-200 text-gray-700 font-medium text-sm flex-shrink-0 hover:bg-gray-300 transition"
+                >
+                  Clear
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleFilterChange('q', keyword || null)}
+                  className="w-24 px-4 py-3 rounded-full bg-[#F5A300] text-white font-medium text-sm flex-shrink-0"
+                >
+                  Search
+                </button>
+              )}
+
             </div>
           </div>
         </div>

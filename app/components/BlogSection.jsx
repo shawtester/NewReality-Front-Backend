@@ -9,18 +9,25 @@ export default function BlogSection({ blogs = [] }) {
   const touchStartX = useRef(null);
   const autoScrollIntervalRef = useRef(null);
   const isAutoScrolling = useRef(true);
-  const cardWidth = 320; // 300px card + 20px gap
+  const getCardWidth = () => {
+    if (!scrollRef.current) return 300;
+    const card = scrollRef.current.querySelector("a");
+    return card ? card.offsetWidth + 24 : 300; // gap included
+  };
 
   if (!blogs.length) return null;
 
   /* ================= SCROLL FUNCTIONS ================= */
-  const scrollLeft = useCallback(() => {
-    scrollRef.current?.scrollBy({ left: -cardWidth, behavior: "smooth" });
-  }, []);
+  const scrollLeft = () => {
+    const width = getCardWidth();
+    scrollRef.current?.scrollBy({ left: -width, behavior: "smooth" });
+  };
 
-  const scrollRight = useCallback(() => {
-    scrollRef.current?.scrollBy({ left: cardWidth, behavior: "smooth" });
-  }, []);
+  const scrollRight = () => {
+    const width = getCardWidth();
+    scrollRef.current?.scrollBy({ left: width, behavior: "smooth" });
+  };
+
 
   const startAutoScroll = useCallback(() => {
     if (autoScrollIntervalRef.current) {
@@ -31,12 +38,14 @@ export default function BlogSection({ blogs = [] }) {
       if (isAutoScrolling.current && scrollRef.current) {
         const scrollLeftPos = scrollRef.current.scrollLeft;
         const maxScroll = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
-        
+
         // ✅ Infinite loop: jump back to start at end
         if (scrollLeftPos >= maxScroll - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
-          scrollRef.current.scrollBy({ left: cardWidth, behavior: "smooth" });
+          const width = getCardWidth();
+          scrollRef.current.scrollBy({ left: width, behavior: "smooth" });
+
         }
       }
     }, 3500); // 3.5s interval
@@ -115,13 +124,20 @@ export default function BlogSection({ blogs = [] }) {
         ref={scrollRef}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6 snap-x snap-mandatory px-4 lg:px-0 py-4"
+        className="flex gap-6 overflow-x-auto scrollbar-hide pb-6
+             snap-x snap-mandatory scroll-smooth py-4"
+        style={{ scrollBehavior: "smooth" }}
       >
+
         {blogs.map((blog) => (
           <Link
             key={blog.id}
             href={`/blog/${blog.id}`}
-            className="min-w-[300px] flex-shrink-0 snap-center hover:scale-[1.02] transition-all"
+            className="w-[85%] sm:w-[300px] flex-shrink-0 snap-center mx-auto sm:mx-0
+           first:ml-4 last:mr-4
+           lg:first:ml-0 lg:last:mr-0
+           hover:scale-[1.02] transition-all"
+
           >
             <article className="group h-full flex flex-col overflow-hidden rounded-2xl
               bg-white shadow-sm hover:shadow-lg transition-all duration-300
@@ -139,10 +155,11 @@ export default function BlogSection({ blogs = [] }) {
               </div>
 
               {/* CONTENT */}
-              <div className="flex flex-1 flex-col p-4">
-                <h3 className="text-base font-semibold text-gray-900 line-clamp-2">
+              <div className="flex flex-1 flex-col p-4 min-h-[150px]">
+                <h3 className="text-base font-semibold text-gray-900 truncate">
                   {blog.title}
                 </h3>
+
 
                 <p className="mt-2 text-sm text-gray-600 line-clamp-2">
                   {blog.excerpt}
@@ -152,9 +169,9 @@ export default function BlogSection({ blogs = [] }) {
                   <span className="text-xs text-gray-400">
                     {blog.timestampCreate
                       ? new Date(blog.timestampCreate * 1000).toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "2-digit" }
-                        )
+                        "en-US",
+                        { month: "short", day: "2-digit" }
+                      )
                       : ""}
                   </span>
 

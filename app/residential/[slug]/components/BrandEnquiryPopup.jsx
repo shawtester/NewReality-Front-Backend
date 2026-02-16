@@ -135,6 +135,22 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
                 <div className="flex border border-gray-300 rounded-md overflow-hidden">
                   <select className="px-3 text-sm bg-gray-50 outline-none border-r">
                     <option>+91 India</option>
+                    <option value="+1">United States (+1)</option>
+<option value="+1">Canada (+1)</option>
+<option value="+44">United Kingdom (+44)</option>
+<option value="+91">India (+91)</option>
+<option value="+61">Australia (+61)</option>
+<option value="+49">Germany (+49)</option>
+<option value="+33">France (+33)</option>
+<option value="+81">Japan (+81)</option>
+<option value="+55">Brazil (+55)</option>
+<option value="+86">China (+86)</option>
+<option value="+39">Italy (+39)</option>
+<option value="+52">Mexico (+52)</option>
+<option value="+7">Russia (+7)</option>
+<option value="+82">South Korea (+82)</option>
+<option value="+34">Spain (+34)</option>
+
                   </select>
                   <input
                     type="tel"

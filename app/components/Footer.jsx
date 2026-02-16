@@ -248,17 +248,17 @@ export default function Footer() {
           <h4 className="text-white font-semibold text-lg mb-4">Quick Links</h4>
           <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-400">
             <Link href="/">Home</Link>
-            <Link href="/about-us">About</Link>
-            <Link href="/our-services">Services</Link>
-            <Link href={BASE_ROUTE}>Residential</Link>
-            <Link href="/commercial">Commercial</Link>
-            <Link href="/careers">Careers</Link>
-            <Link href="/terms-condition">Terms & Condition</Link>
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/faqs">FAQs</Link>
             <Link href="/blog">Blog</Link>
+            <Link href={BASE_ROUTE}>Residential</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/commercial">Commercial</Link>  
+            <Link href="/terms-condition">Terms & Condition</Link>
+            <Link href="/about-us">About</Link>
             <Link href="/disclaimer">Disclaimer</Link>
+            <Link href="/our-services">Services</Link>
             <Link href="/contact-us">Contact</Link>
+            <Link href="/careers">Careers</Link>
+            <Link href="/faqs">FAQs</Link>
           </div>
         </div>
 

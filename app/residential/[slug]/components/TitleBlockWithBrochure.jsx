@@ -1,10 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+
+// Country codes array (same as EMI calculator)
+const countryCodes = [
+  { code: "+1", label: "🇺🇸 USA" },
+  { code: "+1", label: "🇨🇦 Canada" },
+  { code: "+44", label: "🇬🇧 UK" },
+  { code: "+91", label: "🇮🇳 India" },
+  { code: "+61", label: "🇦🇺 Australia" },
+  { code: "+49", label: "🇩🇪 Germany" },
+  { code: "+33", label: "🇫🇷 France" },
+  { code: "+81", label: "🇯🇵 Japan" },
+  { code: "+55", label: "🇧🇷 Brazil" },
+  { code: "+86", label: "🇨🇳 China" },
+  { code: "+39", label: "🇮🇹 Italy" },
+  { code: "+52", label: "🇲🇽 Mexico" },
+  { code: "+7", label: "🇷🇺 Russia" },
+  { code: "+82", label: "🇰🇷 South Korea" },
+  { code: "+34", label: "🇪🇸 Spain" },
+  { code: "+971", label: "🇦🇪 UAE" }
+];
 
 export default function TitleBlockWithBrochure({ property }) {
   const [lead, setLead] = useState({
@@ -12,13 +31,10 @@ export default function TitleBlockWithBrochure({ property }) {
     email: "",
     phone: "",
   });
+  const [countryCode, setCountryCode] = useState("+91"); // ✅ NEW: Country code state
 
   const [showBrochurePopup, setShowBrochurePopup] = useState(false);
-
-  /* ✅ NEW — THANK YOU STATE */
   const [showThankYou, setShowThankYou] = useState(false);
-
-  /* ✅ NEW — ERRORS */
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -28,7 +44,6 @@ export default function TitleBlockWithBrochure({ property }) {
     };
   }, [showBrochurePopup]);
 
-
   const validate = () => {
     const newErrors = {};
 
@@ -36,8 +51,10 @@ export default function TitleBlockWithBrochure({ property }) {
       newErrors.name = "Name is required";
     }
 
-    if (!/^[6-9]\d{9}$/.test(lead.phone)) {
-      newErrors.phone = "Enter valid 10 digit phone";
+    // ✅ UPDATED: International phone validation (8-15 digits)
+    const phoneDigits = lead.phone.replace(/\D/g, '');
+    if (!phoneDigits || phoneDigits.length < 8 || phoneDigits.length > 15) {
+      newErrors.phone = "Enter valid phone number (8-15 digits)";
     }
 
     if (!/^\S+@\S+\.\S+$/.test(lead.email)) {
@@ -47,12 +64,15 @@ export default function TitleBlockWithBrochure({ property }) {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   async function handleSubmit() {
     if (!validate()) return;
 
     try {
       await addDoc(collection(db, "brochureLeads"), {
-        ...lead,
+        name: lead.name,
+        email: lead.email,
+        phone: `${countryCode}${lead.phone}`, // ✅ COMBINE country code + phone
         propertySlug: property.slug,
         propertyTitle: property.title,
         createdAt: serverTimestamp(),
@@ -60,6 +80,7 @@ export default function TitleBlockWithBrochure({ property }) {
 
       // Clear form
       setLead({ name: "", email: "", phone: "" });
+      setCountryCode("+91"); // ✅ RESET country code
 
       // 🔥 CLOSE FORM FIRST
       setShowBrochurePopup(false);
@@ -83,15 +104,12 @@ export default function TitleBlockWithBrochure({ property }) {
     }
   }
 
-
-
   if (!property || typeof property !== "object") return null;
 
   const {
     sector = "",
     locationName = "",
   } = property;
-
 
   return (
     <>
@@ -107,8 +125,6 @@ export default function TitleBlockWithBrochure({ property }) {
             <p className="text-sm text-[#F5A300]">
               {property.location}
             </p>
-
-
 
             <div className="flex flex-col gap-2 mt-1 text-sm text-gray-600">
               {typeof property.builderName === "string" && (
@@ -185,9 +201,6 @@ export default function TitleBlockWithBrochure({ property }) {
       {/* ================= BROCHURE POPUP ================= */}
       {showBrochurePopup && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
-
-
-
           <div className="relative w-full max-w-md bg-white rounded-xl p-6">
             <button
               onClick={() => setShowBrochurePopup(false)}
@@ -242,16 +255,31 @@ export default function TitleBlockWithBrochure({ property }) {
                 )}
               </div>
 
+              {/* ✅ NEW PHONE INPUT WITH COUNTRY CODE */}
               <div>
-                <input
-                  type="tel"
-                  placeholder="Contact Number*"
-                  value={lead.phone}
-                  onChange={(e) =>
-                    setLead({ ...lead, phone: e.target.value })
-                  }
-                  className="w-full border rounded-md px-4 py-2 text-sm"
-                />
+                <div className="flex gap-2">
+                  <select 
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="w-28 px-3 py-2 border rounded-md text-sm bg-white flex items-center justify-between"
+                  >
+                    {countryCodes.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number*"
+                    value={lead.phone}
+                    onChange={(e) =>
+                      setLead({ ...lead, phone: e.target.value.replace(/\D/g, '') }) // ✅ Only digits
+                    }
+                    className="flex-1 border rounded-md px-4 py-2 text-sm"
+                    maxLength={15}
+                  />
+                </div>
                 {errors.phone && (
                   <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
                 )}
@@ -267,6 +295,7 @@ export default function TitleBlockWithBrochure({ property }) {
           </div>
         </div>
       )}
+
       {/* ✅ THANK YOU POPUP */}
       {showThankYou && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -280,6 +309,7 @@ export default function TitleBlockWithBrochure({ property }) {
           </div>
         </div>
       )}
+
       {/* ================= MOBILE QUICK FACTS ================= */}
       <div className="lg:hidden bg-white rounded-xl p-5 shadow-sm mt-4">
         <h3 className="font-semibold mb-3 border-b pb-2">
@@ -295,8 +325,6 @@ export default function TitleBlockWithBrochure({ property }) {
           <p>Possession : {property.possession || "-"}</p>
         </div>
       </div>
-
-
     </>
   );
 }

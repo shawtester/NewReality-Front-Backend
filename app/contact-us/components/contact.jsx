@@ -82,22 +82,24 @@ export default function ContactPage() {
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/60">
                     <Phone className="h-4 w-4" />
                   </span>
-                  <span>+1 012 3456 789</span>
+                  <span>+918824966966</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/60">
                     <Mail className="h-4 w-4" />
                   </span>
-                  <span>demo@gmail.com</span>
+                  <span>support@neevreality.com <br />
+
+                   info@neevreality.com</span>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/60">
                     <MapPin className="h-4 w-4" />
                   </span>
                   <span>
-                    132 Dartmouth Street Boston,
+                    SF-09, Ninex City Mart, Sector
                     <br />
-                    Massachusetts 02156 United States
+                  49, Sohna Road, Gurgaon.
                   </span>
                 </div>
               </div>

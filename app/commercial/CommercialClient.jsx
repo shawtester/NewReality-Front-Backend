@@ -159,23 +159,23 @@ const applyCommercialFilters = ({
   // 💰 BUDGET FILTER
   if (budget) {
     filtered = filtered.filter((item) => {
-        const range = extractPriceRange(item.priceRange);
-        if (!range) return false;
+      const range = extractPriceRange(item.priceRange);
+      if (!range) return false;
 
-        const { min: propertyMin, max: propertyMax } = range;
+      const { min: propertyMin, max: propertyMax } = range;
 
-        if (budget === "above-8-cr") {
-            return propertyMax >= 8;
-        }
+      if (budget === "above-8-cr") {
+        return propertyMax >= 8;
+      }
 
-        const [min, max] = budget
-            .replace("-cr", "")
-            .split("-")
-            .map(Number);
+      const [min, max] = budget
+        .replace("-cr", "")
+        .split("-")
+        .map(Number);
 
-        return propertyMax >= min && propertyMin <= max;
+      return propertyMax >= min && propertyMin <= max;
     });
-}
+  }
 
 
 
@@ -373,9 +373,10 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   }, [searchParams, router]);
 
   const totalPages = useMemo(
-    () => Math.ceil(filteredApartments.length / apartmentsPerPage),
-    [filteredApartments.length]
+    () => Math.ceil(sortedApartments.length / apartmentsPerPage),
+    [sortedApartments.length]
   );
+
 
   const currentPage = Number(searchParams.get("page")) || 1;
   const startIndex = (currentPage - 1) * apartmentsPerPage;

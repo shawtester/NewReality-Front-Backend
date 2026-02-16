@@ -348,7 +348,15 @@ export default function ResidentialPage({ apartments = [] }) {
             bhk: urlBhk
         });
 
-        setFilteredApartments(filtered);
+        /* 🔥 SORT BY LATEST FIRST (SAME AS ADMIN) */
+        const sorted = [...filtered].sort(
+            (a, b) =>
+                (b.timestampCreate?.seconds || 0) -
+                (a.timestampCreate?.seconds || 0)
+        );
+
+        setFilteredApartments(sorted);
+
     }, [searchParams, apartments]);
 
     // ✅ BANNER FETCH
@@ -405,8 +413,9 @@ export default function ResidentialPage({ apartments = [] }) {
         [filteredApartments.length]
     );
 
-    const currentPage = Number(searchParams.get("page")) || page;
-    const startIndex = (currentPage - 1) * apartmentsPerPage;
+    const startIndex = (page - 1) * apartmentsPerPage;
+    const currentPage = page;
+
     const currentApartments = filteredApartments.slice(startIndex, startIndex + apartmentsPerPage);
 
     const displayTitle = banner?.pageTitle || pageTitleDynamic;

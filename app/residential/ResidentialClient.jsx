@@ -368,7 +368,7 @@ export default function ResidentialPage({ apartments = [] }) {
             </section>
 
             {/* ✅ FIXED BANNER - EXACT REFERENCE SIZING */}
-            {/* ✅ FIXED BANNER - FULL IMAGE VISIBLE (NO CROPPING) */}
+   
             <section className="bg-white">
                 <div className="max-w-[1440px] mx-auto px-4 ">
                     <h2 className="text-center text-3xl sm:text-2xl font-bold ">
@@ -499,7 +499,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 }
                             }} placeholder="Enter Keyword" className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0" />
                             <select value={type} onChange={(e) => handleFilterChange('type', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option value="" disabled hidden>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option><option value="villa">Villas</option><option value="plot">Plots</option>
+                                <option value="" disabled hidden>Type</option><option value="apartment">Apartments</option><option value="builder-floor">Builder Floor</option>
                             </select>
                             <select value={status} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option value="" disabled hidden>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>

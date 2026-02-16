@@ -28,7 +28,7 @@ export default function StickyIcons() {
 
             {/* WhatsApp */}
             <a
-              href="https://wa.me/919876543210?text=Hello%20I%20am%20interested"
+              href="https://wa.me/918368607767?text=Hi%20Neev%20Reality%20,%20I,m%20looking%20to%20to%20buy%20a%20property.%20Kindly%20share%20available%20options."
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center border border-green-500 text-green-600 px-4 py-3 rounded-2xl font-medium gap-2 shadow-md hover:shadow-lg transition-all"

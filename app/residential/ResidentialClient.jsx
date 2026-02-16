@@ -91,6 +91,32 @@ const applyAllFilters = ({
         (item) => item.propertyType === "residential"
     );
 
+    // 💰 Convert price string like "2.5 Cr" or "1.8 - 2.2 Cr" to numeric value in Crores
+    const extractPriceRange = (priceRange = "") => {
+        if (!priceRange) return null;
+
+        const cleaned = priceRange
+            .toLowerCase()
+            .replace(/cr|crore|₹|,/g, "")
+            .trim();
+
+        if (!/\d/.test(cleaned)) return null;
+
+        if (cleaned.includes("-")) {
+            const [min, max] = cleaned.split("-").map(Number);
+            return {
+                min: min || 0,
+                max: max || min || 0,
+            };
+        }
+
+        const value = parseFloat(cleaned);
+        return { min: value, max: value };
+    };
+
+
+
+
     // 🔎 KEYWORD SEARCH
     if (keyword) {
         const lower = keyword.toLowerCase();
@@ -124,6 +150,29 @@ const applyAllFilters = ({
             )
         );
     }
+
+    // 💰 BUDGET FILTER
+    if (budget) {
+        filtered = filtered.filter((item) => {
+            const range = extractPriceRange(item.priceRange);
+            if (!range) return false;
+
+            const { min: propertyMin, max: propertyMax } = range;
+
+            if (budget === "above-8-cr") {
+                return propertyMax >= 8;
+            }
+
+            const [min, max] = budget
+                .replace("-cr", "")
+                .split("-")
+                .map(Number);
+
+            return propertyMax >= min && propertyMin <= max;
+        });
+    }
+
+
 
     // 🛏️ BHK
     if (bhk) {
@@ -368,7 +417,7 @@ export default function ResidentialPage({ apartments = [] }) {
             </section>
 
             {/* ✅ FIXED BANNER - EXACT REFERENCE SIZING */}
-   
+
             <section className="bg-white">
                 <div className="max-w-[1440px] mx-auto px-4 ">
                     <h2 className="text-center text-3xl sm:text-2xl font-bold ">
@@ -672,7 +721,7 @@ export default function ResidentialPage({ apartments = [] }) {
                             baseRoute="residential"
                             property={{
                                 title: item.title,
-                                developer: item.developer,
+                                builder: item.developer,
                                 locationName: item.location,
                                 sector: item.sector,
                                 bhk: item.configurations?.join(", "),

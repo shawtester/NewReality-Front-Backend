@@ -254,6 +254,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
                   price: p.priceRange,
                   img: p.mainImage?.url,
                   slug: p.slug || p.id,
+                  propertyType: p.propertyType, 
                   isRera: p.isRera,
                 }}
               />

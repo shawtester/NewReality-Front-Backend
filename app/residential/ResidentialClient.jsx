@@ -729,6 +729,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 price: item.priceRange,
                                 img: item.mainImage?.url || "/placeholder.jpg",
                                 slug: item.slug || item.id,
+                                propertyType: item.propertyType, 
                                 isTrending: item.isTrending,
                                 isNewLaunch: item.isNewLaunch,
                                 isRera: item.isRera,

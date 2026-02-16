@@ -158,13 +158,13 @@ export default function Navbar() {
           </AuthContextProvider>
 
           <div className="ml-3 text-sm rounded-full bg-[#F5F5F5] px-4 py-1.5 font-medium text-[#DBA40D]">
-            <a href="tel:+918824966669">+91 8824966669</a>
+            <a href="tel:+918824966966">+91 8824966966</a>
           </div>
         </div>
 
         {/* ================= MOBILE ================= */}
         <div className="flex items-center gap-4 min-[800px]:hidden">
-          <a href="tel:+918824966669">
+          <a href="tel:+918824966966">
             <Phone size={20} />
           </a>
 

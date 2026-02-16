@@ -220,7 +220,7 @@ export default function Navbar() {
               ))}
 
               <li className="pt-4 border-t text-[#DBA40D] font-medium">
-                <a href="tel:+918824966669">+91 8824966669</a>
+                <a href="tel:+918824966966">+91 8824966966</a>
               </li>
             </ul>
           </div>

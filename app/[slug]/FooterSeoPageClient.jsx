@@ -227,8 +227,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
     }
 
     result.sort((a, b) => {
-      const dateA = a?.timestampCreate?.seconds || 0;
-      const dateB = b?.timestampCreate?.seconds || 0;
+      const dateA = a?.timestampCreate || 0;
+      const dateB = b?.timestampCreate || 0;
       return dateB - dateA;
     });
 

@@ -212,6 +212,7 @@ const applyAllFilters = ({
 };
 
 export default function ResidentialPage({ apartments = [] }) {
+
     const BASE_ROUTE = "/residential";
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -351,8 +352,8 @@ export default function ResidentialPage({ apartments = [] }) {
         /* 🔥 SORT BY LATEST FIRST (SAME AS ADMIN) */
         const sorted = [...filtered].sort(
             (a, b) =>
-                (b.timestampCreate?.seconds || 0) -
-                (a.timestampCreate?.seconds || 0)
+                (b.timestampCreate || 0) -
+                (a.timestampCreate || 0)
         );
 
         setFilteredApartments(sorted);

@@ -24,8 +24,8 @@ export default function TrendingProjects({ properties = [] }) {
     .filter((p) => p?.isTrending)
     .sort((a, b) => {
       //  Firestore Timestamp support
-      const dateA = a?.timestampCreate?.seconds || 0;
-      const dateB = b?.timestampCreate?.seconds || 0;
+      const dateA = a?.timestampCreate || 0;
+      const dateB = b?.timestampCreate || 0;
 
       return dateB - dateA; // Latest first
     });

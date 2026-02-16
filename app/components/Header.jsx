@@ -73,8 +73,8 @@ export default function Navbar() {
 
   return (
     <header className="fixed  top-0 z-50 bg-white w-full">
-      <nav className="mx-auto flex items-center justify-between px-4 sm:px-6 py-3 max-w-[1212px] h-[102px]">
-
+      <nav className="mx-auto flex items-center justify-between px-4 sm:px-6 py-3 min-[800px]:h-[102px] h-[70px] max-w-[1212px]">
+       
         {/* LOGO */}
         <Link href="/" className="flex items-center">
           <Image
@@ -158,13 +158,13 @@ export default function Navbar() {
           </AuthContextProvider>
 
           <div className="ml-3 text-sm rounded-full bg-[#F5F5F5] px-4 py-1.5 font-medium text-[#DBA40D]">
-            <a href="tel:+918824966669">+91 8824966669</a>
+            <a href="tel:+918824966966">+91 8824966966</a>
           </div>
         </div>
 
         {/* ================= MOBILE ================= */}
         <div className="flex items-center gap-4 min-[800px]:hidden">
-          <a href="tel:+918824966669">
+          <a href="tel:+918824966966">
             <Phone size={20} />
           </a>
 
@@ -220,7 +220,7 @@ export default function Navbar() {
               ))}
 
               <li className="pt-4 border-t text-[#DBA40D] font-medium">
-                <a href="tel:+918824966669">+91 8824966669</a>
+                <a href="tel:+918824966966">+91 8824966966</a>
               </li>
             </ul>
           </div>

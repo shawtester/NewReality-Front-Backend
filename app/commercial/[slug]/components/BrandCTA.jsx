@@ -31,7 +31,7 @@ export default function BrandCTA({ propertyTitle }) {
 
         <div className="flex gap-3 mt-4">
           <a
-            href="tel:+918824966669"
+            href="tel:+918824966966"
             className="flex-1 py-2 border rounded-lg text-sm"
           >
             Call Us

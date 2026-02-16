@@ -51,11 +51,10 @@ export default function FloorPlanSection({ floorPlans = [] }) {
             <button
               key={t}
               onClick={() => setActiveType(t)}
-              className={`px-4 py-1 rounded-full text-sm border transition ${
-                activeType === t
+              className={`px-4 py-1 rounded-full text-sm border transition ${activeType === t
                   ? "bg-gray-900 text-white"
                   : "bg-gray-100 text-gray-600"
-              }`}
+                }`}
             >
               {t}
             </button>
@@ -102,12 +101,23 @@ export default function FloorPlanSection({ floorPlans = [] }) {
                 <p className="text-sm font-medium">{fp.title}</p>
                 <p className="text-sm font-semibold">{fp.price}</p>
 
-                <div className="flex justify-between items-center mt-3 text-xs">
-                  <span className="text-[#F5A300] cursor-pointer">
+                <div className="flex justify-between items-center mt-3">
+
+                  {/* REQUEST CALLBACK TEXT */}
+                  <span className="text-[#F5A300] text-xs font-medium cursor-pointer">
                     Request<br />Callback
                   </span>
-                  <FaPhoneAlt className="text-yellow-400 text-lg" />
+
+                  {/* PHONE BUTTON */}
+                  <a
+                    href="tel:+918824966966"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium text-[#DBA40D] hover:bg-[#DBA40D]/10 transition"
+                  >
+                    <FaPhoneAlt className="text-md" />
+                  </a>
+
                 </div>
+
               </div>
             ))}
           </div>

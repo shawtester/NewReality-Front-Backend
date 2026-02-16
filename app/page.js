@@ -18,7 +18,7 @@ export default async function Home() {
  
 
   return (
-    <main className="w-screen overflow-x-hidden">
+    <main className="w-full overflow-x-hidden">
       <Header />
 
       {/* 🔍 HERO + SEARCH */}

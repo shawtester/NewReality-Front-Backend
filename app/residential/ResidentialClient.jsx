@@ -627,10 +627,15 @@ export default function ResidentialPage({ apartments = [] }) {
                                 >
                                     <option value="" disabled hidden>BHK</option>
                                     <option value="1-bhk">1 BHK</option>
+                                    <option value="1.5-bhk">1.5 BHK</option>
                                     <option value="2-bhk">2 BHK</option>
+                                    <option value="2.5-bhk">2.5 BHK</option>
                                     <option value="3-bhk">3 BHK</option>
+                                    <option value="3.5-bhk">3.5 BHK</option>
                                     <option value="4-bhk">4 BHK</option>
+                                    <option value="4.5-bhk">4.5 BHK</option>
                                     <option value="5-bhk">5 BHK</option>
+                                    <option value="above-5-bhk">Above 5 BHK</option>
                                 </select>
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
                             </div>

@@ -153,7 +153,8 @@ export default async function PropertyPage({ params }) {
 
           <TitleBlockWithBrochure property={cleanProperty} />
 
-          <div className="sticky top-[96px] z-30 bg-white">
+          <div className="sticky top-[64px] md:top-[96px] z-30 bg-white">
+
             <ScrollTabs />
           </div>
 

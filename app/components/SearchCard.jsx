@@ -41,6 +41,8 @@ export default function SearchCard() {
   const [desktopVideoPlaying, setDesktopVideoPlaying] = useState(true);
   const [videoKey, setVideoKey] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
+
 
   /* ================= FETCH HERO ================= */
   useEffect(() => {
@@ -74,6 +76,31 @@ export default function SearchCard() {
     fetchHero();
   }, []);
 
+  /* ================= SCREEN SIZE WATCH ================= */
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobileView(mobile);
+
+      if (mobile) {
+        // Desktop video stop
+        setDesktopVideoPlaying(false);
+        setVideoKey(prev => prev + 1);
+      } else {
+        // Mobile video close
+        setPlayMobileVideo(false);
+        setVideoKey(prev => prev + 1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
+
   /* ================= HERO IMAGE CLICK ================= */
   const handleHeroImageClick = useCallback(() => {
     const currentImage = hero?.images?.[currentSlide];
@@ -102,9 +129,8 @@ export default function SearchCard() {
       const videoId = idMatch?.[1];
 
       return videoId
-        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${
-            isMuted ? 1 : 0
-          }`
+        ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isMuted ? 1 : 0
+        }`
         : DEFAULT_VIDEO;
     }
   };
@@ -197,9 +223,8 @@ export default function SearchCard() {
       return (
         <div
           key={`${imageUrl}-${index}`}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"
-          }`}
+          className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100 z-[15]" : "opacity-0 z-0"
+            }`}
         >
           {imageUrl && (
             <Image
@@ -220,12 +245,12 @@ export default function SearchCard() {
     <section className="relative w-full ">
       {/* HERO CONTAINER */}
       <div className="relative w-full h-[304px] sm:h-[304px] md:h-[450px] overflow-hidden z-[10]">
-       <div 
-  className="absolute inset-0 z-[25] cursor-pointer max-md:bottom-20"
-  onClick={handleHeroImageClick}
->
-  {renderHeroBackground()}
-</div>
+        <div
+          className="absolute inset-0 z-[25] cursor-pointer max-md:bottom-20"
+          onClick={handleHeroImageClick}
+        >
+          {renderHeroBackground()}
+        </div>
 
 
         <button
@@ -243,7 +268,7 @@ export default function SearchCard() {
         </button>
 
         {/* DESKTOP VIDEO */}
-           {hero?.videoUrl && desktopVideoPlaying && (
+        {hero?.videoUrl && desktopVideoPlaying && !isMobileView && (
           <div className="absolute hidden md:flex items-center justify-end pr-8 z-[200] pt-14 right-10 bottom-20">
             <div
               className="relative rounded-3xl overflow-hidden bg-black shadow-2xl"
@@ -275,7 +300,7 @@ export default function SearchCard() {
         )}
 
         {/* DESKTOP PLAY BUTTON */}
-        {hero?.videoUrl && !desktopVideoPlaying && (
+        {hero?.videoUrl && !desktopVideoPlaying && !isMobileView && (
           <div className="absolute hidden md:flex items-center justify-end pr-8 z-[200] pt-14 right-10 bottom-20">
             <button
               onClick={() => {
@@ -297,7 +322,7 @@ export default function SearchCard() {
 
 
         {/* MOBILE VIDEO */}
-        {playMobileVideo && hero?.videoUrl && (
+        {playMobileVideo && hero?.videoUrl && isMobileView && (
           <div className="md:hidden absolute inset-0 z-[80] bg-black/80 flex items-start justify-center pt-1 pb-10">
             <button
               onClick={() => setPlayMobileVideo(false)}
@@ -325,7 +350,7 @@ export default function SearchCard() {
           </div>
         )}
 
-        {!playMobileVideo && hero?.videoUrl && (
+        {!playMobileVideo && hero?.videoUrl && isMobileView && (
           <div className="md:hidden absolute right-4 bottom-20 z-[100] mb-10">
             <button
               onClick={() => setPlayMobileVideo(true)}
@@ -338,7 +363,7 @@ export default function SearchCard() {
       </div>
 
       {/* SEARCH BAR */}
-       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[200px] w-full max-w-[990px] px-4 z-30">
+      <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[200px] w-full max-w-[990px] px-4 z-30">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h2 className="text-sm sm:text-base font-semibold text-gray-800">

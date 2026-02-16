@@ -45,9 +45,9 @@ export default async function AboutPage() {
                     Location
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    3rd Floor, Tower B, Business Hub <br />
-                    Golf Course Road, Sector 54 <br />
-                    Gurugram, Haryana – 122002
+                    SF-09, Ninex City Mart, Sector <br />
+                    49, Shona Road, Gurgaon<br />
+                    
                   </p>
                 </div>
 

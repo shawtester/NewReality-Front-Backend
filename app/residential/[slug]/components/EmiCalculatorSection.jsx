@@ -4,8 +4,27 @@ import { useState, useMemo, useEffect } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
+// Country codes array from our previous conversation
+const countryCodes = [
+  { code: "+1", label: "🇺🇸 USA" },
+  { code: "+1", label: "🇨🇦 Canada" },
+  { code: "+44", label: "🇬🇧 UK" },
+  { code: "+91", label: "🇮🇳 India" },
+  { code: "+61", label: "🇦🇺 Australia" },
+  { code: "+49", label: "🇩🇪 Germany" },
+  { code: "+33", label: "🇫🇷 France" },
+  { code: "+81", label: "🇯🇵 Japan" },
+  { code: "+55", label: "🇧🇷 Brazil" },
+  { code: "+86", label: "🇨🇳 China" },
+  { code: "+39", label: "🇮🇹 Italy" },
+  { code: "+52", label: "🇲🇽 Mexico" },
+  { code: "+7", label: "🇷🇺 Russia" },
+  { code: "+82", label: "🇰🇷 South Korea" },
+  { code: "+34", label: "🇪🇸 Spain" },
+  { code: "+971", label: "🇦🇪 UAE" }
+];
 
+export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   const [loanAmount, setLoanAmount] = useState(2500000);
   const [interestRate, setInterestRate] = useState(10.5);
   const [tenure, setTenure] = useState(30);
@@ -14,6 +33,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
   // form states
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+91"); // Default to India
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +47,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       document.body.style.overflow = "auto";
     };
   }, [showLoanPopup]);
-
 
   /* ================= EMI CALC ================= */
   const { emi, totalInterest, totalPayment } = useMemo(() => {
@@ -76,8 +95,11 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
     if (!name.trim()) newErrors.name = "Name is required";
 
-    if (!/^[6-9]\d{9}$/.test(phone))
-      newErrors.phone = "Enter valid 10 digit phone";
+    // Updated phone validation - check only digits after country code (8-15 digits)
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!phoneDigits || phoneDigits.length < 8 || phoneDigits.length > 15) {
+      newErrors.phone = "Enter valid phone number (8-15 digits)";
+    }
 
     if (email && !/^\S+@\S+\.\S+$/.test(email))
       newErrors.email = "Enter valid email";
@@ -95,7 +117,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
       await addDoc(collection(db, "contacts"), {
         name,
-        phone,
+        phone: `${countryCode}${phone}`, // Combine country code + phone
         email,
         propertyTitle,
         source: "EMI Calculator Popup",
@@ -109,6 +131,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       setName("");
       setPhone("");
       setEmail("");
+      setCountryCode("+91"); // Reset to default
 
       // 🔥 CLOSE FORM FIRST
       setShowLoanPopup(false);
@@ -122,16 +145,13 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
     }
   };
 
-
   return (
     <>
       {/* ================= EMI CALCULATOR ================= */}
       <section id="emi" className="max-w-[1240px] mx-auto px-4 mt-14">
         <h2 className="text-xl font-semibold mb-6">EMI Calculator</h2>
 
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-[#F6FAFF] p-6 rounded-xl">
-
           {/* RIGHT GRAPH */}
           <div className="flex flex-col items-center">
             <h3 className="text-lg font-semibold mb-4 text-center">
@@ -167,7 +187,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
           {/* LEFT */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
-
             <div>
               <label className="text-sm text-gray-600">Loan Amount</label>
               <input type="number" value={loanAmount} onChange={(e) => setLoanAmount(+e.target.value)} className="w-full mt-1 px-4 py-2 border rounded-md" />
@@ -204,7 +223,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
               </span>
             </div>
 
-
             <button
               onClick={() => setShowLoanPopup(true)}
               className="w-full mt-4 bg-[#F5A300] text-white py-2.5 rounded-lg font-semibold"
@@ -218,9 +236,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
       {/* ================= POPUP ================= */}
       {showLoanPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-
           <div className="bg-white w-full max-w-md rounded-xl p-6 relative">
-
             <button
               onClick={() => setShowLoanPopup(false)}
               className="absolute top-3 right-3 text-xl"
@@ -232,13 +248,43 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
             <p className="py-2">Our loan expert will contact you shortly</p>
 
             <div className="space-y-3">
-              <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              <input 
+                placeholder="Full Name" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                className="w-full px-4 py-2 border rounded-md" 
+              />
               {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
 
-              <input placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              {/* ✅ NEW PHONE INPUT WITH COUNTRY CODE */}
+              <div className="flex gap-2">
+                <select 
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="w-28 px-3 py-2 border rounded-md text-sm bg-white flex items-center justify-between"
+                >
+                  {countryCodes.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.label}
+                    </option>
+                  ))}
+                </select>
+                <input 
+                  placeholder="Phone Number" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} // Only digits
+                  className="flex-1 px-4 py-2 border rounded-md" 
+                  maxLength={15}
+                />
+              </div>
               {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
 
-              <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded-md" />
+              <input 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                className="w-full px-4 py-2 border rounded-md" 
+              />
               {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
             </div>
 
@@ -252,6 +298,7 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
           </div>
         </div>
       )}
+
       {/* ================= THANK YOU POPUP ================= */}
       {showThankYou && (
         <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
@@ -265,7 +312,6 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
           </div>
         </div>
       )}
-
     </>
   );
 }

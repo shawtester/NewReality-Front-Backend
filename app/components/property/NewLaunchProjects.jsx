@@ -94,6 +94,7 @@ export default function NewLaunchProjects({ properties = [] }) {
                   price: p.priceRange,
                   img: p.mainImage?.url || "/images/placeholder.jpg",
                   slug: p.slug || p.id,
+                  propertyType: p.propertyType, 
                   isRera: p.isRera,
                 }}
               />

@@ -72,6 +72,35 @@ const filterCommercialByType = (list = [], type) => {
   );
 };
 
+const extractPriceRange = (priceRange = "") => {
+  if (!priceRange) return null;
+
+  const cleaned = priceRange
+    .toLowerCase()
+    .replace(/₹/g, "")
+    .replace(/cr|crore/g, "")
+    .replace(/onwards/g, "")
+    .replace(/\+/g, "")
+    .replace(/\*/g, "")
+    .replace(/,/g, "")
+    .trim();
+
+  if (!/\d/.test(cleaned)) return null;
+
+  if (cleaned.includes("-")) {
+    const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
+    return {
+      min: min || 0,
+      max: max || min || 0,
+    };
+  }
+
+  const value = parseFloat(cleaned);
+  return { min: value, max: value };
+};
+
+
+
 // ✅ COMMERCIAL PRO FILTER ENGINE
 const applyCommercialFilters = ({
   apartments = [],
@@ -85,6 +114,8 @@ const applyCommercialFilters = ({
   let filtered = apartments.filter(
     (item) => !item.propertyType || item.propertyType === "commercial"
   );
+
+
 
   // 🔎 KEYWORD SEARCH
   if (keyword) {
@@ -105,14 +136,15 @@ const applyCommercialFilters = ({
 
   // 🚧 STATUS
   if (status) {
-    filtered = filtered.filter(
-      (item) =>
-        item.isNewLaunch && status === "new-launch" ||
-        item.isReadyToMove && status === "ready-to-move" ||
-        item.isUnderConstruction && status === "under-construction" ||
-        item.isPreLaunch && status === "pre-launch"
-    );
+    filtered = filtered.filter((item) => {
+      if (status === "new-launch") return item.isNewLaunch;
+      if (status === "ready-to-move") return item.isReadyToMove;
+      if (status === "under-construction") return item.isUnderConstruction;
+      if (status === "pre-launch") return item.isPreLaunch;
+      return true;
+    });
   }
+
 
   // 📍 LOCALITY
   if (locality) {
@@ -122,6 +154,31 @@ const applyCommercialFilters = ({
       )
     );
   }
+
+
+  // 💰 BUDGET FILTER
+  if (budget) {
+    filtered = filtered.filter((item) => {
+        const range = extractPriceRange(item.priceRange);
+        if (!range) return false;
+
+        const { min: propertyMin, max: propertyMax } = range;
+
+        if (budget === "above-8-cr") {
+            return propertyMax >= 8;
+        }
+
+        const [min, max] = budget
+            .replace("-cr", "")
+            .split("-")
+            .map(Number);
+
+        return propertyMax >= min && propertyMin <= max;
+    });
+}
+
+
+
 
   return filtered;
 };
@@ -243,6 +300,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
       title = `${urlBudget.replace(/-/g, " to ")} Properties in Gurgaon`;
     }
     setPageTitleDynamic(title);
+
 
     const filtered = applyCommercialFilters({
       apartments,
@@ -694,13 +752,14 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
               baseRoute="commercial"
               property={{
                 title: item.title,
-                developer: item.developer,
+                builder: item.developer,
                 location: item.location,
                 bhk: item.configurations?.join(", "),
                 size: item.areaRange,
                 price: item.priceRange,
                 img: item.mainImage?.url || "/placeholder.jpg",
                 slug: item.slug || item.id,
+                propertyType: item.propertyType,
                 isTrending: item.isTrending,
                 isNewLaunch: item.isNewLaunch,
                 isRera: item.isRera,

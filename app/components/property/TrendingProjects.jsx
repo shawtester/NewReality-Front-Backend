@@ -88,6 +88,7 @@ export default function TrendingProjects({ properties = [] }) {
                   price: p.priceRange,
                   img: p.mainImage?.url || "/placeholder.png",
                   slug: p.slug || p.id,
+                  propertyType: p.propertyType, 
                   isRera: p.isRera,
                 }}
               />

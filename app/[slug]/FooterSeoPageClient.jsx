@@ -35,6 +35,34 @@ export default function FooterSeoPage({ params, properties = [] }) {
   const [description, setDescription] = useState("");
   const [heading, setHeading] = useState("");
 
+  const extractPriceRange = (priceRange = "") => {
+    if (!priceRange) return null;
+
+    const cleaned = priceRange
+      .toLowerCase()
+      .replace(/₹/g, "")
+      .replace(/cr|crore/g, "")
+      .replace(/onwards/g, "")
+      .replace(/\+/g, "")
+      .replace(/\*/g, "")
+      .replace(/,/g, "")
+      .trim();
+
+    if (!/\d/.test(cleaned)) return null;
+
+    if (cleaned.includes("-")) {
+      const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
+      return {
+        min: min || 0,
+        max: max || min || 0,
+      };
+    }
+
+    const value = parseFloat(cleaned);
+    return { min: value, max: value };
+  };
+
+
   /* ================= NORMALIZED SLUG ================= */
   const normalizedSlug = slug
     .toLowerCase()
@@ -76,17 +104,28 @@ export default function FooterSeoPage({ params, properties = [] }) {
 
   /* ================= SIZE FILTER ================= */
   if (normalizedSlug.includes("bhk")) {
-    filtered = filtered.filter((p) =>
-      p.configurations?.some((cfg) => {
-        const normalizedCfg = cfg
-          ?.toLowerCase()
-          .trim()
-          .replace(/\s+/g, "-");
+    filtered = filtered.filter((p) => {
+      if (!p.configurations) return false;
 
-        return normalizedCfg === normalizedSlug;
-      })
-    );
+      // Above 5 BHK
+      if (normalizedSlug === "above-5-bhk") {
+        return p.configurations.some((cfg) => {
+          const match = cfg.match(/\d+(\.\d+)?/);
+          if (!match) return false;
+          return parseFloat(match[0]) > 5;
+        });
+      }
+
+      const selectedBhk = parseFloat(normalizedSlug);
+
+      return p.configurations.some((cfg) => {
+        const match = cfg.match(/\d+(\.\d+)?/);
+        if (!match) return false;
+        return parseFloat(match[0]) === selectedBhk;
+      });
+    });
   }
+
 
   /* ================= STATUS FILTER ================= */
   const statusMap = {
@@ -133,13 +172,10 @@ export default function FooterSeoPage({ params, properties = [] }) {
   /* ================= BUDGET FILTER ================= */
   if (normalizedSlug.includes("cr")) {
     filtered = filtered.filter((p) => {
-      if (!p.priceRange) return false;
+      const range = extractPriceRange(p.priceRange);
+      if (!range) return false;
 
-      const match = p.priceRange.match(/([\d.]+)/g);
-      if (!match || match.length < 2) return false;
-
-      const propertyMin = parseFloat(match[0]);
-      const propertyMax = parseFloat(match[1]);
+      const { min: propertyMin, max: propertyMax } = range;
 
       if (normalizedSlug === "above-8-cr") {
         return propertyMax >= 8;
@@ -149,9 +185,10 @@ export default function FooterSeoPage({ params, properties = [] }) {
       const min = parseFloat(parts[0]);
       const max = parseFloat(parts[1]);
 
-      return propertyMin >= min && propertyMax <= max;
+      return propertyMax >= min && propertyMin <= max;
     });
   }
+
 
   /* ================= LOCATION FILTER (🔥 FIXED) ================= */
   const locationSlugs = [
@@ -254,6 +291,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
                   price: p.priceRange,
                   img: p.mainImage?.url,
                   slug: p.slug || p.id,
+                  propertyType: p.propertyType,
                   isRera: p.isRera,
                 }}
               />

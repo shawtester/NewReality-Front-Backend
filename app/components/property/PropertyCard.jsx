@@ -15,7 +15,8 @@ const countries = [
   { code: "+971", label: "🇦🇪 UAE" },
 ];
 
-export default function PropertyCard({ property = {}, baseRoute = "residential" }) {
+export default function PropertyCard({ property = {} }) {
+
   const [open, setOpen] = useState(false);
   const [countryCode, setCountryCode] = useState("+91");
 
@@ -40,6 +41,7 @@ export default function PropertyCard({ property = {}, baseRoute = "residential" 
     price = "",
     img = "/images/placeholder.jpg",
     slug = "",
+    propertyType = "residential",
     isRera = false,
   } = property;
 
@@ -81,7 +83,9 @@ export default function PropertyCard({ property = {}, baseRoute = "residential" 
   return (
     <>
       {/* ================= CARD ================= */}
-      <Link href={slug ? `/${baseRoute}/${slug}` : "#"}>
+      <Link href={slug ? `/${propertyType}/${slug}` : "#"}>
+
+
         <div
           className="
             group flex h-full w-full flex-col overflow-hidden rounded-xl

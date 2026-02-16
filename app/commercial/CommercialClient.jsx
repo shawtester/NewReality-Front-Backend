@@ -72,24 +72,30 @@ const filterCommercialByType = (list = [], type) => {
   );
 };
 
-// 💰 Extract min & max price from priceRange
 const extractPriceRange = (priceRange = "") => {
-  if (!priceRange) return { min: 0, max: 0 };
+  if (!priceRange) return null;
 
   const cleaned = priceRange
     .toLowerCase()
-    .replace(/cr|crore|₹|,/g, "")
+    .replace(/₹/g, "")
+    .replace(/cr|crore/g, "")
+    .replace(/onwards/g, "")
+    .replace(/\+/g, "")
+    .replace(/\*/g, "")
+    .replace(/,/g, "")
     .trim();
 
+  if (!/\d/.test(cleaned)) return null;
+
   if (cleaned.includes("-")) {
-    const [min, max] = cleaned.split("-").map(Number);
+    const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
     return {
       min: min || 0,
       max: max || min || 0,
     };
   }
 
-  const value = parseFloat(cleaned) || 0;
+  const value = parseFloat(cleaned);
   return { min: value, max: value };
 };
 
@@ -130,14 +136,14 @@ const applyCommercialFilters = ({
 
   // 🚧 STATUS
   if (status) {
-  filtered = filtered.filter((item) => {
-    if (status === "new-launch") return item.isNewLaunch;
-    if (status === "ready-to-move") return item.isReadyToMove;
-    if (status === "under-construction") return item.isUnderConstruction;
-    if (status === "pre-launch") return item.isPreLaunch;
-    return true;
-  });
-}
+    filtered = filtered.filter((item) => {
+      if (status === "new-launch") return item.isNewLaunch;
+      if (status === "ready-to-move") return item.isReadyToMove;
+      if (status === "under-construction") return item.isUnderConstruction;
+      if (status === "pre-launch") return item.isPreLaunch;
+      return true;
+    });
+  }
 
 
   // 📍 LOCALITY
@@ -151,24 +157,26 @@ const applyCommercialFilters = ({
 
 
   // 💰 BUDGET FILTER
-if (budget) {
-  filtered = filtered.filter((item) => {
-    const { min: propertyMin, max: propertyMax } =
-      extractPriceRange(item.priceRange);
+  if (budget) {
+    filtered = filtered.filter((item) => {
+        const range = extractPriceRange(item.priceRange);
+        if (!range) return false;
 
-    if (budget === "above-8-cr") {
-      return propertyMax >= 8;
-    }
+        const { min: propertyMin, max: propertyMax } = range;
 
-    const [min, max] = budget
-      .replace("-cr", "")
-      .split("-")
-      .map(Number);
+        if (budget === "above-8-cr") {
+            return propertyMax >= 8;
+        }
 
-    // ✅ Proper range overlap logic
-    return propertyMax >= min && propertyMin <= max;
-  });
+        const [min, max] = budget
+            .replace("-cr", "")
+            .split("-")
+            .map(Number);
+
+        return propertyMax >= min && propertyMin <= max;
+    });
 }
+
 
 
 
@@ -751,7 +759,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 price: item.priceRange,
                 img: item.mainImage?.url || "/placeholder.jpg",
                 slug: item.slug || item.id,
-                propertyType: item.propertyType, 
+                propertyType: item.propertyType,
                 isTrending: item.isTrending,
                 isNewLaunch: item.isNewLaunch,
                 isRera: item.isRera,

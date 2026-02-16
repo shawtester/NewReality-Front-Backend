@@ -97,13 +97,18 @@ const applyAllFilters = ({
 
         const cleaned = priceRange
             .toLowerCase()
-            .replace(/cr|crore|₹|,/g, "")
+            .replace(/₹/g, "")
+            .replace(/cr|crore/g, "")
+            .replace(/onwards/g, "")
+            .replace(/\+/g, "")
+            .replace(/\*/g, "")
+            .replace(/,/g, "")
             .trim();
 
         if (!/\d/.test(cleaned)) return null;
 
         if (cleaned.includes("-")) {
-            const [min, max] = cleaned.split("-").map(Number);
+            const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
             return {
                 min: min || 0,
                 max: max || min || 0,
@@ -174,16 +179,34 @@ const applyAllFilters = ({
 
 
 
+
     // 🛏️ BHK
     if (bhk) {
-        filtered = filtered.filter((item) =>
-            item.configurations?.some((c) =>
-                c.toLowerCase().includes(
-                    bhk.replace(/-/g, " ").toLowerCase()
-                )
-            )
-        );
+        filtered = filtered.filter((item) => {
+            if (!item.configurations) return false;
+
+            // Handle "above-5-bhk"
+            if (bhk === "above-5-bhk") {
+                return item.configurations.some((config) => {
+                    const match = config.match(/\d+(\.\d+)?/);
+                    if (!match) return false;
+                    const bhkValue = parseFloat(match[0]);
+                    return bhkValue > 5;
+                });
+            }
+
+            // Normal BHK (1,2,3,4 etc)
+            const selectedBhk = parseFloat(bhk);
+
+            return item.configurations.some((config) => {
+                const match = config.match(/\d+(\.\d+)?/);
+                if (!match) return false;
+                const bhkValue = parseFloat(match[0]);
+                return bhkValue === selectedBhk;
+            });
+        });
     }
+
 
     return filtered;
 };
@@ -729,7 +752,7 @@ export default function ResidentialPage({ apartments = [] }) {
                                 price: item.priceRange,
                                 img: item.mainImage?.url || "/placeholder.jpg",
                                 slug: item.slug || item.id,
-                                propertyType: item.propertyType, 
+                                propertyType: item.propertyType,
                                 isTrending: item.isTrending,
                                 isNewLaunch: item.isNewLaunch,
                                 isRera: item.isRera,

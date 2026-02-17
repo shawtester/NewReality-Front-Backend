@@ -265,8 +265,8 @@ export default function Footer() {
         {/* CONTACT */}
         <div>
           <h4 className="text-white font-semibold mb-4">Connect with us</h4>
-          <p className="text-sm text-gray-400">support@neevreality.com</p>
-          <p className="text-sm text-gray-400 mt-2">info@neevreality.com</p>
+          <p className="text-sm text-gray-400">support@neevrealty.com</p>
+          <p className="text-sm text-gray-400 mt-2">info@neevrealty.com</p>
 
           {/* ✅ UPDATED: Clickable social media icons */}
           <div className="mt-4 flex gap-2">

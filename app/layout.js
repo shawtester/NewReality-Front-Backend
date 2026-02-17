@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "E Commerce Website",
+  title: "Neev Realty",
   description: "Create By Docs Readers",
 };
 

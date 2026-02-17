@@ -14,45 +14,15 @@ import "react-quill/dist/quill.snow.css";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-/* ================= QUILL TOOLBAR ================= */
 const quillModules = {
   toolbar: [
-    [{ font: [] }],
-    [{ size: ["small", false, "large", "huge"] }],
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ script: "sub" }, { script: "super" }],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
+    ["bold", "italic", "underline"],
     [{ list: "ordered" }, { list: "bullet" }],
-    [{ indent: "-1" }, { indent: "+1" }],
-    ["blockquote", "code-block"],
-    ["link", "image", "video"],
+    ["link"],
     ["clean"],
   ],
 };
-
-const quillFormats = [
-  "font",
-  "size",
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "script",
-  "color",
-  "background",
-  "align",
-  "list",
-  "bullet",
-  "indent",
-  "blockquote",
-  "code-block",
-  "link",
-  "image",
-  "video",
-];
 
 export default function BlogForm() {
   const router = useRouter();
@@ -63,7 +33,6 @@ export default function BlogForm() {
   const [imgLoading, setImgLoading] = useState(false);
 
   const dataRef = useRef({
-    id: "",
     mainTitle: "",
     detailHeading: "",
     slug: "",
@@ -74,22 +43,17 @@ export default function BlogForm() {
     source: "",
     metaTitle: "",
     metaDescription: "",
-    status: "draft",
-    sections: [
-      {
-        id: "",
-        content: "",
-      },
-    ],
-
+    sections: "",
+    anchors: [{ id: "", label: "" }],
     faqs: [{ question: "", answer: "" }],
+    status: "draft",
   });
 
   const [data, setData] = useState(dataRef.current);
 
   const updateField = useCallback((key, value) => {
     dataRef.current[key] = value;
-    setData((p) => ({ ...p, [key]: value }));
+    setData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   /* ================= FETCH BLOG ================= */
@@ -103,6 +67,9 @@ export default function BlogForm() {
       const filled = {
         ...dataRef.current,
         ...res,
+        description: res.description || "",
+        anchors: res.anchors || [{ id: "", label: "" }],
+        faqs: res.faqs || [{ question: "", answer: "" }],
         status: res.isActive ? "published" : "draft",
       };
 
@@ -128,10 +95,33 @@ export default function BlogForm() {
     }
   };
 
+  /* ================= ANCHOR FUNCTIONS ================= */
+
+  const addAnchor = () => {
+    updateField("anchors", [
+      ...data.anchors,
+      { id: "", label: "" },
+    ]);
+  };
+
+  const updateAnchor = (index, key, value) => {
+    const updated = [...data.anchors];
+    updated[index][key] = value;
+    updateField("anchors", updated);
+  };
+
+  const removeAnchor = (index) => {
+    const updated = data.anchors.filter((_, i) => i !== index);
+    updateField("anchors", updated);
+  };
+
   /* ================= FAQ FUNCTIONS ================= */
+
   const addFaq = () => {
-    const updated = [...data.faqs, { question: "", answer: "" }];
-    updateField("faqs", updated);
+    updateField("faqs", [
+      ...data.faqs,
+      { question: "", answer: "" },
+    ]);
   };
 
   const updateFaq = (index, key, value) => {
@@ -146,11 +136,15 @@ export default function BlogForm() {
   };
 
   /* ================= SUBMIT ================= */
+
   const submit = async () => {
     const current = dataRef.current;
 
-    if (!current.mainTitle.trim()) return toast.error("Title required");
-    if (!current.slug.trim()) return toast.error("Slug required");
+    if (!current.mainTitle.trim())
+      return toast.error("Title required");
+
+    if (!current.slug.trim())
+      return toast.error("Slug required");
 
     const validFaqs = current.faqs.filter(
       (f) => f.question.trim() && f.answer.trim()
@@ -159,12 +153,6 @@ export default function BlogForm() {
     const payload = {
       ...current,
       faqs: validFaqs,
-      mainTitle: current.mainTitle.trim(),
-      detailHeading: current.detailHeading.trim(),
-      slug: current.slug.trim(),
-      excerpt: current.excerpt.trim(),
-      metaTitle: current.metaTitle.trim(),
-      metaDescription: current.metaDescription.trim(),
       isActive: current.status === "published",
     };
 
@@ -185,13 +173,14 @@ export default function BlogForm() {
   };
 
   /* ================= UI ================= */
+
   return (
     <div className="max-w-4xl p-6 space-y-6">
+
       <h1 className="text-2xl font-bold">
         {id ? "Update Blog" : "Create Blog"}
       </h1>
 
-      {/* BASIC INFO */}
       <input
         className="border p-3 rounded w-full"
         placeholder="Main Title"
@@ -221,7 +210,6 @@ export default function BlogForm() {
         onChange={(e) => updateField("excerpt", e.target.value)}
       />
 
-      {/* CATEGORY + AUTHOR */}
       <div className="grid grid-cols-2 gap-4">
         <input
           className="border p-3 rounded w-full"
@@ -229,7 +217,6 @@ export default function BlogForm() {
           value={data.category}
           onChange={(e) => updateField("category", e.target.value)}
         />
-
         <input
           className="border p-3 rounded w-full"
           placeholder="Author"
@@ -240,34 +227,12 @@ export default function BlogForm() {
 
       <input
         className="border p-3 rounded w-full"
-        placeholder="Source (optional)"
+        placeholder="Source"
         value={data.source}
         onChange={(e) => updateField("source", e.target.value)}
       />
 
-      {/* STATUS */}
-      <div className="flex gap-6">
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            checked={data.status === "draft"}
-            onChange={() => updateField("status", "draft")}
-          />
-          Draft
-        </label>
-
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            checked={data.status === "published"}
-            onChange={() => updateField("status", "published")}
-          />
-          Published
-        </label>
-      </div>
-
-      {/* SEO */}
-      <h3 className="font-semibold mt-4">SEO Settings</h3>
+      <h3 className="font-semibold">SEO</h3>
 
       <input
         className="border p-3 rounded w-full"
@@ -284,85 +249,52 @@ export default function BlogForm() {
         onChange={(e) => updateField("metaDescription", e.target.value)}
       />
 
-      {/* IMAGE */}
-      <input type="file" accept="image/*" onChange={(e) => handleImage(e.target.files?.[0])} />
+      <input type="file" onChange={(e) => handleImage(e.target.files?.[0])} />
       {imgLoading && <p>Uploading...</p>}
       {data.image?.url && (
         <img src={data.image.url} className="h-32 rounded border" />
       )}
 
-      {/* CONTENT */}
-      <h3 className="font-semibold">Sections</h3>
-      {data.sections.map((section, i) => (
-        <div key={i} className="space-y-3 border p-4 rounded">
+      <h3 className="font-semibold">Description</h3>
 
-          {/* Section Anchor ID */}
+      <ReactQuill
+        theme="snow"
+        value={data.description}
+        onChange={(val) => updateField("sections", val)}
+        modules={quillModules}
+      />
+
+      <h3 className="font-semibold mt-6">Table of Contents Anchors</h3>
+
+      {data.anchors.map((anchor, i) => (
+        <div key={i} className="border p-3 rounded space-y-2">
           <input
+            placeholder="Anchor ID (no space)"
+            value={anchor.id}
+            onChange={(e) => updateAnchor(i, "id", e.target.value)}
             className="border p-2 rounded w-full"
-            placeholder="Section Anchor ID (no space, e.g. overview)"
-            value={section.id}
-            onChange={(e) => {
-              const arr = [...data.sections];
-              arr[i].id = e.target.value;
-              updateField("sections", arr);
-            }}
           />
-
-          {/* Section Content */}
-          <ReactQuill
-            theme="snow"
-            value={section.content}
-            onChange={(val) => {
-              const arr = [...data.sections];
-              arr[i].content = val;
-              updateField("sections", arr);
-            }}
-            modules={quillModules}
-            formats={quillFormats}
+          <input
+            placeholder="Display Label"
+            value={anchor.label}
+            onChange={(e) => updateAnchor(i, "label", e.target.value)}
+            className="border p-2 rounded w-full"
           />
-
         </div>
       ))}
 
-
-      {/* FAQ SECTION */}
-      <h3 className="font-semibold mt-6">FAQs</h3>
-
-      {data.faqs.map((faq, i) => (
-        <div key={i} className="border p-4 rounded space-y-3">
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Question"
-            value={faq.question}
-            onChange={(e) => updateFaq(i, "question", e.target.value)}
-          />
-
-          <textarea
-            rows={3}
-            className="border p-2 rounded w-full"
-            placeholder="Answer"
-            value={faq.answer}
-            onChange={(e) => updateFaq(i, "answer", e.target.value)}
-          />
-
-          {data.faqs.length > 1 && (
-            <button
-              className="text-red-500 text-sm"
-              onClick={() => removeFaq(i)}
-            >
-              Remove FAQ
-            </button>
-          )}
-        </div>
-      ))}
-
-      <Button variant="light" onClick={addFaq}>
-        + Add FAQ
+      <Button variant="light" onClick={addAnchor}>
+        + Add Anchor
       </Button>
 
-      <Button isLoading={loading} onClick={submit} className="bg-[#DBA40D]">
+      <Button
+        isLoading={loading}
+        onClick={submit}
+        className="bg-[#DBA40D]"
+      >
         {id ? "Update Blog" : "Create Blog"}
       </Button>
+
     </div>
   );
 }

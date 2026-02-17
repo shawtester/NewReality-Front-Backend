@@ -33,24 +33,51 @@ export default function BlogDetailPage({ params }) {
     const fetchBlog = async () => {
       const ref = doc(db, "blogs", blogId);
       const snap = await getDoc(ref);
-      if (snap.exists()) setBlog(snap.data());
+
+      if (snap.exists()) {
+        const data = snap.data();
+
+        setBlog({
+          ...data,
+          sections: data.sections || [],
+          faqs: data.faqs || [],
+        });
+      }
     };
+
     fetchBlog();
   }, [blogId]);
+
+
 
   /* ================= FETCH LATEST BLOGS ================= */
   useEffect(() => {
     if (!blog?.sections) return;
 
-    const items = blog.sections
-      .filter((s) => s.id)
-      .map((s) => ({
-        id: s.id,
-        label: s.id.replace(/-/g, " "),
-      }));
+    setTimeout(() => {
+      const wrapper = document.getElementById("blog-wrapper");
+      if (!wrapper) return;
 
-    setTocItems(items);
+      const headings = wrapper.querySelectorAll("h2, h3");
+
+      const items = [];
+
+      headings.forEach((el, index) => {
+        const id = `section-${index + 1}`;
+        el.id = id;
+
+        items.push({
+          id,
+          label: el.innerText,
+        });
+      });
+
+      setTocItems(items);
+    }, 200);
   }, [blog]);
+
+
+
 
 
 
@@ -217,22 +244,15 @@ export default function BlogDetailPage({ params }) {
             )}
 
             {/* BLOG SECTIONS */}
-            <div id="blog-wrapper">
-              {blog.sections?.map((section, i) => (
-                <section
-                  key={i}
-                  id={section.id}
-                  className="bg-white rounded-xl p-6 shadow-sm scroll-mt-32"
-                >
+              <div id="blog-wrapper">
+                {blog.sections?.map((section, i) => (
                   <div
-                    dangerouslySetInnerHTML={{ __html: section.content }}
+                    key={i}
+                    className="bg-white rounded-xl p-6 shadow-sm scroll-mt-32"
+                    dangerouslySetInnerHTML={{ __html: section }}
                   />
-                </section>
-              ))}
-
-            </div>
-
-
+                ))}
+              </div>
 
             {/* SOURCE (Only if exists) */}
             {blog.source && blog.source.trim() !== "" && (

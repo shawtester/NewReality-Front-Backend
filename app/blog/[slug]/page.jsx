@@ -40,37 +40,18 @@ export default function BlogDetailPage({ params }) {
 
   /* ================= FETCH LATEST BLOGS ================= */
   useEffect(() => {
-    if (!blog) return;
+    if (!blog?.sections) return;
 
-    const timeout = setTimeout(() => {
-      const wrapper = document.getElementById("blog-wrapper");
-      if (!wrapper) return;
+    const items = blog.sections
+      .filter((s) => s.id)
+      .map((s) => ({
+        id: s.id,
+        label: s.id.replace(/-/g, " "),
+      }));
 
-      const headings = wrapper.querySelectorAll("h2, h3");
-
-      const items = [];
-
-      headings.forEach((el, index) => {
-        const id = `section-${index + 1}`;
-        el.id = id;
-
-        items.push({
-          id,
-          label: el.innerText.trim(),
-          level: el.tagName.toLowerCase(),
-        });
-      });
-
-      setTocItems(items);
-
-      if (items.length) {
-        setActiveId(items[0].id);
-      }
-    }, 100); // 👈 small delay ensures DOM ready
-
-    return () => clearTimeout(timeout);
-
+    setTocItems(items);
   }, [blog]);
+
 
 
   // SCROLL SPY
@@ -109,14 +90,12 @@ export default function BlogDetailPage({ params }) {
     const el = document.getElementById(id);
     if (!el) return;
 
-    const headerHeight =
-      document.querySelector("header")?.offsetHeight || 0;
-
-    window.scrollTo({
-      top: el.offsetTop - headerHeight - 30,
+    el.scrollIntoView({
       behavior: "smooth",
+      block: "start",
     });
   };
+
 
 
   if (!blog) {
@@ -239,16 +218,18 @@ export default function BlogDetailPage({ params }) {
 
             {/* BLOG SECTIONS */}
             <div id="blog-wrapper">
-              {blog.sections?.map((html, i) => (
+              {blog.sections?.map((section, i) => (
                 <section
                   key={i}
-                  className="bg-white rounded-xl p-6 lg:p-7 xl:p-8 shadow-sm"
+                  id={section.id}
+                  className="bg-white rounded-xl p-6 shadow-sm scroll-mt-32"
                 >
                   <div
-                    dangerouslySetInnerHTML={{ __html: html }}
+                    dangerouslySetInnerHTML={{ __html: section.content }}
                   />
                 </section>
               ))}
+
             </div>
 
 

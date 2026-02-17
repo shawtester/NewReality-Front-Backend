@@ -23,12 +23,19 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
             setIsOverflowing(element.scrollHeight > maxHeight);
         }
     }, [html, maxLines]);
-
     return (
-        <div className={`space-y-1 ${className}`}>
+        <div className={className}>
             <div
                 ref={textRef}
-                className="leading-relaxed [&>p]:mb-2 [&>h1]:text-lg [&>h1]:font-semibold [&>h1]:mt-2 [&>h1]:mb-2"
+                className="leading-relaxed
+    [&>p]:mb-0
+    [&>p]:mt-0
+    [&>h1]:text-2xl
+    [&>h2]:text-xl
+    [&>h3]:text-lg
+    [&>strong]:font-semibold
+    [&>ul]:pl-5
+    [&>ul]:list-disc"
                 style={{
                     display: "-webkit-box",
                     WebkitLineClamp: isExpanded ? "unset" : maxLines,

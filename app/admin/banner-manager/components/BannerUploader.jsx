@@ -247,7 +247,7 @@ export default function BannerUploader({ category }) {
     const handleSaveTextOnly = async () => {
         setError("");
 
-        const introText = extractPlainText(editedIntroText || "").trim();
+        const introText = editedIntroText;
         const pageTitle = editedPageTitle.trim();
 
         if (!introText) {

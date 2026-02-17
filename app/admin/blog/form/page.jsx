@@ -75,7 +75,13 @@ export default function BlogForm() {
     metaTitle: "",
     metaDescription: "",
     status: "draft",
-    sections: [""],
+    sections: [
+      {
+        id: "",
+        content: "",
+      },
+    ],
+
     faqs: [{ question: "", answer: "" }],
   });
 
@@ -287,20 +293,37 @@ export default function BlogForm() {
 
       {/* CONTENT */}
       <h3 className="font-semibold">Sections</h3>
-      {data.sections.map((content, i) => (
-        <ReactQuill
-          key={i}
-          theme="snow"
-          value={content}
-          onChange={(val) => {
-            const arr = [...data.sections];
-            arr[i] = val;
-            updateField("sections", arr);
-          }}
-          modules={quillModules}
-          formats={quillFormats}
-        />
+      {data.sections.map((section, i) => (
+        <div key={i} className="space-y-3 border p-4 rounded">
+
+          {/* Section Anchor ID */}
+          <input
+            className="border p-2 rounded w-full"
+            placeholder="Section Anchor ID (no space, e.g. overview)"
+            value={section.id}
+            onChange={(e) => {
+              const arr = [...data.sections];
+              arr[i].id = e.target.value;
+              updateField("sections", arr);
+            }}
+          />
+
+          {/* Section Content */}
+          <ReactQuill
+            theme="snow"
+            value={section.content}
+            onChange={(val) => {
+              const arr = [...data.sections];
+              arr[i].content = val;
+              updateField("sections", arr);
+            }}
+            modules={quillModules}
+            formats={quillFormats}
+          />
+
+        </div>
       ))}
+
 
       {/* FAQ SECTION */}
       <h3 className="font-semibold mt-6">FAQs</h3>

@@ -16,6 +16,8 @@ export default function ContactPage() {
     type: "residential",
   });
   const [loading, setLoading] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,9 +36,8 @@ export default function ContactPage() {
         createdAt: serverTimestamp(),
       });
 
-      toast.success("Contact submitted successfully ✅");
+      // toast.success("Contact submitted successfully ✅");
 
-      // Reset form
       setFormData({
         firstName: "",
         lastName: "",
@@ -45,6 +46,10 @@ export default function ContactPage() {
         message: "",
         type: "residential",
       });
+
+      setShowThankYou(true);
+      setTimeout(() => setShowThankYou(false), 2400);
+
     } catch (err) {
       console.error("Failed to submit contact:", err);
       toast.error("Failed to submit contact ❌");
@@ -88,9 +93,9 @@ export default function ContactPage() {
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/60">
                     <Mail className="h-4 w-4" />
                   </span>
-                  <span>support@neevreality.com <br />
+                  <span>support@neevrealty.com <br />
 
-                   info@neevreality.com</span>
+                    info@neevrealty.com</span>
                 </div>
                 <div className="flex items-start gap-4">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/60">
@@ -99,7 +104,7 @@ export default function ContactPage() {
                   <span>
                     SF-09, Ninex City Mart, Sector
                     <br />
-                  49, Sohna Road, Gurgaon.
+                    49, Sohna Road, Gurgaon.
                   </span>
                 </div>
               </div>
@@ -169,11 +174,17 @@ export default function ContactPage() {
                     <input
                       type="tel"
                       name="phone"
+                      inputMode="numeric"
                       value={formData.phone}
-                      onChange={handleChange}
+                      maxLength={10}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "");
+                        setFormData((prev) => ({ ...prev, phone: value }));
+                      }}
                       className="w-full border-0 border-b border-slate-300 text-sm py-1 focus:outline-none focus:border-[#DBA40D]"
                       required
                     />
+
                   </div>
                 </div>
 
@@ -202,6 +213,21 @@ export default function ContactPage() {
           </section>
         </div>
       </section>
+      {/* ================= THANK YOU POPUP ================= */}
+
+      {showThankYou && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-xl p-20 text-center shadow-xl animate-fadeIn">
+            <h3 className="text-lg font-semibold text-[#c8950a]">
+              Thank You 🙌
+            </h3>
+            <p className="text-sm mt-1">
+              Our team will contact you shortly.
+            </p>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }

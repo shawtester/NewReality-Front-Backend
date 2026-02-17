@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -9,24 +10,46 @@ import Footer from "@/app/components/Footer";
 import PropertyCard from "@/app/components/property/PropertyCard";
 
 /* ================= EXPANDABLE TEXT ================= */
-const ExpandableText = ({ children, maxLines = 2 }) => {
-  const [expanded, setExpanded] = useState(false);
+const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const textRef = useRef(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const element = textRef.current;
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+      const maxHeight = lineHeight * maxLines;
+      setIsOverflowing(element.scrollHeight > maxHeight);
+    }
+  }, [html, maxLines]);
 
   return (
-    <div className="mt-2 text-sm text-gray-600 leading-relaxed">
-      <p className={`${expanded ? "" : "line-clamp-2"}`}>
-        {children}
-      </p>
+    <div className={`space-y-1 ${className}`}>
+      <div
+        ref={textRef}
+        className="leading-relaxed [&>p]:mb-2 [&>h1]:text-lg [&>h1]:font-semibold [&>h1]:mt-2 [&>h1]:mb-2"
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: isExpanded ? "unset" : maxLines,
+          WebkitBoxOrient: "vertical",
+          overflow: isExpanded ? "visible" : "hidden",
+        }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
 
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="text-[#F5A300] text-sm mt-1"
-      >
-        {expanded ? "Read Less" : "Read More"}
-      </button>
+      {isOverflowing && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-sm text-[#F5A300] font-medium pt-1 cursor-pointer"
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      )}
     </div>
   );
 };
+
 
 export default function FooterSeoPage({ params, properties = [] }) {
   const { slug } = params;
@@ -238,29 +261,35 @@ export default function FooterSeoPage({ params, properties = [] }) {
   return (
     <>
       <Header />
-
       {/* INTRO */}
       <section className="bg-[#F6FBFF]">
         <div className="max-w-[1240px] mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
-            <div className="max-w-4xl">
-              <h1 className="text-xl md:text-[26px] font-semibold text-gray-900 capitalize">
-                {heading || `${slug.replaceAll("-", " ")} Properties`}
-              </h1>
 
-              {description && (
-                <ExpandableText maxLines={2}>
-                  {description}
-                </ExpandableText>
-              )}
-            </div>
+          {/* Top Row: Title + Results */}
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-xl md:text-[26px] font-semibold text-gray-900 capitalize">
+              {heading || `${slug.replaceAll("-", " ")} Properties`}
+            </h1>
 
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 whitespace-nowrap pt-1">
               {finalFiltered.length} results
             </div>
           </div>
+
+          {/* Expandable Text Below */}
+          {description && (
+            <ExpandableText
+              maxLines={2}
+              className="mt-3 text-sm sm:text-[15px] text-gray-600"
+            >
+              {description}
+            </ExpandableText>
+          )}
+
         </div>
       </section>
+
+
 
       {/* LISTING */}
       <section className="max-w-[1240px] mx-auto px-4 py-16">

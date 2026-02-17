@@ -10,7 +10,7 @@ import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
 // ✅ EXPANDABLE TEXT (UNCHANGED)
-const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
+const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
     const textRef = useRef(null);
@@ -22,22 +22,22 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
             const maxHeight = lineHeight * maxLines;
             setIsOverflowing(element.scrollHeight > maxHeight);
         }
-    }, [text, maxLines]);
+    }, [html, maxLines]);
 
     return (
         <div className={`space-y-1 ${className}`}>
             <div
                 ref={textRef}
-                className="leading-relaxed transition-all duration-300"
+                className="leading-relaxed [&>p]:mb-2 [&>h1]:text-lg [&>h1]:font-semibold [&>h1]:mt-2 [&>h1]:mb-2"
                 style={{
                     display: "-webkit-box",
                     WebkitLineClamp: isExpanded ? "unset" : maxLines,
                     WebkitBoxOrient: "vertical",
                     overflow: isExpanded ? "visible" : "hidden",
                 }}
-            >
-                {text}
-            </div>
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
+
             {isOverflowing && (
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
@@ -49,6 +49,7 @@ const ExpandableText = ({ children: text, maxLines = 2, className = "" }) => {
         </div>
     );
 };
+
 
 // ✅ FILTER FUNCTIONS (UNCHANGED)
 const PROPERTY_TYPE_MAP = {
@@ -429,25 +430,29 @@ export default function ResidentialPage({ apartments = [] }) {
             {/* PAGE INTRO */}
             <section className="bg-[#F6FBFF]">
                 <div className="max-w-[1240px] mx-auto px-4 py-6">
-                    <div className="text-sm text-gray-500 mb-3">Residential</div>
-                    <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
-                        <div className="max-w-4xl">
-                            <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
-                                {displayTitle}
-                            </h1>
-                            <ExpandableText
-                                maxLines={2}
-                                className="mt-2 text-sm sm:text-[15px] text-gray-600"
-                            >
-                                {introText || "Loading..."}
-                            </ExpandableText>
-                        </div>
-                        <div className="text-sm text-gray-500">
+
+                    {/* Top Row: Title + Results */}
+                    <div className="flex items-start justify-between gap-4">
+                        <h1 className="text-xl sm:text-2xl md:text-[26px] font-semibold text-gray-900">
+                            {displayTitle}
+                        </h1>
+
+                        <div className="text-sm text-gray-500 whitespace-nowrap pt-1">
                             {filteredApartments.length} results
                         </div>
                     </div>
+
+                    {/* Expandable Text Below */}
+                    <ExpandableText
+                        maxLines={2}
+                        className="mt-3 text-sm sm:text-[15px] text-gray-600"
+                    >
+                        {introText || "Loading..."}
+                    </ExpandableText>
+
                 </div>
             </section>
+
 
             {/* ✅ FIXED BANNER - EXACT REFERENCE SIZING */}
 

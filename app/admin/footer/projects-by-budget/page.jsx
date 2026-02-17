@@ -1,8 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import "react-quill/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
+/* ================= QUILL TOOLBAR ================= */
+const quillModules = {
+  toolbar: [
+    [{ font: [] }],
+    [{ size: ["small", false, "large", "huge"] }],
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "font",
+  "size",
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "color",
+  "background",
+  "align",
+  "list",
+  "bullet",
+  "link",
+];
 
 export default function AdminFooterProjectBudget() {
   const [data, setData] = useState(null);
@@ -19,32 +54,12 @@ export default function AdminFooterProjectBudget() {
     setData(snap.data());
   };
 
-  /* ✅ UPDATE URL */
-  const updateValue = (id, value) => {
+  /* ================= UPDATE FUNCTIONS ================= */
+  const updateField = (id, key, value) => {
     setData((prev) => ({
       ...prev,
       links: prev.links.map((l) =>
-        l.id === id ? { ...l, value } : l
-      ),
-    }));
-  };
-
-  /* ✅ UPDATE HEADING */
-  const updateHeading = (id, heading) => {
-    setData((prev) => ({
-      ...prev,
-      links: prev.links.map((l) =>
-        l.id === id ? { ...l, heading } : l
-      ),
-    }));
-  };
-
-  /* ✅ UPDATE DESCRIPTION */
-  const updateDescription = (id, description) => {
-    setData((prev) => ({
-      ...prev,
-      links: prev.links.map((l) =>
-        l.id === id ? { ...l, description } : l
+        l.id === id ? { ...l, [key]: value } : l
       ),
     }));
   };
@@ -80,77 +95,77 @@ export default function AdminFooterProjectBudget() {
         {data.title}
       </h2>
 
-      {/* HEADER */}
-      <div className="grid grid-cols-12 gap-4 mb-3 text-sm font-medium text-gray-500">
-        <div className="col-span-2">Label</div>
-        <div className="col-span-2">URL</div>
-        <div className="col-span-3">Heading</div>
-        <div className="col-span-3">Description</div>
-        <div className="col-span-2 text-right">Action</div>
-      </div>
-
-      {/* ROWS */}
-      <div className="space-y-3">
+      <div className="space-y-6">
         {data.links.map((item) => (
           <div
             key={item.id}
-            className="grid grid-cols-12 gap-4 items-start bg-white border rounded-lg px-4 py-3 hover:shadow-sm transition"
+            className="bg-white border rounded-xl p-6 shadow-sm"
           >
-            {/* LABEL */}
-            <div className="col-span-2 text-sm text-gray-800">
-              {item.label}
+            {/* TOP ROW */}
+            <div className="grid grid-cols-12 gap-4 mb-4 items-center">
+              <div className="col-span-2 text-sm font-medium text-gray-800">
+                {item.label}
+              </div>
+
+              <div className="col-span-3">
+                <input
+                  value={item.value}
+                  onChange={(e) =>
+                    updateField(item.id, "value", e.target.value)
+                  }
+                  className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#DBA40D]"
+                />
+              </div>
+
+              <div className="col-span-5">
+                <input
+                  placeholder="SEO Heading"
+                  value={item.heading || ""}
+                  onChange={(e) =>
+                    updateField(item.id, "heading", e.target.value)
+                  }
+                  className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#DBA40D]"
+                />
+              </div>
+
+              <div className="col-span-2 text-right">
+                <button
+                  onClick={() => saveSingle(item)}
+                  disabled={savingId === item.id}
+                  className={`px-4 py-2 rounded-md text-sm text-white transition
+                    ${
+                      savingId === item.id
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-[#DBA40D] hover:bg-yellow-700"
+                    }`}
+                >
+                  {savingId === item.id ? "Saving..." : "Save"}
+                </button>
+              </div>
             </div>
 
-            {/* URL INPUT */}
-            <div className="col-span-2">
-              <input
-                value={item.value}
-                onChange={(e) =>
-                  updateValue(item.id, e.target.value)
-                }
-                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
+            {/* 🔥 DESCRIPTION FULL WIDTH BELOW */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                SEO Description
+              </label>
 
-            {/* ✅ HEADING INPUT */}
-            <div className="col-span-3">
-              <input
-                placeholder="SEO Heading"
-                value={item.heading || ""}
-                onChange={(e) =>
-                  updateHeading(item.id, e.target.value)
-                }
-                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
+              <div className="border rounded-lg overflow-hidden">
+                <ReactQuill
+                  theme="snow"
+                  value={item.description || ""}
+                  onChange={(val) =>
+                    updateField(item.id, "description", val)
+                  }
+                  modules={quillModules}
+                  formats={quillFormats}
+                  className="h-[200px]"
+                />
+              </div>
 
-            {/* ✅ DESCRIPTION INPUT */}
-            <div className="col-span-3">
-              <textarea
-                rows={3}
-                placeholder="Enter SEO description..."
-                value={item.description || ""}
-                onChange={(e) =>
-                  updateDescription(item.id, e.target.value)
-                }
-                className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-
-            {/* SAVE BUTTON */}
-            <div className="col-span-2 text-right">
-              <button
-                onClick={() => saveSingle(item)}
-                disabled={savingId === item.id}
-                className={`px-4 py-2 rounded-md text-sm text-white transition
-                  ${
-                    savingId === item.id
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#DBA40D] hover:bg-yellow-700"
-                  }`}
-              >
-                {savingId === item.id ? "Saving..." : "Save"}
-              </button>
+              <p className="text-xs text-gray-500 mt-2">
+                You can use formatting (bold, lists, headings, links).
+              </p>
             </div>
           </div>
         ))}

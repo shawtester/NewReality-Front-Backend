@@ -17,25 +17,41 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 /* ================= QUILL TOOLBAR ================= */
 const quillModules = {
   toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline"],
+    [{ font: [] }],
+    [{ size: ["small", false, "large", "huge"] }],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ script: "sub" }, { script: "super" }],
     [{ color: [] }, { background: [] }],
-    ["link"],
+    [{ align: [] }],
     [{ list: "ordered" }, { list: "bullet" }],
+    [{ indent: "-1" }, { indent: "+1" }],
+    ["blockquote", "code-block"],
+    ["link", "image", "video"],
     ["clean"],
   ],
 };
 
 const quillFormats = [
+  "font",
+  "size",
   "header",
   "bold",
   "italic",
   "underline",
+  "strike",
+  "script",
   "color",
   "background",
+  "align",
   "list",
   "bullet",
+  "indent",
+  "blockquote",
+  "code-block",
   "link",
+  "image",
+  "video",
 ];
 
 export default function BlogForm() {
@@ -46,7 +62,6 @@ export default function BlogForm() {
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
 
-  /* ================= SOURCE OF TRUTH ================= */
   const dataRef = useRef({
     id: "",
     mainTitle: "",
@@ -54,6 +69,12 @@ export default function BlogForm() {
     slug: "",
     excerpt: "",
     image: null,
+    category: "",
+    author: "",
+    source: "",
+    metaTitle: "",
+    metaDescription: "",
+    status: "draft",
     sections: [""],
     faqs: [{ question: "", answer: "" }],
   });
@@ -70,70 +91,21 @@ export default function BlogForm() {
     if (!id) return;
 
     const fetchBlog = async () => {
-      try {
-        const res = await getBlogById({ id });
-        if (!res) {
-          toast.error("Blog not found");
-          router.push("/admin/blog");
-          return;
-        }
+      const res = await getBlogById({ id });
+      if (!res) return;
 
-        const filledData = {
-          id: res.id,
-          mainTitle: res.mainTitle || "",
-          detailHeading: res.detailHeading || "",
-          slug: res.slug || "",
-          excerpt: res.excerpt || "",
-          image: res.image || null,
-          sections: res.sections?.length ? res.sections : [""],
-          faqs: res.faqs?.length ? res.faqs : [{ question: "", answer: "" }],
-        };
+      const filled = {
+        ...dataRef.current,
+        ...res,
+        status: res.isActive ? "published" : "draft",
+      };
 
-        dataRef.current = filledData;
-        setData(filledData);
-      } catch {
-        toast.error("Failed to load blog");
-      }
+      dataRef.current = filled;
+      setData(filled);
     };
 
     fetchBlog();
-  }, [id, router]);
-
-  /* ================= SECTIONS ================= */
-  const addSection = () => {
-    updateField("sections", [...dataRef.current.sections, ""]);
-  };
-
-  const updateSection = (i, val) => {
-    const sections = [...dataRef.current.sections];
-    sections[i] = val;
-    updateField("sections", sections);
-  };
-
-  const removeSection = (i) => {
-    updateField(
-      "sections",
-      dataRef.current.sections.filter((_, idx) => idx !== i)
-    );
-  };
-
-  /* ================= FAQ ================= */
-  const addFaq = () => {
-    updateField("faqs", [...dataRef.current.faqs, { question: "", answer: "" }]);
-  };
-
-  const updateFaq = (i, key, value) => {
-    const faqs = [...dataRef.current.faqs];
-    faqs[i] = { ...faqs[i], [key]: value };
-    updateField("faqs", faqs);
-  };
-
-  const removeFaq = (i) => {
-    updateField(
-      "faqs",
-      dataRef.current.faqs.filter((_, idx) => idx !== i)
-    );
-  };
+  }, [id]);
 
   /* ================= IMAGE ================= */
   const handleImage = async (file) => {
@@ -144,52 +116,63 @@ export default function BlogForm() {
       updateField("image", res);
       toast.success("Image uploaded");
     } catch {
-      toast.error("Image upload failed");
+      toast.error("Upload failed");
     } finally {
       setImgLoading(false);
     }
+  };
+
+  /* ================= FAQ FUNCTIONS ================= */
+  const addFaq = () => {
+    const updated = [...data.faqs, { question: "", answer: "" }];
+    updateField("faqs", updated);
+  };
+
+  const updateFaq = (index, key, value) => {
+    const updated = [...data.faqs];
+    updated[index][key] = value;
+    updateField("faqs", updated);
+  };
+
+  const removeFaq = (index) => {
+    const updated = data.faqs.filter((_, i) => i !== index);
+    updateField("faqs", updated);
   };
 
   /* ================= SUBMIT ================= */
   const submit = async () => {
     const current = dataRef.current;
 
-    if (!current.mainTitle.trim()) return toast.error("Main title required");
+    if (!current.mainTitle.trim()) return toast.error("Title required");
     if (!current.slug.trim()) return toast.error("Slug required");
-
-    const validSections = current.sections.filter(
-      (s) => s && s.replace(/<(.|\n)*?>/g, "").trim()
-    );
-
-    if (!validSections.length)
-      return toast.error("Add at least one section");
 
     const validFaqs = current.faqs.filter(
       (f) => f.question.trim() && f.answer.trim()
     );
 
+    const payload = {
+      ...current,
+      faqs: validFaqs,
+      mainTitle: current.mainTitle.trim(),
+      detailHeading: current.detailHeading.trim(),
+      slug: current.slug.trim(),
+      excerpt: current.excerpt.trim(),
+      metaTitle: current.metaTitle.trim(),
+      metaDescription: current.metaDescription.trim(),
+      isActive: current.status === "published",
+    };
+
     setLoading(true);
 
     try {
-      const payload = {
-        mainTitle: current.mainTitle.trim(),
-        detailHeading: current.detailHeading.trim(),
-        slug: current.slug.trim(),
-        excerpt: current.excerpt.trim(),
-        image: current.image,
-        sections: validSections,
-        faqs: validFaqs,
-      };
-
       id
         ? await updateBlog({ data: { ...payload, id } })
         : await createBlog({ data: payload });
 
-      toast.success(id ? "Blog updated" : "Blog created");
+      toast.success(id ? "Updated" : "Created");
       router.push("/admin/blog");
-      router.refresh();
-    } catch (err) {
-      toast.error(err.message || "Failed to save blog");
+    } catch {
+      toast.error("Failed");
     } finally {
       setLoading(false);
     }
@@ -197,11 +180,12 @@ export default function BlogForm() {
 
   /* ================= UI ================= */
   return (
-    <div className="max-w-3xl p-6 space-y-6">
+    <div className="max-w-4xl p-6 space-y-6">
       <h1 className="text-2xl font-bold">
         {id ? "Update Blog" : "Create Blog"}
       </h1>
 
+      {/* BASIC INFO */}
       <input
         className="border p-3 rounded w-full"
         placeholder="Main Title"
@@ -231,39 +215,95 @@ export default function BlogForm() {
         onChange={(e) => updateField("excerpt", e.target.value)}
       />
 
+      {/* CATEGORY + AUTHOR */}
+      <div className="grid grid-cols-2 gap-4">
+        <input
+          className="border p-3 rounded w-full"
+          placeholder="Category"
+          value={data.category}
+          onChange={(e) => updateField("category", e.target.value)}
+        />
+
+        <input
+          className="border p-3 rounded w-full"
+          placeholder="Author"
+          value={data.author}
+          onChange={(e) => updateField("author", e.target.value)}
+        />
+      </div>
+
+      <input
+        className="border p-3 rounded w-full"
+        placeholder="Source (optional)"
+        value={data.source}
+        onChange={(e) => updateField("source", e.target.value)}
+      />
+
+      {/* STATUS */}
+      <div className="flex gap-6">
+        <label className="flex items-center gap-2">
+          <input
+            type="radio"
+            checked={data.status === "draft"}
+            onChange={() => updateField("status", "draft")}
+          />
+          Draft
+        </label>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="radio"
+            checked={data.status === "published"}
+            onChange={() => updateField("status", "published")}
+          />
+          Published
+        </label>
+      </div>
+
+      {/* SEO */}
+      <h3 className="font-semibold mt-4">SEO Settings</h3>
+
+      <input
+        className="border p-3 rounded w-full"
+        placeholder="Meta Title"
+        value={data.metaTitle}
+        onChange={(e) => updateField("metaTitle", e.target.value)}
+      />
+
+      <textarea
+        rows={3}
+        className="border p-3 rounded w-full"
+        placeholder="Meta Description"
+        value={data.metaDescription}
+        onChange={(e) => updateField("metaDescription", e.target.value)}
+      />
+
+      {/* IMAGE */}
       <input type="file" accept="image/*" onChange={(e) => handleImage(e.target.files?.[0])} />
-      {imgLoading && <p className="text-sm">Uploading...</p>}
+      {imgLoading && <p>Uploading...</p>}
       {data.image?.url && (
         <img src={data.image.url} className="h-32 rounded border" />
       )}
 
-      <h3 className="font-semibold mt-6">Sections</h3>
-
+      {/* CONTENT */}
+      <h3 className="font-semibold">Sections</h3>
       {data.sections.map((content, i) => (
-        <div key={i} className="border p-4 rounded mb-4">
-          <ReactQuill
-            theme="snow"
-            value={content}
-            onChange={(val) => updateSection(i, val)}
-            modules={quillModules}
-            formats={quillFormats}
-          />
-          {data.sections.length > 1 && (
-            <button
-              className="text-red-500 text-sm mt-2"
-              onClick={() => removeSection(i)}
-            >
-              Remove Section
-            </button>
-          )}
-        </div>
+        <ReactQuill
+          key={i}
+          theme="snow"
+          value={content}
+          onChange={(val) => {
+            const arr = [...data.sections];
+            arr[i] = val;
+            updateField("sections", arr);
+          }}
+          modules={quillModules}
+          formats={quillFormats}
+        />
       ))}
 
-      <Button variant="light" onClick={addSection}>
-        + Add Section
-      </Button>
-
-      <h3 className="font-semibold mt-8">FAQs</h3>
+      {/* FAQ SECTION */}
+      <h3 className="font-semibold mt-6">FAQs</h3>
 
       {data.faqs.map((faq, i) => (
         <div key={i} className="border p-4 rounded space-y-3">
@@ -273,13 +313,15 @@ export default function BlogForm() {
             value={faq.question}
             onChange={(e) => updateFaq(i, "question", e.target.value)}
           />
+
           <textarea
+            rows={3}
             className="border p-2 rounded w-full"
             placeholder="Answer"
-            rows={3}
             value={faq.answer}
             onChange={(e) => updateFaq(i, "answer", e.target.value)}
           />
+
           {data.faqs.length > 1 && (
             <button
               className="text-red-500 text-sm"

@@ -10,7 +10,7 @@ import { updateBanner, deleteBannerImage } from "@/lib/firestore/banners/write";
 import { getBanner } from "@/lib/firestore/banners/read";
 
 const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
+    ssr: false,
 });
 
 // ✅ COMPLETE INTRO TEXTS (PLAIN TEXT)
@@ -37,28 +37,47 @@ export default function BannerUploader({ category }) {
     const [editMode, setEditMode] = useState(false);
     const [imageLinks, setImageLinks] = useState({});
 
-    const modules = {
+    const quillModules = {
         toolbar: [
-            [{ header: [1, 2, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            ['link'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'align': [] }],
-            ['clean']
+            [{ font: [] }],
+            [{ size: ["small", false, "large", "huge"] }],
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ["bold", "italic", "underline", "strike"],
+            [{ script: "sub" }, { script: "super" }],
+            [{ color: [] }, { background: [] }],
+            [{ align: [] }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ indent: "-1" }, { indent: "+1" }],
+            ["blockquote", "code-block"],
+            ["link", "image", "video"],
+            ["clean"],
         ],
     };
 
-    const formats = [
-        'header', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet',
-        'link', 'color', 'background', 'align'
+    const quillFormats = [
+        "font",
+        "size",
+        "header",
+        "bold",
+        "italic",
+        "underline",
+        "strike",
+        "script",
+        "color",
+        "background",
+        "align",
+        "list",
+        "bullet",
+        "indent",
+        "blockquote",
+        "code-block",
+        "link",
+        "image",
+        "video",
     ];
 
-    // ✅ EXTRACT PLAIN TEXT FROM HTML
-    const extractPlainText = (html) => {
-        if (!html) return "";
-        return html.replace(/<[^>]*>/g, "").trim();
-    };
+
+
 
     // 🔥 DELETE BANNER IMAGE
     const handleDeleteImage = async (imageUrl) => {
@@ -84,7 +103,7 @@ export default function BannerUploader({ category }) {
             const updatedBanner = await getBanner(category);
             setCurrentBanner(updatedBanner);
             setImageLinks(updatedBanner?.imageLinks || {});
-            
+
             alert("🗑️ Banner image deleted successfully!");
         } catch (err) {
             console.error("Delete error:", err);
@@ -99,12 +118,13 @@ export default function BannerUploader({ category }) {
             try {
                 const banner = await getBanner(category);
                 setCurrentBanner(banner);
-                
+
                 if (banner?.imageLinks) {
                     setImageLinks(banner.imageLinks);
                 }
 
-                const savedIntro = extractPlainText(banner?.introText || INTRO_TEXTS[category] || INTRO_TEXTS.default);
+                const savedIntro =
+                    banner?.introText || INTRO_TEXTS[category] || INTRO_TEXTS.default;
                 setCurrentIntroText(savedIntro);
                 setEditedIntroText(savedIntro);
 
@@ -177,7 +197,7 @@ export default function BannerUploader({ category }) {
                     files.map(file => uploadToCloudinary(file, "banners"))
                 );
                 imageUrls = [...imageUrls, ...uploadedUrls];
-                
+
                 files.forEach((file, idx) => {
                     const previewUrl = URL.createObjectURL(file);
                     if (updatedLinks[previewUrl]) {
@@ -187,7 +207,7 @@ export default function BannerUploader({ category }) {
                 });
             }
 
-            const introText = extractPlainText(editedIntroText || currentIntroText || "").trim();
+            const introText = (editedIntroText || currentIntroText || "").trim();
             const pageTitle = (editedPageTitle || currentPageTitle || "").trim();
 
             if (!pageTitle) {
@@ -299,9 +319,9 @@ export default function BannerUploader({ category }) {
                             return (
                                 <div key={`${img}-${idx}`} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl group">
                                     <div className="relative w-32 h-20 flex-shrink-0 rounded-lg border cursor-pointer overflow-visible">
-                                        <Link 
-                                            href={hasValidLink ? imageLink : '#'} 
-                                            target="_blank" 
+                                        <Link
+                                            href={hasValidLink ? imageLink : '#'}
+                                            target="_blank"
                                             rel="noopener"
                                             className="block w-full h-full rounded-lg overflow-hidden relative group-hover:shadow-lg transition-all duration-200"
                                         >
@@ -321,7 +341,7 @@ export default function BannerUploader({ category }) {
                                             )}
                                         </Link>
                                     </div>
-                                    
+
                                     {/* 🔥 DELETE BUTTON */}
                                     <button
                                         onClick={() => handleDeleteImage(img)}
@@ -432,11 +452,10 @@ export default function BannerUploader({ category }) {
                         theme="snow"
                         value={editedIntroText}
                         onChange={setEditedIntroText}
-                        modules={modules}
-                        formats={formats}
-                        placeholder="Write your page intro (will be saved as plain text without formatting)..."
-                        className="h-[150px]"
-                        style={{ height: '150px', fontSize: '14px' }}
+                        modules={quillModules}
+                        formats={quillFormats}
+                        placeholder="Write full formatted page intro..."
+                        className="h-[250px]"
                     />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">

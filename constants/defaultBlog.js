@@ -15,10 +15,7 @@ export const defaultBlog = {
   isActive: true,
 
   /* 🔹 MEDIA */
-  image: {
-    url: "",
-    publicId: "",
-  },
+  image: null, // ✅ VERY IMPORTANT FIX
 
   /* 🔹 CONTENT */
   detailHeading: "",

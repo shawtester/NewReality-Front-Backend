@@ -18,7 +18,7 @@ export default function BlogDetailPage({ params }) {
 
   /* ================= FETCH BLOG ================= */
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         setLoading(true);
 
@@ -37,19 +37,18 @@ export default function BlogDetailPage({ params }) {
           .slice(0, 5);
 
         setRecentBlogs(filtered);
-
       } catch (error) {
         console.error("Blog fetch error:", error);
         setBlog(null);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     if (slug) fetchData();
   }, [slug]);
 
-  /* ================= HANDLE HEADINGS ================= */
+  /* ================= BUILD TOC ================= */
   const handleHeadingsReady = (headings) => {
     if (!headings.length) return;
 
@@ -79,35 +78,47 @@ export default function BlogDetailPage({ params }) {
     });
 
     setTocItems(items);
-
-    /* ===== SCROLL SPY ===== */
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              a.boundingClientRect.top -
-              b.boundingClientRect.top
-          );
-
-        if (visible.length > 0) {
-          setActiveId(visible[0].target.id);
-        }
-      },
-      {
-        rootMargin: "-180px 0px -50% 0px",
-        threshold: 0.2,
-      }
-    );
-
-    headings.forEach((heading) => observer.observe(heading));
   };
 
-  /* ================= SCROLL FUNCTION ================= */
+  /* ================= SCROLL SPY ================= */
+  useEffect(() => {
+    if (!blog) return;
+
+    const handleScroll = () => {
+      const headings = document.querySelectorAll(
+        "#blog-wrapper h2, #blog-wrapper h3"
+      );
+
+      if (!headings.length) return;
+
+      let currentId = "";
+
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect();
+        if (rect.top <= 150) {
+          currentId = heading.id;
+        }
+      });
+
+      if (currentId) {
+        setActiveId(currentId);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    setTimeout(handleScroll, 300);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [blog]);
+
+  /* ================= SCROLL TO SECTION ================= */
   const scrollToHeading = (id) => {
     const element = document.getElementById(id);
     if (!element) return;
+
+    setActiveId(id);
 
     const yOffset = -120;
     const y =
@@ -138,31 +149,37 @@ export default function BlogDetailPage({ params }) {
   }
 
   return (
-    <main className="bg-[#f8f8f8] w-full">
-      <div className="max-w-[1400px] mx-auto px-6 py-12">
+    <main className="bg-[#f5f5f5] w-full">
+      <div className="mx-auto max-w-7xl px-4 py-10">
 
-        <div className="flex gap-16">
+        {/* GRID LAYOUT */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_1fr]">
 
-          {/* MAIN CONTENT */}
-          <div className="flex-1 min-w-0 space-y-16">
+          {/* LEFT COLUMN */}
+          <div className="space-y-10">
             <BlogContent
               blog={blog}
               onHeadingsReady={handleHeadingsReady}
             />
+
             <BlogFAQ faqs={blog.faqs} />
           </div>
 
-          {/* SIDEBAR */}
-          <div className="hidden lg:block w-[320px] flex-shrink-0">
-            <div className="sticky top-[120px] space-y-8">
-              <BlogTOC
-                tocItems={tocItems}
-                activeId={activeId}
-                scrollToHeading={scrollToHeading}
-                recentBlogs={recentBlogs}
-              />
+          {/* RIGHT SIDEBAR */}
+          <aside className="hidden lg:block space-y-300 mb-8">
+            <div className="sticky top-[120px]">
+
+              <div className="bg-white rounded-lg p-5 shadow-sm">
+                <BlogTOC
+                  tocItems={tocItems}
+                  activeId={activeId}
+                  scrollToHeading={scrollToHeading}
+                  recentBlogs={recentBlogs}
+                />
+              </div>
+
             </div>
-          </div>
+          </aside>
 
         </div>
 

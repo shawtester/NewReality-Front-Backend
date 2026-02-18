@@ -25,7 +25,6 @@ const ensureUniqueSlug = async (slug, currentId = null) => {
   if (snap.empty) return slug;
 
   const existing = snap.docs.find((d) => d.id !== currentId);
-
   if (!existing) return slug;
 
   let counter = 1;
@@ -53,13 +52,18 @@ const ensureUniqueSlug = async (slug, currentId = null) => {
 /* ===================================================== */
 
 export const createBlog = async ({ data }) => {
+
+  // 🔥 SAFETY: remove File object if exists
+  if (data.image?.file) {
+    delete data.image.file;
+  }
+
   const title = data.mainTitle || data.title;
 
   if (!title?.trim()) throw new Error("Title required");
   if (!data?.slug?.trim()) throw new Error("Slug required");
 
   const newId = doc(collection(db, "blogs")).id;
-
   const finalSlug = await ensureUniqueSlug(data.slug.trim());
 
   await setDoc(doc(db, "blogs", newId), {
@@ -71,7 +75,16 @@ export const createBlog = async ({ data }) => {
 
     slug: finalSlug,
     excerpt: data.excerpt?.trim() || "",
-    image: data.image || null,
+
+    image: data.image
+      ? {
+          url: data.image.url || "",
+          publicId: data.image.publicId || "",
+        }
+      : null,
+
+    shortDescription: data.shortDescription || "",
+    content: data.content || "",
 
     category: data.category || "",
     author: data.author || "",
@@ -83,7 +96,7 @@ export const createBlog = async ({ data }) => {
     sections: data.sections || [],
     faqs: data.faqs || [],
 
-    isActive: data.isActive ?? false, // draft by default
+    isActive: data.isActive ?? false,
 
     timestampCreate: Timestamp.now(),
     timestampUpdate: Timestamp.now(),
@@ -97,6 +110,12 @@ export const createBlog = async ({ data }) => {
 /* ===================================================== */
 
 export const updateBlog = async ({ data }) => {
+
+  // 🔥 SAFETY: remove File object if exists
+  if (data.image?.file) {
+    delete data.image.file;
+  }
+
   if (!data?.id) throw new Error("Blog ID missing");
 
   const title = data.mainTitle || data.title;
@@ -118,7 +137,16 @@ export const updateBlog = async ({ data }) => {
 
       slug: finalSlug,
       excerpt: data.excerpt?.trim() || "",
-      image: data.image || null,
+
+      image: data.image
+        ? {
+            url: data.image.url || "",
+            publicId: data.image.publicId || "",
+          }
+        : null,
+
+      shortDescription: data.shortDescription || "",
+      content: data.content || "",
 
       category: data.category || "",
       author: data.author || "",

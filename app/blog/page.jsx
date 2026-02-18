@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Navbar from "../components/Header";
-import Footer from "../components/Footer";
 import Pagination from "../components/property/Pagination";
 import BlogPage from "./components/section1";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";
@@ -35,7 +33,7 @@ export default function Blog() {
 
   return (
     <>
-      <Navbar />
+      
 
       {/* ================= BREADCRUMB ================= */}
       <div className="max-w-[1240px] mx-auto px-4 py-2 text-sm text-gray-500">
@@ -52,7 +50,7 @@ export default function Blog() {
         />
       </div>
 
-      <Footer />
+      
     </>
   );
 }

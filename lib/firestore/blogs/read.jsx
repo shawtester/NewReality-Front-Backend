@@ -25,7 +25,8 @@ const normalizeBlogData = (data) => {
         value.seconds !== undefined &&
         value.nanoseconds !== undefined
       ) {
-        return value.seconds;
+        // 🔥 Convert Firestore Timestamp to ISO string
+        return new Date(value.seconds * 1000).toISOString();
       }
       return value;
     })
@@ -83,7 +84,7 @@ export const getBlogBySlug = async ({ slug }) => {
   const q = query(
     collection(db, "blogs"),
     where("slug", "==", slug),
-    where("isActive", "==", true), // only published
+    where("isActive", "==", true),
     limit(1)
   );
 

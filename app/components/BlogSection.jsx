@@ -132,7 +132,7 @@ export default function BlogSection({ blogs = [] }) {
         {blogs.map((blog) => (
           <Link
             key={blog.id}
-            href={`/blog/${blog.id}`}
+            href={`/blog/${blog.slug}`}
             className="w-[85%] sm:w-[300px] flex-shrink-0 snap-center mx-auto sm:mx-0
            first:ml-4 last:mr-4
            lg:first:ml-0 lg:last:mr-0

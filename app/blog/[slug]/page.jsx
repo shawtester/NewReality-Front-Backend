@@ -1,443 +1,189 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
-import {
-  doc,
-  getDoc,
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useEffect, useState } from "react";
+import { getBlogBySlug, getBlogsForHome } from "@/lib/firestore/blogs/read";
+
+import BlogContent from "./components/BlogContent";
+import BlogTOC from "./components/BlogTOC";
+import BlogFAQ from "./components/BlogFAQ";
 
 export default function BlogDetailPage({ params }) {
-  const blogId = params.slug;
+  const slug = params.slug;
 
   const [blog, setBlog] = useState(null);
-  const [latestBlogs, setLatestBlogs] = useState([]);
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const [tocItems, setTocItems] = useState([]);
   const [activeId, setActiveId] = useState("");
-  const [openFaq, setOpenFaq] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // ✅ ONLY for mobile TOC
-  const [isTocOpen, setIsTocOpen] = useState(false);
-
-
-
-  /* ================= FETCH CURRENT BLOG ================= */
+  /* ================= FETCH BLOG ================= */
   useEffect(() => {
-    const fetchBlog = async () => {
-      const ref = doc(db, "blogs", blogId);
-      const snap = await getDoc(ref);
+    async function fetchData() {
+      try {
+        setLoading(true);
 
-      if (snap.exists()) {
-        const data = snap.data();
+        const blogData = await getBlogBySlug({ slug });
 
-        setBlog({
-          ...data,
-          sections: data.sections || [],
-          faqs: data.faqs || [],
-        });
+        if (!blogData) {
+          setBlog(null);
+          return;
+        }
+
+        setBlog(blogData);
+
+        const allBlogs = await getBlogsForHome();
+        const filtered = allBlogs
+          .filter((b) => b.slug !== slug)
+          .slice(0, 5);
+
+        setRecentBlogs(filtered);
+      } catch (error) {
+        console.error("Blog fetch error:", error);
+        setBlog(null);
+      } finally {
+        setLoading(false);
       }
-    };
+    }
 
-    fetchBlog();
-  }, [blogId]);
+    if (slug) fetchData();
+  }, [slug]);
 
+  /* ================= BUILD TOC ================= */
+  const handleHeadingsReady = (headings) => {
+    if (!headings.length) return;
 
+    const items = [];
+    let currentH2 = null;
 
-  /* ================= FETCH LATEST BLOGS ================= */
-  useEffect(() => {
-    if (!blog?.sections) return;
+    headings.forEach((el, index) => {
+      if (!el.id) {
+        el.id = `section-${index + 1}`;
+      }
 
-    setTimeout(() => {
-      const wrapper = document.getElementById("blog-wrapper");
-      if (!wrapper) return;
+      if (el.tagName === "H2") {
+        currentH2 = {
+          id: el.id,
+          label: el.innerText,
+          children: [],
+        };
+        items.push(currentH2);
+      }
 
-      const headings = wrapper.querySelectorAll("h2, h3");
-
-      const items = [];
-
-      headings.forEach((el, index) => {
-        const id = `section-${index + 1}`;
-        el.id = id;
-
-        items.push({
-          id,
+      if (el.tagName === "H3" && currentH2) {
+        currentH2.children.push({
+          id: el.id,
           label: el.innerText,
         });
-      });
+      }
+    });
 
-      setTocItems(items);
-    }, 200);
-  }, [blog]);
+    setTocItems(items);
+  };
 
-
-
-
-
-
-  // SCROLL SPY
-
+  /* ================= SCROLL SPY ================= */
   useEffect(() => {
-    if (!tocItems.length) return;
+    if (!blog) return;
 
     const handleScroll = () => {
-      const headerHeight =
-        document.querySelector("header")?.offsetHeight || 0;
+      const headings = document.querySelectorAll(
+        "#blog-wrapper h2, #blog-wrapper h3"
+      );
 
-      const scrollPosition = window.scrollY + headerHeight + 50;
+      if (!headings.length) return;
 
-      let current = tocItems[0]?.id;
+      let currentId = "";
 
-      tocItems.forEach((item) => {
-        const el = document.getElementById(item.id);
-        if (!el) return;
-
-        if (scrollPosition >= el.offsetTop) {
-          current = item.id;
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect();
+        if (rect.top <= 150) {
+          currentId = heading.id;
         }
       });
 
-      setActiveId(current);
+      if (currentId) {
+        setActiveId(currentId);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll();
+    setTimeout(handleScroll, 300);
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [tocItems]);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [blog]);
 
-
+  /* ================= SCROLL TO SECTION ================= */
   const scrollToHeading = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
+    const element = document.getElementById(id);
+    if (!element) return;
 
-    el.scrollIntoView({
+    setActiveId(id);
+
+    const yOffset = -120;
+    const y =
+      element.getBoundingClientRect().top +
+      window.pageYOffset +
+      yOffset;
+
+    window.scrollTo({
+      top: y,
       behavior: "smooth",
-      block: "start",
     });
   };
 
-
-
-  if (!blog) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading blog...
       </div>
     );
   }
 
-  const imageSrc = blog.image?.url || blog.image || null;
+  if (!blog) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Blog not found.
+      </div>
+    );
+  }
 
   return (
+    <main className="bg-[#f5f5f5] w-full">
+      <div className="mx-auto max-w-7xl px-4 py-10">
 
+        {/* GRID LAYOUT */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_1fr]">
 
-    <main className="bg-[#f6f6f6] w-full">
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-10 xl:px-12">
+          {/* LEFT COLUMN */}
+          <div className="space-y-10">
+            <BlogContent
+              blog={blog}
+              onHeadingsReady={handleHeadingsReady}
+            />
 
-        {/* BREADCRUMB */}
-        <div className="py-4 text-sm text-gray-500 flex flex-wrap items-center gap-1">
-          <Link href="/" className="hover:text-gray-700">
-            Home
-          </Link>
-
-          <span>/</span>
-
-          {blog.category && (
-            <>
-              <Link
-                href={`/blog?category=${blog.category}`}
-                className="hover:text-gray-700 capitalize"
-              >
-                {blog.category}
-              </Link>
-              <span>/</span>
-            </>
-          )}
-
-          <span className="text-gray-900 font-medium capitalize">
-            {blog.mainTitle}
-          </span>
-        </div>
-
-
-        <div className="grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-8 lg:gap-10">
-
-          {/* LEFT CONTENT */}
-          <div className="space-y-6 max-w-full lg:max-w-[900px] xl:max-w-[1080px]">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug">
-              {blog.detailHeading || blog.mainTitle}
-            </h1>
-
-            <div className="flex flex-wrap items-center justify-between text-sm text-gray-500 mt-2">
-              <div>
-                By <span className="text-[#993F7F] font-medium">
-                  {blog.author || "Admin"}
-                </span>
-                <span className="mx-2">•</span>
-                {blog.date || "Nov 12, 2025"}
-              </div>
-
-              <button className="flex items-center gap-2 hover:text-gray-700">
-                Share this story
-              </button>
-            </div>
-
-
-            <p className="text-sm text-gray-500 relative bottom-2">
-              {blog.excerpt || "No excerpt available"}
-            </p>
-
-            {imageSrc && (
-              <div className="relative w-full aspect-[16/7] rounded-xl overflow-hidden">
-                <Image
-                  src={imageSrc}
-                  alt={blog.mainTitle}
-                  fill
-                  priority
-                  className="object-cover"
-                />
-              </div>
-            )}
-
-            {/* ================= MOBILE / TAB TOC (NEW) ================= */}
-            {tocItems.length > 0 && (
-              <div className="lg:hidden bg-white rounded-xl p-4 shadow-sm">
-                <button
-                  onClick={() => setIsTocOpen(!isTocOpen)}
-                  className="w-full flex justify-between items-center font-semibold text-sm"
-                >
-                  Table of Contents
-                  <span className="text-lg">
-                    {isTocOpen ? "−" : "+"}
-                  </span>
-                </button>
-
-                {isTocOpen && (
-                  <ul className="mt-4 space-y-2">
-                    {tocItems.map((item) => (
-                      <li key={item.id}>
-                        <button
-                          onClick={() => {
-                            scrollToHeading(item.id);
-                            setIsTocOpen(false);
-                          }}
-                          className={`w-full text-left ${item.level === "h3" ? "pl-6" : "pl-3"
-                            } py-1 border-l-2 text-sm ${activeId === item.id
-                              ? "border-[#8B2C6F] text-[#D4A017] font-semibold"
-                              : "border-transparent text-gray-500"
-                            }`}
-                        >
-                          {item.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-
-            {/* BLOG SECTIONS */}
-              <div id="blog-wrapper">
-                {blog.sections?.map((section, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-xl p-6 shadow-sm scroll-mt-32"
-                    dangerouslySetInnerHTML={{ __html: section }}
-                  />
-                ))}
-              </div>
-
-            {/* SOURCE (Only if exists) */}
-            {blog.source && blog.source.trim() !== "" && (
-              <div className="bg-white rounded-xl p-6 lg:p-7 xl:p-8 shadow-sm text-sm text-gray-600">
-                <span className="font-semibold text-gray-800">Source:</span>{" "}
-                {blog.source}
-              </div>
-            )}
-
-
-            {/* FAQ */}
-            {blog.faqs?.length > 0 && (
-              <section className="bg-white rounded-xl p-6 lg:p-7 xl:p-8 shadow-sm relative bottom-4">
-                <h2 className="text-xl font-semibold mb-6">
-                  Frequently Asked Questions
-                </h2>
-
-                <div className="space-y-4">
-                  {blog.faqs.map((faq, i) => (
-                    <div key={i} className="border rounded-lg">
-                      <button
-                        onClick={() =>
-                          setOpenFaq(openFaq === i ? null : i)
-                        }
-                        className="w-full flex justify-between items-center p-4 text-left font-medium"
-                      >
-                        <span>{faq.question}</span>
-                        <span className="text-xl">
-                          {openFaq === i ? "−" : "+"}
-                        </span>
-                      </button>
-
-                      {openFaq === i && (
-                        <div className="px-4 pb-4 text-gray-600 text-sm">
-                          {faq.answer}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ================= MOBILE / TAB LATEST BLOGS (NEW) ================= */}
-            {latestBlogs.length > 0 && (
-              <section className="lg:hidden bg-white rounded-xl p-5 shadow-sm">
-                <h3 className="font-semibold mb-4">Latest Blogs</h3>
-
-                <ul className="space-y-4">
-                  {latestBlogs.map((item) => (
-                    <li key={item.id} className="flex gap-3">
-                      <Image
-                        src={
-                          item.image?.url ||
-                          item.image ||
-                          "/images/placeholder.jpg"
-                        }
-                        alt={item.mainTitle}
-                        width={44}
-                        height={44}
-                        className="rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="text-sm font-medium line-clamp-2">
-                          {item.mainTitle}
-                        </p>
-                        <Link
-                          href={`/blog/${item.id}`}
-                          className="text-xs text-[#993F7F] font-semibold"
-                        >
-                          Read More
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex justify-center mt-4">
-                  <Link
-                    href="/blog"
-                    className="bg-[#DBA40D] text-white px-4 py-2 rounded-lg text-sm font-semibold"
-                  >
-                    View more
-                  </Link>
-                </div>
-              </section>
-            )}
+            <BlogFAQ faqs={blog.faqs} />
           </div>
 
-          {/* ================= DESKTOP SIDEBAR (UNCHANGED) ================= */}
-          <aside className="hidden lg:block justify-self-end">
-            <div
-              className="
-      sticky
-      lg:top-[110px]
-      xl:top-[120px]
-      mt-[130px]
-      xl:mt-[150px]
-      space-y-8
-    "
-            >
+          {/* RIGHT SIDEBAR */}
+          <aside className="hidden lg:block space-y-300 mb-8">
+            <div className="sticky top-[120px]">
 
-              {/* ===== TOC ===== */}
-              {tocItems.length > 0 && (
-                <div
-                  className="bg-white rounded-xl p-6 shadow-sm w-[300px] lg:w-[320px] xl:w-[340px] h-fit"  >
-
-                  <h3 className="text-lg font-semibold mb-4">
-                    Table of Contents
-                  </h3>
-
-                  <ul className="space-y-2">
-                    {tocItems.map((item) => (
-                      <li key={item.id}>
-                        <button
-                          onClick={() => scrollToHeading(item.id)}
-                          className={`w-full text-left ${item.level === "h3" ? "pl-8" : "pl-4"
-                            } py-1 border-l-2 text-sm transition ${activeId === item.id
-                              ? "border-[#8B2C6F] text-[#D4A017] font-semibold"
-                              : "border-transparent text-gray-500 hover:text-gray-700"
-                            }`}
-                        >
-                          {item.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* ===== LATEST BLOGS ===== */}
-              <section
-                className="
-        bg-white rounded-lg px-4 relative bottom-4 py-4 shadow-sm
-        w-[300px] lg:w-[320px] xl:w-[340px]
-      "
-              >
-                <h3 className="font-semibold mb-3">Latest Blogs</h3>
-
-                <ul className="space-y-4">
-                  {latestBlogs.map((item) => (
-                    <li key={item.id} className="flex gap-3">
-                      <Image
-                        src={
-                          item.image?.url ||
-                          item.image ||
-                          "/images/placeholder.jpg"
-                        }
-                        alt={item.mainTitle}
-                        width={44}
-                        height={44}
-                        className="rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="text-sm font-medium line-clamp-2">
-                          {item.mainTitle}
-                        </p>
-                        <Link
-                          href={`/blog/${item.id}`}
-                          className="text-xs text-[#993F7F] font-semibold"
-                        >
-                          Read More
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex justify-center mt-4">
-                  <Link
-                    href="/blog"
-                    className="bg-[#DBA40D] text-white px-4 py-2 rounded-lg text-sm font-semibold"
-                  >
-                    View more
-                  </Link>
-                </div>
-              </section>
+              <div className="bg-white rounded-lg p-5 shadow-sm">
+                <BlogTOC
+                  tocItems={tocItems}
+                  activeId={activeId}
+                  scrollToHeading={scrollToHeading}
+                  recentBlogs={recentBlogs}
+                />
+              </div>
 
             </div>
           </aside>
 
         </div>
+
       </div>
     </main>
-
-
   );
 }

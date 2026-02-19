@@ -25,7 +25,6 @@ const ensureUniqueSlug = async (slug, currentId = null) => {
   if (snap.empty) return slug;
 
   const existing = snap.docs.find((d) => d.id !== currentId);
-
   if (!existing) return slug;
 
   let counter = 1;
@@ -53,16 +52,22 @@ const ensureUniqueSlug = async (slug, currentId = null) => {
 /* ===================================================== */
 
 export const createBlog = async ({ data }) => {
+
+  if (!data) throw new Error("Blog data missing");
+
+  if (data.image?.file) {
+    delete data.image.file;
+  }
+
   const title = data.mainTitle || data.title;
 
   if (!title?.trim()) throw new Error("Title required");
   if (!data?.slug?.trim()) throw new Error("Slug required");
 
   const newId = doc(collection(db, "blogs")).id;
-
   const finalSlug = await ensureUniqueSlug(data.slug.trim());
 
-  await setDoc(doc(db, "blogs", newId), {
+  const payload = {
     id: newId,
 
     title: title.trim(),
@@ -71,7 +76,9 @@ export const createBlog = async ({ data }) => {
 
     slug: finalSlug,
     excerpt: data.excerpt?.trim() || "",
-    image: data.image || null,
+
+    shortDescription: data.shortDescription || "",
+    content: data.content || "",
 
     category: data.category || "",
     author: data.author || "",
@@ -83,11 +90,23 @@ export const createBlog = async ({ data }) => {
     sections: data.sections || [],
     faqs: data.faqs || [],
 
-    isActive: data.isActive ?? false, // draft by default
+    isActive: data.isActive ?? false,
 
     timestampCreate: Timestamp.now(),
     timestampUpdate: Timestamp.now(),
-  });
+  };
+
+  // ✅ Only add image if valid
+  if (data.image?.url) {
+    payload.image = {
+      url: data.image.url,
+      publicId: data.image.publicId || "",
+    };
+  } else {
+    payload.image = null;
+  }
+
+  await setDoc(doc(db, "blogs", newId), payload);
 
   return newId;
 };
@@ -96,8 +115,14 @@ export const createBlog = async ({ data }) => {
 /* ================= UPDATE BLOG ======================= */
 /* ===================================================== */
 
-export const updateBlog = async ({ data }) => {
-  if (!data?.id) throw new Error("Blog ID missing");
+export const updateBlog = async ({ id, data }) => {
+
+  if (!id) throw new Error("Blog ID missing");
+  if (!data) throw new Error("Blog data missing");
+
+  if (data.image?.file) {
+    delete data.image.file;
+  }
 
   const title = data.mainTitle || data.title;
 
@@ -106,38 +131,50 @@ export const updateBlog = async ({ data }) => {
 
   const finalSlug = await ensureUniqueSlug(
     data.slug.trim(),
-    data.id
+    id
   );
 
+  const updatePayload = {
+    title: title.trim(),
+    mainTitle: title.trim(),
+    detailHeading: data.detailHeading?.trim() || "",
+
+    slug: finalSlug,
+    excerpt: data.excerpt?.trim() || "",
+
+    shortDescription: data.shortDescription || "",
+    content: data.content || "",
+
+    category: data.category || "",
+    author: data.author || "",
+    source: data.source || "",
+
+    metaTitle: data.metaTitle || "",
+    metaDescription: data.metaDescription || "",
+
+    sections: data.sections || [],
+    faqs: data.faqs || [],
+
+    isActive: data.isActive ?? false,
+
+    timestampUpdate: Timestamp.now(),
+  };
+
+  // ✅ IMPORTANT: Only update image if new valid image exists
+  if (data.image?.url) {
+    updatePayload.image = {
+      url: data.image.url,
+      publicId: data.image.publicId || "",
+    };
+  }
+
   await setDoc(
-    doc(db, "blogs", data.id),
-    {
-      title: title.trim(),
-      mainTitle: title.trim(),
-      detailHeading: data.detailHeading?.trim() || "",
-
-      slug: finalSlug,
-      excerpt: data.excerpt?.trim() || "",
-      image: data.image || null,
-
-      category: data.category || "",
-      author: data.author || "",
-      source: data.source || "",
-
-      metaTitle: data.metaTitle || "",
-      metaDescription: data.metaDescription || "",
-
-      sections: data.sections || [],
-      faqs: data.faqs || [],
-
-      isActive: data.isActive ?? false,
-
-      timestampUpdate: Timestamp.now(),
-    },
+    doc(db, "blogs", id),
+    updatePayload,
     { merge: true }
   );
 
-  return data.id;
+  return id;
 };
 
 /* ===================================================== */

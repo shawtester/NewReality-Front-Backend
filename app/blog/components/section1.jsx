@@ -47,7 +47,7 @@ export default function BlogPage({ blogs = [] }) {
             finalBlogs.map((blog) => (
               <Link
                 key={blog.id}
-                href={`/blog/${blog.id}`}
+                href={`/blog/${blog.slug}`}
                 className="block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
               >
                 {/* IMAGE */}
@@ -127,7 +127,7 @@ export default function BlogPage({ blogs = [] }) {
               {recentBlogs.map((blog) => (
                 <li key={blog.id}>
                   <Link
-                    href={`/blog/${blog.id}`}
+                    href={`/blog/${blog.slug}`}
                     className="flex gap-3 items-start group"
                   >
                     {/* IMAGE */}

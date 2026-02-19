@@ -1,56 +1,16 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import "react-quill/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill"), {
-  ssr: false,
-});
+import RichEditors from "@/app/components/RichEditor";
 
 export default function ContentEditor({ formData, setFormData }) {
-  const [editorHtml, setEditorHtml] = useState(formData.content || []);
   const [tocItems, setTocItems] = useState([]);
-
-  /* ========================= */
-  /* 🔹 QUILL CONFIG           */
-  /* ========================= */
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link"],
-      ["clean"],
-    ],
-  };
-
-  /* ========================= */
-  /* 🔹 HANDLE CONTENT CHANGE  */
-  /* ========================= */
-
-  const handleChange = (value) => {
-    setEditorHtml(value);
-
-    setFormData((prev) => ({
-      ...prev,
-      content: value,
-    }));
-
-    generateTOC(value);
-  };
-
-  /* ========================= */
-  /* 🔹 AUTO TOC GENERATOR     */
-  /* ========================= */
 
   const generateTOC = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
     const headings = doc.querySelectorAll("h2, h3");
-
     const items = [];
 
     headings.forEach((el, index) => {
@@ -68,13 +28,13 @@ export default function ContentEditor({ formData, setFormData }) {
     setFormData((prev) => ({
       ...prev,
       toc: items,
-      content: doc.body.innerHTML, // updated with ids
+      content: doc.body.innerHTML,
     }));
   };
 
-  /* ========================= */
-  /* 🔹 LOAD EXISTING CONTENT  */
-  /* ========================= */
+  const handleEditorChange = (data) => {
+    generateTOC(data);
+  };
 
   useEffect(() => {
     if (formData.content) {
@@ -89,16 +49,11 @@ export default function ContentEditor({ formData, setFormData }) {
         Blog Content
       </h2>
 
-      {/* 🔹 RICH EDITOR */}
-      <ReactQuill
-        theme="snow"
-        value={editorHtml}
-        onChange={handleChange}
-        modules={modules}
-        className="bg-white"
+      <RichEditors
+        value={formData.content}
+        onChange={handleEditorChange}
       />
 
-      {/* 🔹 TOC PREVIEW */}
       {tocItems.length > 0 && (
         <div className="mt-6 border rounded-xl p-5 bg-gray-50">
           <h3 className="font-semibold mb-4">

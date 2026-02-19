@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Timestamp } from "firebase/firestore";
 
 import { createBlog, updateBlog } from "@/lib/firestore/blogs/write";
 import { getBlogById } from "@/lib/firestore/blogs/read";
@@ -15,13 +16,17 @@ import FAQBuilder from "./components/FAQBuilder";
 export default function BlogFormPage() {
   const params = useParams();
   const router = useRouter();
-
   const blogId = params?.id;
 
-  const [formData, setFormData] = useState(defaultBlog);
+  const [formData, setFormData] = useState({
+    ...defaultBlog,
+    timestampCreate: Timestamp.now(),
+  });
+
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
+  const [actionType, setActionType] = useState(null); // draft or publish
 
   /* ================= FETCH FOR EDIT ================= */
   useEffect(() => {
@@ -49,57 +54,68 @@ export default function BlogFormPage() {
   }, [blogId]);
 
   /* ================= SUBMIT ================= */
-  const handleSubmit = async () => {
+  const handleSubmit = async (type) => {
     try {
       setLoading(true);
+      setActionType(type);
 
       let finalImage = formData.image || null;
 
       /* ================= IMAGE LOGIC ================= */
-
-      // ✅ Case 1: New image selected
       if (imageFile) {
-        console.log("Uploading image...");
         const uploadResult = await uploadToCloudinary(imageFile);
-        console.log("Upload Result:", uploadResult);
-
-        finalImage = uploadResult; // 🔥 Direct assign
+        finalImage = uploadResult;
       }
 
-      // ✅ Case 2: Image removed intentionally
       if (!imageFile && !formData.image?.url) {
         finalImage = null;
       }
 
       /* ================= FINAL DATA ================= */
-
       const finalData = {
         ...formData,
         image: finalImage,
+        isActive: type === "publish", // 🔥 Draft or Publish
+        timestampUpdate: Timestamp.now(),
       };
+
+      if (!blogId) {
+        finalData.timestampCreate = Timestamp.now();
+      }
 
       if (blogId) {
         await updateBlog({
           id: blogId,
           data: finalData,
         });
-        alert("Blog Updated ✅");
+
+        alert(
+          type === "publish"
+            ? "Blog Published ✅"
+            : "Blog Saved as Draft 📝"
+        );
       } else {
         await createBlog({ data: finalData });
-        alert("Blog Created ✅");
+
+        alert(
+          type === "publish"
+            ? "Blog Published ✅"
+            : "Blog Saved as Draft 📝"
+        );
       }
 
       router.push("/admin/blog");
+
     } catch (error) {
       console.error("Save blog error:", error);
       alert("Error saving blog ❌");
     } finally {
       setLoading(false);
+      setActionType(null);
     }
   };
 
   /* ================= LOADING STATE ================= */
-
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -109,9 +125,9 @@ export default function BlogFormPage() {
   }
 
   /* ================= UI ================= */
-
   return (
     <div className="max-w-5xl mx-auto py-10 px-6 space-y-10">
+
       <h1 className="text-2xl font-bold">
         {blogId ? "Edit Blog" : "Create Blog"}
       </h1>
@@ -132,21 +148,35 @@ export default function BlogFormPage() {
         setFormData={setFormData}
       />
 
-      <div className="flex justify-end pt-4 border-t">
+      {/* 🔥 ACTION BUTTONS */}
+      <div className="flex justify-end gap-4 pt-4 border-t">
+
+        {/* Draft Button */}
         <button
-          onClick={handleSubmit}
+          onClick={() => handleSubmit("draft")}
+          disabled={loading}
+          className="px-6 py-3 rounded-xl border border-gray-400 text-gray-700 hover:bg-gray-100 transition disabled:opacity-50"
+        >
+          {loading && actionType === "draft"
+            ? "Saving..."
+            : "Save as Draft"}
+        </button>
+
+        {/* Publish Button */}
+        <button
+          onClick={() => handleSubmit("publish")}
           disabled={loading}
           className="px-8 py-3 rounded-xl text-white bg-black disabled:opacity-50"
         >
-          {loading
-            ? blogId
-              ? "Updating..."
-              : "Publishing..."
+          {loading && actionType === "publish"
+            ? "Publishing..."
             : blogId
-            ? "Update Blog"
-            : "Publish Blog"}
+              ? "Update & Publish"
+              : "Publish Blog"}
         </button>
+
       </div>
+
     </div>
   );
 }

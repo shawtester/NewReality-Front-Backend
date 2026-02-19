@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^11.0.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.0",
     "@mui/material": "^6.1.0",
     "@nextui-org/react": "^2.4.6",
     "@tailwindcss/line-clamp": "^0.4.4",
+    "@tinymce/tinymce-react": "^6.3.0",
     "algoliasearch": "^4.25.3",
     "canvas-confetti": "^1.9.3",
     "chart.js": "^4.4.4",

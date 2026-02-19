@@ -1,45 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import "react-quill/dist/quill.snow.css";
+import RichEditor from "@/app/components/RichEditor"; // ✅ TinyMCE Editor
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-
-/* ================= QUILL TOOLBAR ================= */
-const quillModules = {
-  toolbar: [
-    [{ font: [] }],
-    [{ size: ["small", false, "large", "huge"] }],
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
-};
-
-const quillFormats = [
-  "font",
-  "size",
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "color",
-  "background",
-  "align",
-  "list",
-  "bullet",
-  "link",
-];
-
-export default function AdminFooterBHK() {
+export default function AdminFooterProjectStatus() {
   const [data, setData] = useState(null);
   const [savingId, setSavingId] = useState(null);
 
@@ -49,7 +15,7 @@ export default function AdminFooterBHK() {
 
   const loadData = async () => {
     const snap = await getDoc(
-      doc(db, "footer_links", "projects_by_size")
+      doc(db, "footer_links", "projects_by_status")
     );
     setData(snap.data());
   };
@@ -74,7 +40,7 @@ export default function AdminFooterBHK() {
       );
 
       await updateDoc(
-        doc(db, "footer_links", "projects_by_size"),
+        doc(db, "footer_links", "projects_by_status"),
         { links: updatedLinks }
       );
     } catch (err) {
@@ -87,7 +53,7 @@ export default function AdminFooterBHK() {
   if (!data) {
     return (
       <div className="p-6 text-center text-gray-500">
-        Loading footer data...
+        Loading project status links...
       </div>
     );
   }
@@ -104,8 +70,9 @@ export default function AdminFooterBHK() {
             key={item.id}
             className="bg-white border rounded-xl p-6 shadow-sm"
           >
-            {/* TOP ROW */}
+            {/* ================= TOP ROW ================= */}
             <div className="grid grid-cols-12 gap-4 mb-4 items-center">
+
               <div className="col-span-2 text-sm font-medium text-gray-800">
                 {item.label}
               </div>
@@ -147,27 +114,23 @@ export default function AdminFooterBHK() {
               </div>
             </div>
 
-            {/* 🔥 DESCRIPTION FULL WIDTH */}
+            {/* ================= DESCRIPTION ================= */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 SEO Description
               </label>
 
               <div className="border rounded-lg overflow-hidden">
-                <ReactQuill
-                  theme="snow"
+                <RichEditor
                   value={item.description || ""}
                   onChange={(val) =>
                     updateField(item.id, "description", val)
                   }
-                  modules={quillModules}
-                  formats={quillFormats}
-                  className="h-[220px]"
                 />
               </div>
 
               <p className="text-xs text-gray-500 mt-2">
-                You can use formatting (bold, headings, lists, links).
+                Full Word-style formatting supported (tables, headings, links, images).
               </p>
             </div>
           </div>

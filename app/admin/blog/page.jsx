@@ -6,6 +6,7 @@ import { Button } from "@nextui-org/react";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Timestamp } from "firebase/firestore";
 
 export default function AdminBlogPage() {
   const [blogs, setBlogs] = useState([]);
@@ -49,18 +50,22 @@ export default function AdminBlogPage() {
   const toggleStatus = async (blog) => {
     try {
       await updateBlog({
+        id: blog.id,
         data: {
-          id: blog.id,
           isActive: !blog.isActive,
+          timestampUpdate: Timestamp.now(),
         },
       });
 
       toast.success(
-        blog.isActive ? "Moved to Draft" : "Published successfully"
+        blog.isActive
+          ? "Moved to Draft"
+          : "Published successfully"
       );
 
       fetchBlogs();
-    } catch {
+    } catch (error) {
+      console.error(error);
       toast.error("Failed to update status");
     }
   };
@@ -86,7 +91,27 @@ export default function AdminBlogPage() {
   /* ================= DATE FORMAT ================= */
   const formatDate = (timestamp) => {
     if (!timestamp) return "-";
-    return new Date(timestamp * 1000).toLocaleDateString();
+
+    try {
+      if (typeof timestamp?.toDate === "function") {
+        return timestamp
+          .toDate()
+          .toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+      }
+
+      if (timestamp?.seconds) {
+        return new Date(timestamp.seconds * 1000)
+          .toLocaleDateString("en-IN");
+      }
+
+      return new Date(timestamp).toLocaleDateString("en-IN");
+    } catch {
+      return "-";
+    }
   };
 
   return (
@@ -221,4 +246,3 @@ export default function AdminBlogPage() {
     </div>
   );
 }
-

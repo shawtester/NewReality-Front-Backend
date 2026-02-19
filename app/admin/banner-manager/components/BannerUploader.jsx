@@ -3,15 +3,12 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
 import { uploadToCloudinary } from "@/lib/cloudinary/uploadBanner";
 import { updateBanner, deleteBannerImage } from "@/lib/firestore/banners/write";
 import { getBanner } from "@/lib/firestore/banners/read";
+import RichEditor from "@/app/components/RichEditor";
 
-const ReactQuill = dynamic(() => import("react-quill"), {
-    ssr: false,
-});
+
 
 // ✅ COMPLETE INTRO TEXTS (PLAIN TEXT)
 const INTRO_TEXTS = {
@@ -36,47 +33,6 @@ export default function BannerUploader({ category }) {
     const [error, setError] = useState("");
     const [editMode, setEditMode] = useState(false);
     const [imageLinks, setImageLinks] = useState({});
-
-    const quillModules = {
-        toolbar: [
-            [{ font: [] }],
-            [{ size: ["small", false, "large", "huge"] }],
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ script: "sub" }, { script: "super" }],
-            [{ color: [] }, { background: [] }],
-            [{ align: [] }],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ indent: "-1" }, { indent: "+1" }],
-            ["blockquote", "code-block"],
-            ["link", "image", "video"],
-            ["clean"],
-        ],
-    };
-
-    const quillFormats = [
-        "font",
-        "size",
-        "header",
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "script",
-        "color",
-        "background",
-        "align",
-        "list",
-        "bullet",
-        "indent",
-        "blockquote",
-        "code-block",
-        "link",
-        "image",
-        "video",
-    ];
-
-
 
 
     // 🔥 DELETE BANNER IMAGE
@@ -448,15 +404,12 @@ export default function BannerUploader({ category }) {
                     Intro Text (Saved as Plain Text)
                 </label>
                 <div className="border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#F5A300]">
-                    <ReactQuill
-                        theme="snow"
+                    <RichEditor
                         value={editedIntroText}
                         onChange={setEditedIntroText}
-                        modules={quillModules}
-                        formats={quillFormats}
                         placeholder="Write full formatted page intro..."
-                        className="h-[250px]"
                     />
+
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
                     💡 You can use rich formatting in editor, but it will be saved/rendered as plain text

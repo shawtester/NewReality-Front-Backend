@@ -7,6 +7,32 @@ import { useMemo, useState } from "react";
 export default function BlogPage({ blogs = [] }) {
   const [query, setQuery] = useState("");
 
+  /* ================= SAFE DATE FORMATTER ================= */
+  const formatBlogDate = (timestamp) => {
+    if (!timestamp) return null;
+
+    try {
+      // Firestore Timestamp
+      if (typeof timestamp?.toDate === "function") {
+        return timestamp.toDate();
+      }
+
+      // Firestore object { seconds }
+      if (timestamp?.seconds) {
+        return new Date(timestamp.seconds * 1000);
+      }
+
+      // If already number (milliseconds)
+      if (typeof timestamp === "number") {
+        return new Date(timestamp);
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   /* ================= SEARCH ================= */
   const finalBlogs = blogs.filter((blog) =>
     `${blog.title || ""} ${blog.excerpt || ""}`
@@ -17,10 +43,11 @@ export default function BlogPage({ blogs = [] }) {
   /* ================= RECENT BLOGS (AUTO) ================= */
   const recentBlogs = useMemo(() => {
     return [...blogs]
-      .sort(
-        (a, b) =>
-          (b.timestampCreate || 0) - (a.timestampCreate || 0)
-      )
+      .sort((a, b) => {
+        const dateA = formatBlogDate(a.timestampCreate);
+        const dateB = formatBlogDate(b.timestampCreate);
+        return (dateB?.getTime() || 0) - (dateA?.getTime() || 0);
+      })
       .slice(0, 5);
   }, [blogs]);
 
@@ -44,53 +71,59 @@ export default function BlogPage({ blogs = [] }) {
         {/* ===== LEFT : BLOG CARDS ===== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {finalBlogs.length > 0 ? (
-            finalBlogs.map((blog) => (
-              <Link
-                key={blog.id}
-                href={`/blog/${blog.slug}`}
-                className="block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
-              >
-                {/* IMAGE */}
-                <div className="relative h-48 w-full">
-                  <Image
-                    src={blog.image?.url || blog.image || "/images/placeholder.jpg"}
-                    alt={blog.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+            finalBlogs.map((blog) => {
+              const formattedDate = formatBlogDate(blog.timestampCreate);
 
-                  {/* DATE */}
-                  {blog.timestampCreate && (
-                    <div className="absolute -bottom-6 right-4 bg-white rounded-2xl px-4 py-2 text-center shadow">
-                      <span className="text-xs text-gray-600">
-                        {new Date(
-                          blog.timestampCreate * 1000
-                        ).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "2-digit",
-                        })}
-                      </span>
-                    </div>
-                  )}
-                </div>
+              return (
+                <Link
+                  key={blog.id}
+                  href={`/blog/${blog.slug}`}
+                  className="block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
+                >
+                  {/* IMAGE */}
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src={
+                        blog.image?.url ||
+                        blog.image ||
+                        "/images/placeholder.jpg"
+                      }
+                      alt={blog.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
 
-                {/* CONTENT */}
-                <div className="px-5 pt-8 pb-5">
-                  <h2 className="text-sm md:text-base font-semibold line-clamp-2">
-                    {blog.title}
-                  </h2>
+                    {/* DATE */}
+                    {formattedDate && (
+                      <div className="absolute -bottom-6 right-4 bg-white rounded-2xl px-4 py-2 text-center shadow">
+                        <span className="text-xs text-gray-600">
+                          {formattedDate.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                  <p className="mt-2 text-xs md:text-sm text-gray-500 line-clamp-2">
-                    {blog.excerpt}
-                  </p>
+                  {/* CONTENT */}
+                  <div className="px-5 pt-8 pb-5">
+                    <h2 className="text-sm md:text-base font-semibold line-clamp-2">
+                      {blog.title}
+                    </h2>
 
-                  <span className="inline-block mt-4 text-xs font-semibold text-black">
-                    Read More →
-                  </span>
-                </div>
-              </Link>
-            ))
+                    <p className="mt-2 text-xs md:text-sm text-gray-500 line-clamp-2">
+                      {blog.excerpt}
+                    </p>
+
+                    <span className="inline-block mt-4 text-xs font-semibold text-black">
+                      Read More →
+                    </span>
+                  </div>
+                </Link>
+              );
+            })
           ) : (
             query && (
               <p className="text-sm text-gray-500">
@@ -117,49 +150,66 @@ export default function BlogPage({ blogs = [] }) {
             </div>
           </div>
 
-          {/* RECENT BLOGS (DYNAMIC + EXCERPT) */}
+          {/* RECENT BLOGS */}
           <div className="bg-white border rounded-xl p-5 shadow-sm">
             <h3 className="font-semibold mb-4 border-b pb-2">
               Recent Blogs
             </h3>
 
             <ul className="space-y-5">
-              {recentBlogs.map((blog) => (
-                <li key={blog.id}>
-                  <Link
-                    href={`/blog/${blog.slug}`}
-                    className="flex gap-3 items-start group"
-                  >
-                    {/* IMAGE */}
-                    <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                      <Image
-                        src={blog.image?.url || blog.image || "/images/placeholder.jpg"}
-                        alt={blog.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+              {recentBlogs.map((blog) => {
+                const formattedDate = formatBlogDate(blog.timestampCreate);
 
-                    {/* CONTENT */}
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-black">
-                        {blog.title}
-                      </p>
+                return (
+                  <li key={blog.id}>
+                    <Link
+                      href={`/blog/${blog.slug}`}
+                      className="flex gap-3 items-start group"
+                    >
+                      {/* IMAGE */}
+                      <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                        <Image
+                          src={
+                            blog.image?.url ||
+                            blog.image ||
+                            "/images/placeholder.jpg"
+                          }
+                          alt={blog.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
 
-                      {/* EXCERPT */}
-                      {blog.excerpt && (
-                        <p className="mt-1 text-xs text-gray-500 line-clamp-2">
-                          {blog.excerpt}
+                      {/* CONTENT */}
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-black">
+                          {blog.title}
                         </p>
-                      )}
 
-                      <span className="inline-block mt-1 text-xs font-semibold text-black">
-                        Read More →
-                      </span>
-                    </div>
-                  </Link>
-                </li>
-              ))}
+                        {blog.excerpt && (
+                          <p className="mt-1 text-xs text-gray-500 line-clamp-2">
+                            {blog.excerpt}
+                          </p>
+                        )}
+
+                        {formattedDate && (
+                          <p className="mt-1 text-xs text-gray-400">
+                            {formattedDate.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
+                          </p>
+                        )}
+
+                        <span className="inline-block mt-1 text-xs font-semibold text-black">
+                          Read More →
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

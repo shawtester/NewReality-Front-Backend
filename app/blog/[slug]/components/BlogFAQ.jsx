@@ -13,7 +13,7 @@ export default function BlogFAQ({ faqs }) {
   };
 
   return (
-    <section className="max-w-[900px] xl:max-w-[1050px] space-y-8">
+    <section className="max-w-[1240px] px-4 space-y-8">
 
       {/* ================= HEADING ================= */}
       <div>

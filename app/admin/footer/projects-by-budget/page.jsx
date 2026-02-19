@@ -1,43 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import "react-quill/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-
-/* ================= QUILL TOOLBAR ================= */
-const quillModules = {
-  toolbar: [
-    [{ font: [] }],
-    [{ size: ["small", false, "large", "huge"] }],
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ color: [] }, { background: [] }],
-    [{ align: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
-};
-
-const quillFormats = [
-  "font",
-  "size",
-  "header",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "color",
-  "background",
-  "align",
-  "list",
-  "bullet",
-  "link",
-];
+import RichEditor from "@/app/components/RichEditor"; // ✅ Import Tiny Editor
 
 export default function AdminFooterProjectBudget() {
   const [data, setData] = useState(null);
@@ -101,7 +67,7 @@ export default function AdminFooterProjectBudget() {
             key={item.id}
             className="bg-white border rounded-xl p-6 shadow-sm"
           >
-            {/* TOP ROW */}
+            {/* ================= TOP ROW ================= */}
             <div className="grid grid-cols-12 gap-4 mb-4 items-center">
               <div className="col-span-2 text-sm font-medium text-gray-800">
                 {item.label}
@@ -144,27 +110,23 @@ export default function AdminFooterProjectBudget() {
               </div>
             </div>
 
-            {/* 🔥 DESCRIPTION FULL WIDTH BELOW */}
+            {/* ================= DESCRIPTION ================= */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 SEO Description
               </label>
 
               <div className="border rounded-lg overflow-hidden">
-                <ReactQuill
-                  theme="snow"
+                <RichEditor
                   value={item.description || ""}
                   onChange={(val) =>
                     updateField(item.id, "description", val)
                   }
-                  modules={quillModules}
-                  formats={quillFormats}
-                  className="h-[200px]"
                 />
               </div>
 
               <p className="text-xs text-gray-500 mt-2">
-                You can use formatting (bold, lists, headings, links).
+                You can use full formatting (bold, tables, images, lists, etc.)
               </p>
             </div>
           </div>

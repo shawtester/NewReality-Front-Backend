@@ -37,18 +37,15 @@ export default function BasicDetails({ formData, setFormData, setImageFile }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Send actual file to parent (for Cloudinary upload)
     setImageFile(file);
 
-    // Create preview only (local blob)
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
-    // DO NOT save blob URL to Firestore
     setFormData((prev) => ({
       ...prev,
       image: {
-        url: "",       // will be filled after upload
+        url: "",
         publicId: "",
       },
     }));
@@ -82,92 +79,129 @@ export default function BasicDetails({ formData, setFormData, setImageFile }) {
   }, [previewUrl]);
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-md space-y-6">
+    <div className="bg-white p-8 rounded-2xl shadow-md space-y-8">
 
-      <h2 className="text-xl font-semibold border-b pb-3">
-        Basic Details
-      </h2>
+      {/* ================= BASIC DETAILS ================= */}
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold border-b pb-3">
+          Basic Details
+        </h2>
 
-      {/* 🔹 TITLE */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-600">
-          Main Title
-        </label>
-        <input
-          type="text"
+        {/* 🔹 TITLE */}
+        <InputField
+          label="Main Title"
           name="title"
-          value={formData.title || ""}
+          value={formData.title}
           onChange={handleChange}
           placeholder="Enter blog title"
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
         />
-      </div>
 
-      {/* 🔹 DETAIL HEADING */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-600">
-          Detail Page Heading (H1)
-        </label>
-        <input
-          type="text"
+        {/* 🔹 DETAIL HEADING */}
+        <InputField
+          label="Detail Page Heading (H1)"
           name="detailHeading"
-          value={formData.detailHeading || ""}
+          value={formData.detailHeading}
           onChange={handleChange}
           placeholder="Enter H1 heading"
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
         />
-      </div>
 
-      {/* 🔹 SLUG */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-600">
-          Slug
-        </label>
-        <input
-          type="text"
+        {/* 🔹 SLUG */}
+        <InputField
+          label="Slug"
           name="slug"
-          value={formData.slug || ""}
+          value={formData.slug}
           onChange={handleChange}
           placeholder="example-blog-title"
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
         />
-      </div>
 
-      {/* 🔹 AUTHOR */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-600">
-          Author
-        </label>
-        <input
-          type="text"
+        {/* 🔹 AUTHOR */}
+        <InputField
+          label="Author"
           name="author"
-          value={formData.author || ""}
+          value={formData.author}
           onChange={handleChange}
           placeholder="Author name"
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
         />
-      </div>
 
-      {/* 🔹 EXCERPT */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-600">
-          Excerpt
-        </label>
-        <textarea
-          name="excerpt"
-          value={formData.excerpt || ""}
+        {/* 🔹 CATEGORY */}
+        <InputField
+          label="Category"
+          name="category"
+          value={formData.category}
           onChange={handleChange}
-          placeholder="Short summary of the blog"
-          rows={4}
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+          placeholder="Interior / Vastu / Real Estate"
+        />
+
+        {/* 🔹 SOURCE */}
+        <InputField
+          label="Source (Optional)"
+          name="source"
+          value={formData.source}
+          onChange={handleChange}
+          placeholder="https://example.com"
+        />
+
+        {/* 🔹 EXCERPT */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-600">
+            Excerpt
+          </label>
+          <textarea
+            name="excerpt"
+            value={formData.excerpt || ""}
+            onChange={handleChange}
+            placeholder="Short summary of the blog"
+            rows={4}
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+          />
+        </div>
+      </div>
+
+      {/* ================= SEO SECTION ================= */}
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold border-b pb-3">
+          SEO Meta Settings
+        </h2>
+
+        {/* 🔹 META TITLE */}
+        <InputField
+          label="Meta Title"
+          name="metaTitle"
+          value={formData.metaTitle}
+          onChange={handleChange}
+          placeholder="SEO optimized title (60 characters recommended)"
+        />
+
+        {/* 🔹 META DESCRIPTION */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-600">
+            Meta Description
+          </label>
+          <textarea
+            name="metaDescription"
+            value={formData.metaDescription || ""}
+            onChange={handleChange}
+            placeholder="SEO description (150-160 characters recommended)"
+            rows={3}
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+          />
+        </div>
+
+        {/* 🔹 META KEYWORDS */}
+        <InputField
+          label="Meta Keywords"
+          name="metaKeywords"
+          value={formData.metaKeywords}
+          onChange={handleChange}
+          placeholder="real estate, vastu, home decor (comma separated)"
         />
       </div>
 
-      {/* 🔹 IMAGE UPLOAD */}
+      {/* ================= IMAGE UPLOAD ================= */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-600">
+        <h2 className="text-xl font-semibold border-b pb-3">
           Featured Image
-        </label>
+        </h2>
 
         <input
           type="file"
@@ -176,7 +210,6 @@ export default function BasicDetails({ formData, setFormData, setImageFile }) {
           className="w-full"
         />
 
-        {/* 🔥 Preview */}
         {previewUrl && (
           <div className="mt-4 relative">
             <img
@@ -196,6 +229,26 @@ export default function BasicDetails({ formData, setFormData, setImageFile }) {
         )}
       </div>
 
+    </div>
+  );
+}
+
+
+/* ================= REUSABLE INPUT COMPONENT ================= */
+function InputField({ label, name, value, onChange, placeholder }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-600">
+        {label}
+      </label>
+      <input
+        type="text"
+        name={name}
+        value={value || ""}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+      />
     </div>
   );
 }

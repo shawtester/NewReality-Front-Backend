@@ -22,8 +22,17 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
+// 🔥 Firebase SEO import
+import { getSEO } from "@/lib/firestore/seo/read";
+
+export const dynamic = "force-dynamic";
+
+// ================== METADATA ==================
 export async function generateMetadata({ params }) {
-  const property = await getPropertyBySlugOrId(params.slug);
+  const slug = params.slug;
+
+  // 1️⃣ Fetch property
+  const property = await getPropertyBySlugOrId(slug);
 
   if (!property) {
     return {
@@ -32,17 +41,28 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  // 2️⃣ Fetch Firebase SEO for this property
+  const seo = await getSEO(slug);
+
+  // 3️⃣ Use Firebase SEO if exists, otherwise fallback to property meta fields
   const title =
+    seo?.title ||
     property.metaTitle ||
     `${property.title} in ${property.location} | Price & Details`;
 
   const description =
+    seo?.description ||
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
   const keywords =
+    seo?.keywords ||
     property.metaKeywords ||
     `${property.title}, ${property.location}, real estate`;
+
+  // ✅ Replace OG image with canonical URL
+  const canonicalURL =
+    seo?.canonical || `https://yourdomain.com/residential/${property.slug}`;
 
   return {
     title,
@@ -51,39 +71,45 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title,
       description,
-      images: property.mainImage?.url
-        ? [property.mainImage.url]
-        : [],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: canonicalURL,
     },
   };
 }
 
-export const dynamic = "force-dynamic";
-
+// ================== PAGE COMPONENT ==================
 export default async function PropertyPage({ params }) {
   const slug = params.slug;
 
+  // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
 
+  // 2️⃣ Fetch all properties for "Similar Projects"
   const allProjects = await getAllProperties();
 
-  /* ✅ SAFE BUILDER FETCH */
+  // 3️⃣ Fetch builder safely
   let builder = null;
   if (property.builderId) {
     builder = await getBuilderById(property.builderId);
   }
 
-  const amenitiesData = await getAmenitiesByIds(
-    property.amenities || []
-  );
+  // 4️⃣ Fetch amenities
+  const amenitiesData = await getAmenitiesByIds(property.amenities || []);
 
+  // 5️⃣ Format location string
   const locationString =
-    [property.sector, property.locationName]
-      .filter(Boolean)
-      .join(", ") || property.location || "";
+    [property.sector, property.locationName].filter(Boolean).join(", ") ||
+    property.location ||
+    "";
 
-  /* ================= CLEAN PROPERTY ================= */
+  // 6️⃣ Clean property object
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
@@ -102,11 +128,8 @@ export default async function PropertyPage({ params }) {
 
     brochure: property.brochure || null,
 
-    /* 🔥 MAIN FIX — RIGHTSIDEBAR DATA */
     mainImage: property.mainImage || null,
     gallery: property.gallery || [],
-
-    /* Mobile Gallery ke liye URLs array */
     images: [
       ...(property.mainImage?.url ? [property.mainImage.url] : []),
       ...(property.gallery?.map((g) => g.url) || []),
@@ -131,7 +154,6 @@ export default async function PropertyPage({ params }) {
 
     disclaimer: property.disclaimer || "",
 
-    /* QUICK FACTS */
     projectArea: property.projectArea || "",
     projectType: property.projectType || "",
     projectStatus: property.projectStatus || "",
@@ -139,6 +161,7 @@ export default async function PropertyPage({ params }) {
     possession: property.possession || "",
   };
 
+  // ================== RENDER ==================
   return (
     <ApartmentClient>
       <AutoPopup propertyTitle={cleanProperty.title} />
@@ -146,28 +169,19 @@ export default async function PropertyPage({ params }) {
       <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
-          <MobileGallery
-            images={cleanProperty.images}
-            title={cleanProperty.title}
-          />
+          <MobileGallery images={cleanProperty.images} title={cleanProperty.title} />
 
           <TitleBlockWithBrochure property={cleanProperty} />
 
           <div className="sticky top-[64px] md:top-[96px] z-30 bg-white">
-
             <ScrollTabs />
           </div>
 
-          <OverviewSection
-            overview={cleanProperty.overview}
-            propertyTitle={cleanProperty.title}
-          />
+          <OverviewSection overview={cleanProperty.overview} propertyTitle={cleanProperty.title} />
 
           <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
 
-          <PaymentPlanSection
-            paymentPlan={cleanProperty.paymentPlan}
-          />
+          <PaymentPlanSection paymentPlan={cleanProperty.paymentPlan} />
 
           <AmenitiesSection amenities={cleanProperty.amenities} />
 
@@ -181,9 +195,7 @@ export default async function PropertyPage({ params }) {
 
           <FAQSection faq={cleanProperty.faq} />
 
-          {cleanProperty.builder && (
-            <DeveloperSection builder={cleanProperty.builder} />
-          )}
+          {cleanProperty.builder && <DeveloperSection builder={cleanProperty.builder} />}
 
           <SimilarProjectsSection
             projects={allProjects}
@@ -195,7 +207,6 @@ export default async function PropertyPage({ params }) {
         </div>
 
         {/* RIGHT */}
-        {/* 🔥 MAIN FIX — NO DATA OVERRIDE */}
         <RightSidebar property={cleanProperty} />
       </section>
 

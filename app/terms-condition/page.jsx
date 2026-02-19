@@ -1,7 +1,38 @@
 import Navbar from "../components/Header";
 import Footer from "../components/Footer";
+import { getSEO } from "@/lib/firestore/seo/read";
 
-export default function PrivacyPolicy() {
+// ✅ Dynamic SEO
+export async function generateMetadata() {
+  const slug = "terms-and-conditions"; // Firestore document ID
+
+  try {
+    const seo = await getSEO(slug);
+
+    return {
+      title: seo?.title || "Terms and Conditions — Neev Realty",
+      description:
+        seo?.description ||
+        "Read the Terms and Conditions of Neev Realty governing the use of our website and real estate services.",
+      keywords:
+        seo?.keywords ||
+        "terms and conditions, Neev Realty terms, real estate website terms India",
+      alternates: {
+        canonical:
+          seo?.canonical ||
+          "https://yourdomain.com/terms-and-conditions",
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Terms and Conditions — Neev Realty",
+      description:
+        "Terms and Conditions of Neev Realty.",
+    };
+  }
+}
+
+export default function TermsAndConditions() {
   return (
     <>
       <Navbar />

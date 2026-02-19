@@ -43,3 +43,8 @@ build
 .env.local
 .env.production
 coverage
+
+
+
+# service keys and private docs 
+serviceAccountKey.json

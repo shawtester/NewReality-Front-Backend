@@ -1,5 +1,36 @@
 import Navbar from "../components/Header";
 import Footer from "../components/Footer";
+import { getSEO } from "@/lib/firestore/seo/read";
+
+// ✅ Dynamic SEO
+export async function generateMetadata() {
+  const slug = "privacy-policy"; // Make sure this matches Firestore document ID
+
+  try {
+    const seo = await getSEO(slug);
+
+    return {
+      title: seo?.title || "Privacy Policy — Neev Realty",
+      description:
+        seo?.description ||
+        "Read the Privacy Policy of Neev Realty and learn how we collect, use, and protect your personal information.",
+      keywords:
+        seo?.keywords ||
+        "privacy policy, Neev Realty privacy, real estate privacy India",
+      alternates: {
+        canonical:
+          seo?.canonical ||
+          "https://yourdomain.com/privacy-policy",
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Privacy Policy — Neev Realty",
+      description:
+        "Privacy Policy of Neev Realty.",
+    };
+  }
+}
 
 export default function PrivacyPolicy() {
   return (

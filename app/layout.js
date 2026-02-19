@@ -4,6 +4,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Toaster } from "react-hot-toast";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
 import StickyIcons from "@/app/components/StickyIcons";
 
 const geistSans = localFont({
@@ -18,8 +19,10 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Neev Realty",
-  description: "Create By Docs Readers",
+  title: "Neev Realty | Best Real Estate Company in Gurgaon",
+  description: " Neev Realty, the best real estate company in Gurugram, offers premium flats, apartments and commercial spaces. Visit our website to find your ideal property.",
+    keywords: ['Neev Realty, best real estate company, real estate company in gurgaon, real estate in gurugram, Property in gurgaon'],
+     canonical: 'https://www.neevrealty.com/ ',
 };
 
 export default function RootLayout({ children }) {

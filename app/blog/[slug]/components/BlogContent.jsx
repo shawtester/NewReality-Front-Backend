@@ -329,7 +329,18 @@ export default function BlogContent({ blog, onHeadingsReady }) {
         <article
           ref={wrapperRef}
           id="blog-wrapper"
-          className="bg-white rounded-lg p-6 md:p-8 shadow-sm prose prose-lg max-w-none prose-headings:scroll-mt-32 prose-img:rounded-xl prose-a:text-black hover:prose-a:underline"
+          className="
+    bg-white rounded-lg p-6 md:p-8 shadow-sm
+    prose prose-lg max-w-none
+    prose-headings:scroll-mt-32
+    prose-img:rounded-xl
+    prose-a:text-black hover:prose-a:underline
+    whitespace-pre-wrap
+    [&_ul]:list-disc
+    [&_ul]:pl-6
+    [&_ol]:list-decimal
+    [&_ol]:pl-6
+  "
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
 

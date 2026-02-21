@@ -5,12 +5,11 @@ import { getSEOPage } from "@/lib/firestore/seo/read_server";
 
 export const dynamic = "force-dynamic";
 
-// ✅ DYNAMIC SEO
+/* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata({ searchParams }) {
   const type = searchParams?.type;
 
   let seoSlug = "residential";
-
   if (type) {
     seoSlug = `residential-${type}`;
   }
@@ -18,29 +17,49 @@ export async function generateMetadata({ searchParams }) {
   const seo = await getSEOPage(seoSlug);
 
   const baseUrl = "https://www.neevrealty.com/residential";
+  const canonicalURL =
+    seo?.canonical ||
+    `${baseUrl}${type ? `?type=${type}` : ""}`;
+
+  const title =
+    seo?.title ||
+    "Best Residential Projects in Gurgaon | Residential Property";
+
+  const description =
+    seo?.description ||
+    "Explore the best residential projects in Gurgaon. Find luxury flats, apartments and top residential options.";
+
+  const keywords = Array.isArray(seo?.keywords)
+    ? seo.keywords
+    : seo?.keywords?.split(",").map((k) => k.trim()) || [
+        "residential property gurgaon",
+        "apartments in gurgaon",
+        "builder floor gurgaon",
+      ];
 
   return {
-    title:
-      seo?.title ||
-      "Best Residential Projects in Gurgaon | Residential Property",
-
-    description:
-      seo?.description ||
-      "Explore the best residential projects in Gurgaon. Find luxury flats, apartments and top residential options.",
-
-    keywords: Array.isArray(seo?.keywords)
-      ? seo.keywords
-      : seo?.keywords?.split(",") || [],
-
+    title,
+    description,
+    keywords,
     alternates: {
-      canonical:
-        seo?.canonical ||
-        `${baseUrl}${type ? `?type=${type}` : ""}`,
+      canonical: canonicalURL,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalURL,
+      siteName: "Neev Realty",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }
 
-// ✅ PAGE WITH FILTER LOGIC
+/* ✅ PAGE WITH FILTER LOGIC */
 export default async function ResidentialPage({ searchParams }) {
   const type = searchParams?.type;
 

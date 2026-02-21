@@ -7,25 +7,49 @@ import { getTestimonials } from "@/lib/firestore/testimonials/read";
 import { getSEO } from "@/lib/firestore/seo/read";
 import { MapPin } from "lucide-react";
 
-// ✅ Dynamic SEO
+/* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "about-us"; // Make sure this matches Firestore document ID
+  const slug = "about"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);
 
+    const title = seo?.title || "About Us — Neev Realty";
+
+    const description =
+      seo?.description ||
+      "Learn more about Neev Realty, a trusted real estate advisory in Gurgaon delivering expert property solutions.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/about";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+          "about neev realty",
+          "real estate gurgaon",
+          "property consultants haryana",
+        ];
+
     return {
-      title: seo?.title || "About Us — Neev Realty",
-      description:
-        seo?.description ||
-        "Learn more about Neev Realty, a trusted real estate advisory in Gurgaon delivering expert property solutions.",
-      keywords:
-        seo?.keywords ||
-        "about Neev Realty, real estate company Gurgaon, property consultants Haryana",
+      title,
+      description,
+      keywords,
       alternates: {
-        canonical:
-          seo?.canonical ||
-          "https://yourdomain.com/about-us",
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   } catch (error) {
@@ -48,7 +72,7 @@ export default async function AboutPage() {
 
       {/* ABOUT SECTIONS */}
       <Section1 />
-      <TestimonialsSection testimonials={testimonials}/>
+      <TestimonialsSection testimonials={testimonials} />
 
       {/* GET IN TOUCH SECTION */}
       <section className="bg-white py-8">

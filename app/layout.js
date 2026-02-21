@@ -19,11 +19,17 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+/* ✅ DEFAULT FALLBACK METADATA ONLY */
 export const metadata = {
-  title: "Neev Realty | Best Real Estate Company in Gurgaon",
-  description: " Neev Realty, the best real estate company in Gurugram, offers premium flats, apartments and commercial spaces. Visit our website to find your ideal property.",
-    keywords: ['Neev Realty, best real estate company, real estate company in gurgaon, real estate in gurugram, Property in gurgaon'],
-     canonical: 'https://www.neevrealty.com/ ',
+  title: "Neev Realty",
+  description:
+    "Neev Realty - Premium flats, apartments and commercial spaces in Gurgaon.",
+  keywords: [
+    "Neev Realty",
+    "real estate in gurgaon",
+    "property in gurugram",
+  ],
+  metadataBase: new URL("https://www.neevrealty.com"),
 };
 
 export default function RootLayout({ children }) {
@@ -64,7 +70,6 @@ export default function RootLayout({ children }) {
         <Toaster />
 
         <NextUIProvider>
-          {/* global offset for fixed navbar */}
           <main className="pt-[70px] min-[800px]:pt-[102px] min-h-screen">
             {children}
           </main>
@@ -75,4 +80,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

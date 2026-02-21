@@ -2,32 +2,56 @@ import Navbar from "../components/Header";
 import Footer from "../components/Footer";
 import { getSEO } from "@/lib/firestore/seo/read";
 
-// ✅ Dynamic SEO
+/* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "privacy-policy"; // Make sure this matches Firestore document ID
+  const slug = "privacy-policy"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);
 
+    const title =
+      seo?.title || "Privacy Policy — Neev Realty";
+
+    const description =
+      seo?.description ||
+      "Read the Privacy Policy of Neev Realty and learn how we collect, use, and protect your personal information.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/privacy-policy";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+        "privacy policy neev realty",
+        "real estate privacy india",
+        "property data protection",
+      ];
+
     return {
-      title: seo?.title || "Privacy Policy — Neev Realty",
-      description:
-        seo?.description ||
-        "Read the Privacy Policy of Neev Realty and learn how we collect, use, and protect your personal information.",
-      keywords:
-        seo?.keywords ||
-        "privacy policy, Neev Realty privacy, real estate privacy India",
+      title,
+      description,
+      keywords,
       alternates: {
-        canonical:
-          seo?.canonical ||
-          "https://yourdomain.com/privacy-policy",
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   } catch (error) {
     return {
       title: "Privacy Policy — Neev Realty",
-      description:
-        "Privacy Policy of Neev Realty.",
+      description: "Privacy Policy of Neev Realty.",
     };
   }
 }

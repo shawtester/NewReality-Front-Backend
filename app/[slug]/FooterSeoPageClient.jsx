@@ -64,6 +64,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
   const [search, setSearch] = useState("");
   const [description, setDescription] = useState("");
   const [heading, setHeading] = useState("");
+  const [isValidSlug, setIsValidSlug] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const extractPriceRange = (priceRange = "") => {
     if (!priceRange) return null;
@@ -101,7 +103,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
     .replace("-properties", "")
     .replace("-projects", "");
 
-  /* ================= FETCH ADMIN SEO DATA ================= */
+  /* ================= FETCH ADMIN SEO DATA + VALIDATE ================= */
   useEffect(() => {
     const fetchSeoData = async () => {
       const collections = [
@@ -112,6 +114,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
         "property_by_type",
       ];
 
+      let foundMatch = false;
+
       for (const col of collections) {
         const snap = await getDoc(doc(db, "footer_links", col));
         const data = snap.data();
@@ -119,11 +123,17 @@ export default function FooterSeoPage({ params, properties = [] }) {
         const found = data?.links?.find((l) => l.value === slug);
 
         if (found) {
+          foundMatch = true;
+
           if (found.description) setDescription(found.description);
           if (found.heading) setHeading(found.heading);
+
           break;
         }
       }
+
+      setIsValidSlug(foundMatch);
+      setIsChecked(true);
     };
 
     fetchSeoData();
@@ -263,7 +273,24 @@ export default function FooterSeoPage({ params, properties = [] }) {
     });
 
     return result;
+
+
   }, [search, filtered]);
+
+  /* ================= INVALID SLUG GUARD ================= */
+  if (isChecked && !isValidSlug) {
+    return (
+      <>
+        <Header />
+        <section className="py-20 text-center">
+          <h1 className="text-2xl font-semibold">
+            Page Not Found
+          </h1>
+        </section>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

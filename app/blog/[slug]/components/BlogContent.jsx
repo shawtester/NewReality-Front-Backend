@@ -254,7 +254,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
 
         {/* ================= MOBILE TOC ================= */}
         <div className="mt-6 lg:hidden">
-          <details className="group bg-[#FDECEC] rounded-lg p-5">
+          <details className="group bg-[#FDECEC] rounded-lg p-2">
             <summary className="flex items-center justify-between cursor-pointer list-none">
               <h2 className="text-lg font-semibold text-gray-900">
                 Table of Contents
@@ -264,7 +264,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
               </span>
             </summary>
 
-            <div className="mt-4 space-y-3 text-sm">
+            <div className="mt-1 space-y-1 text-sm">
 
               {mobileToc.map((item, index) => {
                 const h2Number = index + 1;
@@ -289,7 +289,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
 
                     {/* ================= H3 CHILDREN ================= */}
                     {item.children?.length > 0 && (
-                      <div className="ml-4 mt-2 space-y-2">
+                      <div className="ml-4 mt-1 space-y-1">
                         {item.children.map((child, childIndex) => {
                           const h3Number = `${h2Number}.${childIndex + 1}`;
 

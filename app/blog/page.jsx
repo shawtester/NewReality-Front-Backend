@@ -1,56 +1,24 @@
-"use client";
+import BlogClient from "./BlogClient";
+import { getSEOServer } from "@/lib/firestore/seo/read_server_rest";
 
-import { useEffect, useState } from "react";
-import Pagination from "../components/property/Pagination";
-import BlogPage from "./components/section1";
-import { getBlogsForHome } from "@/lib/firestore/blogs/read";
+export const dynamic = "force-dynamic";
 
-export default function Blog() {
-  const [blogs, setBlogs] = useState([]);
-  const [page, setPage] = useState(1);
+export async function generateMetadata() {
+  const seo = await getSEOServer("blog");
 
-  const blogsPerPage = 4;
+  return {
+    title: seo?.title || "Blog | Neev Realty",
+    description:
+      seo?.description ||
+      "Latest real estate insights from Neev Realty.",
+    alternates: {
+      canonical:
+        seo?.canonical ||
+        "https://www.neevrealty.com/blog",
+    },
+  };
+}
 
-  /* ================= FETCH BLOGS ================= */
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const res = await getBlogsForHome();
-      setBlogs(res || []);
-    };
-    fetchBlogs();
-  }, []);
-
-  /* ================= SCROLL TO TOP ON PAGE CHANGE ================= */
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, [page]);
-
-  const start = (page - 1) * blogsPerPage;
-  const visibleBlogs = blogs.slice(start, start + blogsPerPage);
-
-  return (
-    <>
-      
-
-      {/* ================= BREADCRUMB ================= */}
-      <div className="max-w-[1240px] mx-auto px-4 py-2 text-sm text-gray-500">
-        Home / Blog
-      </div>
-
-      <BlogPage blogs={visibleBlogs} />
-
-      <div className="py-10">
-        <Pagination
-          currentPage={page}
-          totalPages={Math.ceil(blogs.length / blogsPerPage)}
-          onPageChange={setPage}
-        />
-      </div>
-
-      
-    </>
-  );
+export default function BlogPage() {
+  return <BlogClient />;
 }

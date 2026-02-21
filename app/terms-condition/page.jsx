@@ -2,25 +2,51 @@ import Navbar from "../components/Header";
 import Footer from "../components/Footer";
 import { getSEO } from "@/lib/firestore/seo/read";
 
-// ✅ Dynamic SEO
+
+/* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "terms-and-conditions"; // Firestore document ID
+  const slug = "terms-and-conditions"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);
 
+    const title =
+      seo?.title || "Terms and Conditions — Neev Realty";
+
+    const description =
+      seo?.description ||
+      "Read the Terms and Conditions of Neev Realty governing the use of our website and real estate services.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/terms-and-conditions";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+        "terms and conditions neev realty",
+        "real estate website terms india",
+        "property platform legal terms",
+      ];
+
     return {
-      title: seo?.title || "Terms and Conditions — Neev Realty",
-      description:
-        seo?.description ||
-        "Read the Terms and Conditions of Neev Realty governing the use of our website and real estate services.",
-      keywords:
-        seo?.keywords ||
-        "terms and conditions, Neev Realty terms, real estate website terms India",
+      title,
+      description,
+      keywords,
       alternates: {
-        canonical:
-          seo?.canonical ||
-          "https://yourdomain.com/terms-and-conditions",
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   } catch (error) {

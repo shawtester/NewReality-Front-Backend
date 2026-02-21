@@ -7,23 +7,57 @@ import BigServices from "./components/BigServices";
 
 import { getSEO } from "@/lib/firestore/seo/read";
 
+/* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "our-services";
+  const slug = "our-services"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);
 
+    const title =
+      seo?.title || "Our Services — Neev Realty";
+
+    const description =
+      seo?.description ||
+      "Explore premium real estate services offered by Neev Realty including residential and commercial property consulting in Gurgaon.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/our-services";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+          "real estate services gurgaon",
+          "property consultancy",
+          "neev realty services",
+        ];
+
     return {
-      title: seo?.title || "Services — Neev Realty",
-      description: seo?.description || "Explore our real estate services.",
-      keywords: seo?.keywords || "real estate services, property",
+      title,
+      description,
+      keywords,
       alternates: {
-        canonical: seo?.canonical || "https://yourdomain.com/our-services",
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   } catch (error) {
     return {
-      title: "Services — Neev Realty",
+      title: "Our Services — Neev Realty",
+      description:
+        "Explore real estate services provided by Neev Realty in Gurgaon.",
     };
   }
 }

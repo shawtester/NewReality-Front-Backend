@@ -9,183 +9,205 @@ import RecentBlogs from "./components/RecentBlogs";
 import BlogFAQ from "./components/BlogFAQ";
 
 export default function BlogDetailPage({ params }) {
-    const slug = params.slug;
+  const slug = params.slug;
 
-    const [blog, setBlog] = useState(null);
-    const [recentBlogs, setRecentBlogs] = useState([]);
-    const [tocItems, setTocItems] = useState([]);
-    const [activeId, setActiveId] = useState("");
-    const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState(null);
+  const [recentBlogs, setRecentBlogs] = useState([]);
+  const [tocItems, setTocItems] = useState([]);
+  const [activeId, setActiveId] = useState("");
+  const [loading, setLoading] = useState(true);
 
-    /* ================= FETCH BLOG ================= */
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                setLoading(true);
+  /* ================= FETCH BLOG ================= */
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
 
-                const blogData = await getBlogBySlug({ slug });
+        const blogData = await getBlogBySlug({ slug });
 
-                if (!blogData) {
-                    setBlog(null);
-                    return;
-                }
-
-                setBlog(blogData);
-
-                const allBlogs = await getBlogsForHome();
-                const filtered = allBlogs
-                    .filter((b) => b.slug !== slug)
-                    .slice(0, 5);
-
-                setRecentBlogs(filtered);
-            } catch (error) {
-                console.error("Blog fetch error:", error);
-                setBlog(null);
-            } finally {
-                setLoading(false);
-            }
+        if (!blogData) {
+          setBlog(null);
+          return;
         }
 
-        if (slug) fetchData();
-    }, [slug]);
+        setBlog(blogData);
 
-    /* ================= BUILD TOC ================= */
-    const handleHeadingsReady = (headings) => {
-        if (!headings.length) return;
+        const allBlogs = await getBlogsForHome();
+        const filtered = allBlogs
+          .filter((b) => b.slug !== slug)
+          .slice(0, 5);
 
-        const items = [];
-        let currentH2 = null;
+        setRecentBlogs(filtered);
+      } catch (error) {
+        console.error("Blog fetch error:", error);
+        setBlog(null);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-        headings.forEach((el, index) => {
-            if (!el.id) el.id = `section-${index + 1}`;
+    if (slug) fetchData();
+  }, [slug]);
 
-            if (el.tagName === "H2") {
-                currentH2 = {
-                    id: el.id,
-                    label: el.innerText,
-                    children: [],
-                };
-                items.push(currentH2);
-            }
+  /* ================= BUILD TOC ================= */
+  const handleHeadingsReady = (headings) => {
+    if (!headings.length) return;
 
-            if (el.tagName === "H3" && currentH2) {
-                currentH2.children.push({
-                    id: el.id,
-                    label: el.innerText,
-                });
-            }
-        });
+    const items = [];
+    let currentH2 = null;
 
-        setTocItems(items);
-    };
+    headings.forEach((el, index) => {
+      if (!el.id) el.id = `section-${index + 1}`;
 
-    /* ================= SCROLL SPY ================= */
-    useEffect(() => {
-        if (!blog) return;
-
-        const handleScroll = () => {
-            const headings = document.querySelectorAll(
-                "#blog-wrapper h2, #blog-wrapper h3"
-            );
-
-            let currentId = "";
-
-            headings.forEach((heading) => {
-                const rect = heading.getBoundingClientRect();
-                if (rect.top <= 150) {
-                    currentId = heading.id;
-                }
-            });
-
-            if (currentId) setActiveId(currentId);
+      if (el.tagName === "H2") {
+        currentH2 = {
+          id: el.id,
+          label: el.innerText,
+          children: [],
         };
+        items.push(currentH2);
+      }
 
-        window.addEventListener("scroll", handleScroll);
-        setTimeout(handleScroll, 300);
+      if (el.tagName === "H3" && currentH2) {
+        currentH2.children.push({
+          id: el.id,
+          label: el.innerText,
+        });
+      }
+    });
 
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [blog]);
+    setTocItems(items);
+  };
 
-    const scrollToHeading = (id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
+  /* ================= SCROLL SPY ================= */
+  useEffect(() => {
+    if (!blog) return;
 
-        setActiveId(id);
+    const handleScroll = () => {
+      const headings = document.querySelectorAll(
+        "#blog-wrapper h2, #blog-wrapper h3"
+      );
 
-        const yOffset = -120;
-        const y =
-            element.getBoundingClientRect().top +
-            window.pageYOffset +
-            yOffset;
+      let currentId = "";
 
-        window.scrollTo({ top: y, behavior: "smooth" });
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect();
+        if (rect.top <= 150) {
+          currentId = heading.id;
+        }
+      });
+
+      if (currentId) setActiveId(currentId);
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500">
-                Loading blog...
-            </div>
-        );
-    }
+    window.addEventListener("scroll", handleScroll);
+    setTimeout(handleScroll, 300);
 
-    if (!blog) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500">
-                Blog not found.
-            </div>
-        );
-    }
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [blog]);
 
+  /* ================= AUTO SCROLL TOC ================= */
+  useEffect(() => {
+    if (!activeId) return;
+
+    const activeElement = document.getElementById(`toc-${activeId}`);
+    const container = document.getElementById("toc-container");
+
+    if (!activeElement || !container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeElement.getBoundingClientRect();
+
+    if (
+      activeRect.bottom > containerRect.bottom ||
+      activeRect.top < containerRect.top
+    ) {
+      container.scrollTo({
+        top:
+          activeElement.offsetTop -
+          container.offsetHeight / 2 +
+          activeElement.offsetHeight / 2,
+        behavior: "smooth",
+      });
+    }
+  }, [activeId]);
+
+  const scrollToHeading = (id) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    setActiveId(id);
+
+    const yOffset = -120;
+    const y =
+      element.getBoundingClientRect().top +
+      window.pageYOffset +
+      yOffset;
+
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
+
+  if (loading) {
     return (
-        <main className="bg-[#f5f5f5] w-full">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 md:py-1">
-
-                <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-8 lg:gap-1">
-
-                    {/* ================= LEFT COLUMN ================= */}
-                    <div className="space-y-0">
-
-
-                        {/* BLOG CONTENT */}
-                        <BlogContent
-                            blog={blog}
-                            onHeadingsReady={handleHeadingsReady}
-                        />
-
-
-                        <BlogFAQ faqs={blog.faqs} />
-
-                        {/* ✅ MOBILE + TABLET LATEST BLOGS */}
-                        <div className="lg:hidden flex justify-center">
-                            <div className="w-full max-w-4xl">
-                                <RecentBlogs recentBlogs={recentBlogs} />
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* ================= DESKTOP SIDEBAR ================= */}
-                    <aside className="hidden lg:block">
-                        <div className="sticky top-[110px] mt-[125px]  space-y-8">
-
-                            <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <BlogTOC
-                                    tocItems={tocItems}
-                                    activeId={activeId}
-                                    scrollToHeading={scrollToHeading}
-                                />
-                            </div>
-
-                            <div className="bg-white rounded-xl p-6 shadow-sm">
-                                <RecentBlogs recentBlogs={recentBlogs} />
-                            </div>
-
-                        </div>
-                    </aside>
-
-                </div>
-            </div>
-        </main>
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading blog...
+      </div>
     );
+  }
+
+  if (!blog) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Blog not found.
+      </div>
+    );
+  }
+
+  return (
+    <main className="bg-[#f5f5f5] w-full">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 md:py-1">
+        <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-8 lg:gap-1">
+
+          {/* LEFT COLUMN */}
+          <div className="space-y-0">
+            <BlogContent
+              blog={blog}
+              onHeadingsReady={handleHeadingsReady}
+            />
+
+            <BlogFAQ faqs={blog.faqs} />
+
+            <div className="lg:hidden flex justify-center">
+              <div className="w-full max-w-4xl">
+                <RecentBlogs recentBlogs={recentBlogs} />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT SIDEBAR */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-[110px] mt-[125px] space-y-8">
+
+              <div
+                id="toc-container"
+                className="bg-white rounded-xl p-6 shadow-sm max-h-[580px] overflow-y-auto"
+              >
+                <BlogTOC
+                  tocItems={tocItems}
+                  activeId={activeId}
+                  scrollToHeading={scrollToHeading}
+                />
+              </div>
+
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <RecentBlogs recentBlogs={recentBlogs} />
+              </div>
+
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </main>
+  );
 }

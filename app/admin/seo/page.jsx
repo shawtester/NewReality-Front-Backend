@@ -207,7 +207,7 @@ export default function SEOAdminPage() {
           onChange={handleChange}
           className="border p-2 w-full mt-1"
         />
-      </label>
+      </label>  
 
       <button
         onClick={handleSave}

@@ -5,14 +5,13 @@ import { getSEOPage } from "@/lib/firestore/seo/read_server";
 
 export const dynamic = "force-dynamic";
 
-/* ✅ PROFESSIONAL DYNAMIC SEO */
+/* =========================
+   ✅ PROFESSIONAL DYNAMIC SEO
+========================= */
 export async function generateMetadata({ searchParams }) {
   const type = searchParams?.type;
 
-  // Default slug
   let slug = "commercial";
-
-  // If filter exists → generate slug dynamically
   if (type) {
     slug = `commercial-${type}`;
   }
@@ -21,63 +20,50 @@ export async function generateMetadata({ searchParams }) {
 
   const baseUrl = "https://www.neevrealty.com/commercial";
 
-  const canonicalURL =
-    seo?.canonical ||
-    `${baseUrl}${type ? `?type=${type}` : ""}`;
-
-  const title =
-    seo?.title ||
-    "Commercial Property in Gurgaon | Best Commercial Real Estate";
-
-  const description =
-    seo?.description ||
-    "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.";
-
-  const keywords = Array.isArray(seo?.keywords)
-    ? seo.keywords
-    : seo?.keywords?.split(",").map((k) => k.trim()) || [
-        "commercial property gurgaon",
-        "retail shops gurgaon",
-        "sco plots gurgaon",
-      ];
-
   return {
-    title,
-    description,
-    keywords,
+    title:
+      seo?.title ||
+      "Commercial Property in Gurgaon | Best Commercial Real Estate",
+    description:
+      seo?.description ||
+      "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.",
     alternates: {
-      canonical: canonicalURL,
-    },
-    openGraph: {
-      title,
-      description,
-      url: canonicalURL,
-      siteName: "Neev Realty",
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
+      canonical:
+        seo?.canonical ||
+        `${baseUrl}${type ? `?type=${type}` : ""}`,
     },
   };
 }
 
-/* ✅ PAGE WITH FILTER LOGIC */
+/* =========================
+   ✅ PAGE WITH SAFE FILTER LOGIC
+========================= */
 export default async function CommercialPage({ searchParams }) {
   const type = searchParams?.type;
 
   const allProperties = await getAllProperties();
 
-  // Always filter by commercial first
-  let filteredProperties = allProperties.filter(
-    (property) => property.type === "commercial"
+  // ✅ FIX 1: Correct main commercial filter
+  let filteredProperties = (allProperties || []).filter(
+    (property) =>
+      !property.propertyType ||
+      property.propertyType === "commercial"
   );
 
-  // Apply sub-filter (retail-shops / sco-plots)
-  if (type) {
+  // ✅ FIX 2: Match your boolean flag structure (like residential)
+  const PROPERTY_TYPE_MAP = {
+    retail: "isRetail",
+    "retail-shop": "isRetail",
+    "sco-plot": "isScoPlot",
+    office: "isOffice",
+    warehouse: "isWarehouse",
+  };
+
+  if (type && PROPERTY_TYPE_MAP[type]) {
+    const field = PROPERTY_TYPE_MAP[type];
+
     filteredProperties = filteredProperties.filter(
-      (property) => property.category === type
+      (property) => property[field] === true
     );
   }
 

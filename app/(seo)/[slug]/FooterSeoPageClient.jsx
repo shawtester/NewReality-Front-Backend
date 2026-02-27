@@ -1,10 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
-
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
+import { useState, useMemo, useRef, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import PropertyCard from "@/app/components/property/PropertyCard";
@@ -23,19 +19,20 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
       setIsOverflowing(element.scrollHeight > maxHeight);
     }
   }, [html, maxLines]);
+
   return (
     <div className={className}>
       <div
         ref={textRef}
         className="leading-relaxed
-    [&>p]:mb-0
-    [&>p]:mt-0
-    [&>h1]:text-2xl
-    [&>h2]:text-xl
-    [&>h3]:text-lg
-    [&>strong]:font-semibold
-    [&>ul]:pl-5
-    [&>ul]:list-disc"
+        [&>p]:mb-0
+        [&>p]:mt-0
+        [&>h1]:text-2xl
+        [&>h2]:text-xl
+        [&>h3]:text-lg
+        [&>strong]:font-semibold
+        [&>ul]:pl-5
+        [&>ul]:list-disc"
         style={{
           display: "-webkit-box",
           WebkitLineClamp: isExpanded ? "unset" : maxLines,
@@ -57,16 +54,29 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
   );
 };
 
+/* ================= MAIN COMPONENT ================= */
 
-export default function FooterSeoPage({ params, properties = [] }) {
+export default function FooterSeoPageClient({
+  params,
+  properties = [],
+  seoData,
+}) {
   const { slug } = params;
 
   const [search, setSearch] = useState("");
-  const [description, setDescription] = useState("");
-  const [heading, setHeading] = useState("");
-  const [isValidSlug, setIsValidSlug] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
 
+  const description = seoData?.description || "";
+  const heading = seoData?.heading || "";
+
+  /* ================= NORMALIZED SLUG ================= */
+  const normalizedSlug = slug
+    .toLowerCase()
+    .replace("-in-gurgaon", "")
+    .replace("-property", "")
+    .replace("-properties", "")
+    .replace("-projects", "");
+
+  /* ================= PRICE RANGE PARSER ================= */
   const extractPriceRange = (priceRange = "") => {
     if (!priceRange) return null;
 
@@ -84,75 +94,26 @@ export default function FooterSeoPage({ params, properties = [] }) {
 
     if (cleaned.includes("-")) {
       const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
-      return {
-        min: min || 0,
-        max: max || min || 0,
-      };
+      return { min: min || 0, max: max || min || 0 };
     }
 
     const value = parseFloat(cleaned);
     return { min: value, max: value };
   };
 
+  /* ================= FILTERING ================= */
 
-  /* ================= NORMALIZED SLUG ================= */
-  const normalizedSlug = slug
-    .toLowerCase()
-    .replace("-in-gurgaon", "")
-    .replace("-property", "")
-    .replace("-properties", "")
-    .replace("-projects", "");
-
-  /* ================= FETCH ADMIN SEO DATA + VALIDATE ================= */
-  useEffect(() => {
-    const fetchSeoData = async () => {
-      const collections = [
-        "projects_by_budget",
-        "projects_by_location",
-        "projects_by_size",
-        "projects_by_status",
-        "property_by_type",
-      ];
-
-      let foundMatch = false;
-
-      for (const col of collections) {
-        const snap = await getDoc(doc(db, "footer_links", col));
-        const data = snap.data();
-
-        const found = data?.links?.find((l) => l.value === slug);
-
-        if (found) {
-          foundMatch = true;
-
-          if (found.description) setDescription(found.description);
-          if (found.heading) setHeading(found.heading);
-
-          break;
-        }
-      }
-
-      setIsValidSlug(foundMatch);
-      setIsChecked(true);
-    };
-
-    fetchSeoData();
-  }, [slug]);
-
-  /* ================= ONLY ACTIVE PROPERTIES ================= */
   let filtered = [...properties].filter((p) => p.isActive === true);
 
-  /* ================= SIZE FILTER ================= */
+  /* SIZE FILTER */
   if (normalizedSlug.includes("bhk")) {
     filtered = filtered.filter((p) => {
       if (!p.configurations) return false;
 
-      // Above 5 BHK
       if (normalizedSlug === "above-5-bhk") {
         return p.configurations.some((cfg) => {
           const match = cfg.match(/\d+(\.\d+)?/);
-          if (!match) return false;
-          return parseFloat(match[0]) > 5;
+          return match && parseFloat(match[0]) > 5;
         });
       }
 
@@ -160,29 +121,25 @@ export default function FooterSeoPage({ params, properties = [] }) {
 
       return p.configurations.some((cfg) => {
         const match = cfg.match(/\d+(\.\d+)?/);
-        if (!match) return false;
-        return parseFloat(match[0]) === selectedBhk;
+        return match && parseFloat(match[0]) === selectedBhk;
       });
     });
   }
 
-
-  /* ================= STATUS FILTER ================= */
+  /* STATUS FILTER */
   const statusMap = {
     "new-launch": "isNewLaunch",
     "ready-to-move": "isReadyToMove",
     "under-construction": "isUnderConstruction",
     "pre-launch": "isPreLaunch",
-    "trending": "isTrending",
+    trending: "isTrending",
   };
 
   if (statusMap[normalizedSlug]) {
-    filtered = filtered.filter(
-      (p) => p[statusMap[normalizedSlug]] === true
-    );
+    filtered = filtered.filter((p) => p[statusMap[normalizedSlug]] === true);
   }
 
-  /* ================= TYPE FILTER ================= */
+  /* TYPE FILTER */
   const typeMap = {
     "retail-shops": "isRetail",
     "sco-plots": "isSCO",
@@ -191,25 +148,19 @@ export default function FooterSeoPage({ params, properties = [] }) {
   };
 
   if (typeMap[normalizedSlug]) {
-    filtered = filtered.filter(
-      (p) => p[typeMap[normalizedSlug]] === true
-    );
+    filtered = filtered.filter((p) => p[typeMap[normalizedSlug]] === true);
   }
 
   /* PROPERTY TYPE */
   if (normalizedSlug === "residential") {
-    filtered = filtered.filter(
-      (p) => p.propertyType === "residential"
-    );
+    filtered = filtered.filter((p) => p.propertyType === "residential");
   }
 
   if (normalizedSlug === "commercial") {
-    filtered = filtered.filter(
-      (p) => p.propertyType === "commercial"
-    );
+    filtered = filtered.filter((p) => p.propertyType === "commercial");
   }
 
-  /* ================= BUDGET FILTER ================= */
+  /* BUDGET FILTER */
   if (normalizedSlug.includes("cr")) {
     filtered = filtered.filter((p) => {
       const range = extractPriceRange(p.priceRange);
@@ -229,8 +180,7 @@ export default function FooterSeoPage({ params, properties = [] }) {
     });
   }
 
-
-  /* ================= LOCATION FILTER (🔥 FIXED) ================= */
+  /* LOCATION FILTER */
   const locationSlugs = [
     "dwarka-expressway",
     "golf-course-road",
@@ -250,13 +200,12 @@ export default function FooterSeoPage({ params, properties = [] }) {
     );
   }
 
-  /* ================= SEARCH + LATEST SORT ================= */
+  /* SEARCH + SORT */
   const finalFiltered = useMemo(() => {
     let result = [...filtered];
 
     if (search) {
       const keyword = search.toLowerCase();
-
       result = result.filter(
         (p) =>
           p.title?.toLowerCase().includes(keyword) ||
@@ -273,33 +222,16 @@ export default function FooterSeoPage({ params, properties = [] }) {
     });
 
     return result;
-
-
   }, [search, filtered]);
 
-  /* ================= INVALID SLUG GUARD ================= */
-  if (isChecked && !isValidSlug) {
-    return (
-      <>
-        <Header />
-        <section className="py-20 text-center">
-          <h1 className="text-2xl font-semibold">
-            Page Not Found
-          </h1>
-        </section>
-        <Footer />
-      </>
-    );
-  }
+  /* ================= RENDER ================= */
 
   return (
     <>
       <Header />
-      {/* INTRO */}
+
       <section className="bg-[#F6FBFF]">
         <div className="max-w-[1240px] mx-auto px-4 py-6">
-
-          {/* Top Row: Title + Results */}
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-xl md:text-[26px] font-semibold text-gray-900 capitalize">
               {heading || `${slug.replaceAll("-", " ")} Properties`}
@@ -310,7 +242,6 @@ export default function FooterSeoPage({ params, properties = [] }) {
             </div>
           </div>
 
-          {/* Expandable Text Below */}
           {description && (
             <ExpandableText
               maxLines={2}
@@ -319,13 +250,9 @@ export default function FooterSeoPage({ params, properties = [] }) {
               {description}
             </ExpandableText>
           )}
-
         </div>
       </section>
 
-
-
-      {/* LISTING */}
       <section className="max-w-[1240px] mx-auto px-4 py-16">
         <div className="mb-8 flex justify-center">
           <input
@@ -347,8 +274,8 @@ export default function FooterSeoPage({ params, properties = [] }) {
                 property={{
                   title: p.title,
                   builder: p.developer,
-                  locationName: p.location, // ✅ FIXED
-                  sector: p.sector,        // ✅ FIXED
+                  locationName: p.location,
+                  sector: p.sector,
                   bhk: p.configurations?.join(", "),
                   size: p.areaRange,
                   price: p.priceRange,

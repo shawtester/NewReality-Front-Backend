@@ -1,6 +1,7 @@
 import FooterSeoPageClient from "./FooterSeoPageClient";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getFooterSeoBySlug } from "@/lib/firestore/footer/read_server";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }) {
 
   if (!seoData) {
     return {
-      title: "Properties",
+      title: "404 - Page Not Found",
     };
   }
 
@@ -25,6 +26,16 @@ export async function generateMetadata({ params }) {
 
 /* ================= PAGE ================= */
 export default async function Page({ params }) {
+  const { slug } = params;
+
+  // ✅ 1. VALIDATE SLUG FIRST
+  const seoData = await getFooterSeoBySlug(slug);
+
+  if (!seoData) {
+    notFound();   // 🔥 INSTANT 404 (NO FLICKER)
+  }
+
+  // ✅ 2. THEN FETCH PROPERTIES
   const properties = await getAllProperties();
 
   const safeProperties = properties.map((p) => ({
@@ -36,6 +47,7 @@ export default async function Page({ params }) {
     <FooterSeoPageClient
       params={params}
       properties={safeProperties}
+      seoData={seoData}   // 🔥 PASS SEO DATA DIRECTLY
     />
   );
 }

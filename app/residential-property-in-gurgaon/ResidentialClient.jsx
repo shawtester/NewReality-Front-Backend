@@ -432,6 +432,78 @@
         return (
             <>
                 <Header />
+     
+                               {/* ✅ BREADCRUMB */}
+<section className="bg-white ml-10 ">
+  <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
+    <nav className="flex flex-wrap items-center gap-2">
+
+      <span
+        onClick={() => router.push("/")}
+        className="cursor-pointer hover:text-[#F5A300]"
+      >
+        Home
+      </span>
+
+      <span className="text-gray-400">/</span>
+
+      <span
+        onClick={() => router.push(BASE_ROUTE)}
+        className="cursor-pointer hover:text-[#F5A300]"
+      >
+        Residential
+      </span>
+
+      {bhk && (
+        <>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-800 font-medium">
+            {getBhkDisplayName(bhk)}
+          </span>
+        </>
+      )}
+
+      {type && (
+        <>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-800 font-medium">
+            {formatFilterName(type)}
+          </span>
+        </>
+      )}
+
+      {status && (
+        <>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-800 font-medium">
+            {formatFilterName(status)}
+          </span>
+        </>
+      )}
+
+      {locality && (
+        <>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-800 font-medium">
+            {formatFilterName(locality)}
+          </span>
+        </>
+      )}
+
+      {budget && (
+        <>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-800 font-medium">
+            {budget.replace(/-/g, " ").toUpperCase()}
+          </span>
+        </>
+      )}
+
+    </nav>
+  </div>
+</section>
+
+
 
                 {/* PAGE INTRO */}
                 <section className="bg-[#F6FBFF]">

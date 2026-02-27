@@ -1,5 +1,5 @@
 const { nextui } = require("@nextui-org/react");
-const lineClamp = require('@tailwindcss/line-clamp');
+const lineClamp = require("@tailwindcss/line-clamp");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -15,11 +15,28 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+
+      // ✅ ADD THIS ANIMATION SECTION
+      animation: {
+        attention: "attention 2s ease-in-out infinite",
+      },
+      keyframes: {
+        attention: {
+          "0%, 100%": {
+            transform: "scale(1)",
+            boxShadow: "0 0 0 0 rgba(219, 164, 13, 0.6)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+            boxShadow: "0 0 20px 6px rgba(219, 164, 13, 0.4)",
+          },
+        },
+      },
     },
   },
   darkMode: "class",
   plugins: [
     nextui(),
-    lineClamp, // 🔥 Added for 2-line ellipsis support
+    lineClamp,
   ],
 };

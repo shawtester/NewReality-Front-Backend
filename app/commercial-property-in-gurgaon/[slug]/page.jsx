@@ -42,8 +42,7 @@ export async function generateMetadata({ params }) {
 
   const baseUrl = "https://www.neevrealty.com";
   const canonicalURL =
-    seo?.canonical || `${baseUrl}/residential/${property.slug}`;
-
+seo?.canonical || `${baseUrl}/commercial/${property.slug}`;
   const title =
     seo?.title ||
     property.metaTitle ||
@@ -80,8 +79,8 @@ export async function generateMetadata({ params }) {
 }
 
 /* ================== PAGE ================== */
-export default async function PropertyPage({ params }) {
-  const slug = params.slug;
+export default async function PropertyPage({ params, searchParams }) {
+const type = searchParams?.type || "";
 
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
@@ -126,35 +125,57 @@ export default async function PropertyPage({ params }) {
   /* ================== SCHEMA ================== */
 
   const baseUrl = "https://www.neevrealty.com";
-  const propertyUrl = `${baseUrl}/residential/${cleanProperty.slug}`;
+const propertyUrl = type
+  ? `${baseUrl}/commercial/${cleanProperty.slug}?type=${type}`
+  : `${baseUrl}/commercial/${cleanProperty.slug}`;
 
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
       /* ===== Breadcrumb ===== */
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
+ {
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: baseUrl,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Commercial",
+      item: `${baseUrl}/commercial`,
+    },
+
+    ...(type
+      ? [
           {
             "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: baseUrl,
+            position: 3,
+            name: type
+              .replace(/-/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase()),
+            item: `${baseUrl}/commercial?type=${type}`,
           },
           {
             "@type": "ListItem",
-            position: 2,
-            name: "Residential",
-            item: `${baseUrl}/residential`,
+            position: 4,
+            name: cleanProperty.title,
+            item: propertyUrl,
           },
+        ]
+      : [
           {
             "@type": "ListItem",
             position: 3,
             name: cleanProperty.title,
             item: propertyUrl,
           },
-        ],
-      },
+        ]),
+  ],
+},
 
       /* ===== Product ===== */
       {

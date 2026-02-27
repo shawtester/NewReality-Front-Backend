@@ -17,7 +17,7 @@ import {
 
 export default function Footer() {
   const scrollContainerRef = useRef(null);
-  const BASE_ROUTE = "/residential"; // ✅ Dynamic base route
+  const BASE_ROUTE = "/residential-property-in-gurgaon"; // ✅ Dynamic base route
 
   const scrollLeft = () => {
     scrollContainerRef.current?.scrollBy({ left: -350, behavior: "smooth" });
@@ -251,7 +251,7 @@ export default function Footer() {
             <Link href="/blog">Blog</Link>
             <Link href={BASE_ROUTE}>Residential</Link>
             <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/commercial">Commercial</Link>  
+            <Link href="/commercial-property-in-gurgaon">Commercial</Link>  
             <Link href="/terms-condition">Terms & Condition</Link>
             <Link href="/about-us">About</Link>
             <Link href="/disclaimer">Disclaimer</Link>

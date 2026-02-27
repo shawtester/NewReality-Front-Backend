@@ -26,7 +26,7 @@ const navLinks = [
 
   {
     label: "Residential",
-    href: "/residential",
+    href: "/residential-property-in-gurgaon",
     hasDropdown: true,
     children: [
       {
@@ -42,7 +42,7 @@ const navLinks = [
 
   {
     label: "Commercial",
-    href: "/commercial",
+    href: "/commercial-property-in-gurgaon",
     hasDropdown: true,
     children: [
       {

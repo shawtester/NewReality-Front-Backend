@@ -3,7 +3,7 @@ import { getFooterSeoBySlug } from "@/lib/firestore/footer/read_server";
 import { getPropertyBySlugOrId, getAllProperties } from "@/lib/firestore/products/read_server";
 
 import FooterSeoPageClient from "./FooterSeoPageClient";
-import PropertyPage from "@/app/residential/[slug]/page"; // ✅ DEFAULT IMPORT
+import PropertyPage from "@/app/residential-property-in-gurgaon/[slug]/page"; // ✅ DEFAULT IMPORT
 
 export const dynamic = "force-dynamic";
 

@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }) {
 
   const seo = await getSEO(seoSlug);
 
-  const baseUrl = "https://www.neevrealty.com/residential";
+  const baseUrl = "https://www.neevrealty.com/residential-property-in-gurgaon";
 
   return {
     title:

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io5";
 import { FiMail } from "react-icons/fi";
-import GetInTouchModal from "@/app/residential/[slug]/components/GetInTouchModal";
+import GetInTouchModal from "@/app/residential-property-in-gurgaon/[slug]/components/GetInTouchModal";
 
 export default function StickyIcons() {
   const [showEnquiryPopup, setShowEnquiryPopup] = useState(false);

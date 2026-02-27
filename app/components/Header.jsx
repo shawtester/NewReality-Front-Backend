@@ -31,11 +31,11 @@ const navLinks = [
     children: [
       {
         label: "Apartments",
-        href: "/residential?type=apartment",
+        href: "/residential-property-in-gurgaon?type=apartment",
       },
       {
         label: "Builder Floor",
-        href: "/residential?type=builder-floor",
+        href: "/residential-property-in-gurgaon?type=builder-floor",
       },
     ],
   },
@@ -47,11 +47,11 @@ const navLinks = [
     children: [
       {
         label: "Retail",
-        href: "/commercial?type=retail-shops",
+        href: "/commercial-property-in-gurgaon?type=retail-shops",
       },
       {
         label: "SCO",
-        href: "/commercial?type=sco-plots",
+        href: "/commercial-property-in-gurgaon?type=sco-plots",
       },
     ],
   },

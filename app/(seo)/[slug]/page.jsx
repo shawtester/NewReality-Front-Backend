@@ -1,7 +1,9 @@
-import FooterSeoPageClient from "./FooterSeoPageClient";
-import { getAllProperties } from "@/lib/firestore/products/read_server";
-import { getFooterSeoBySlug } from "@/lib/firestore/footer/read_server";
 import { notFound } from "next/navigation";
+import { getFooterSeoBySlug } from "@/lib/firestore/footer/read_server";
+import { getPropertyBySlugOrId, getAllProperties } from "@/lib/firestore/products/read_server";
+
+import FooterSeoPageClient from "./FooterSeoPageClient";
+import PropertyPage from "@/app/residential/[slug]/page"; // ✅ DEFAULT IMPORT
 
 export const dynamic = "force-dynamic";
 
@@ -9,18 +11,33 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }) {
   const { slug } = params;
 
+  // 🔥 1️⃣ PROPERTY FIRST
+  const property = await getPropertyBySlugOrId(slug);
+
+  if (property) {
+    return {
+      title:
+        property.metaTitle ||
+        `${property.title} in ${property.location} | Price & Details`,
+      description:
+        property.metaDescription ||
+        `Explore ${property.title} located in ${property.location}.`,
+    };
+  }
+
+  // 🔥 2️⃣ SEO SECOND
   const seoData = await getFooterSeoBySlug(slug);
 
-  if (!seoData) {
+  if (seoData) {
     return {
-      title: "404 - Page Not Found",
+      title: seoData.metaTitle || seoData.heading || slug,
+      description: seoData.metaDescription || "",
+      keywords: seoData.metaKeywords || "",
     };
   }
 
   return {
-    title: seoData.metaTitle || seoData.heading || slug,
-    description: seoData.metaDescription || "",
-    keywords: seoData.metaKeywords || "",
+    title: "404 - Page Not Found",
   };
 }
 
@@ -28,26 +45,34 @@ export async function generateMetadata({ params }) {
 export default async function Page({ params }) {
   const { slug } = params;
 
-  // ✅ 1. VALIDATE SLUG FIRST
-  const seoData = await getFooterSeoBySlug(slug);
+  // 🔥 1️⃣ PROPERTY CHECK
+  const property = await getPropertyBySlugOrId(slug);
 
-  if (!seoData) {
-    notFound();   // 🔥 INSTANT 404 (NO FLICKER)
+  if (property) {
+    // ✅ Directly render residential detail page
+    return <PropertyPage params={params} />;
   }
 
-  // ✅ 2. THEN FETCH PROPERTIES
-  const properties = await getAllProperties();
+  // 🔥 2️⃣ SEO PAGE CHECK
+  const seoData = await getFooterSeoBySlug(slug);
 
-  const safeProperties = properties.map((p) => ({
-    ...p,
-    timestampCreate: p.timestampCreate ?? null,
-  }));
+  if (seoData) {
+    const properties = await getAllProperties();
 
-  return (
-    <FooterSeoPageClient
-      params={params}
-      properties={safeProperties}
-      seoData={seoData}   // 🔥 PASS SEO DATA DIRECTLY
-    />
-  );
+    const safeProperties = properties.map((p) => ({
+      ...p,
+      timestampCreate: p.timestampCreate ?? null,
+    }));
+
+    return (
+      <FooterSeoPageClient
+        params={params}
+        properties={safeProperties}
+        seoData={seoData}
+      />
+    );
+  }
+
+  // 🔥 3️⃣ NOTHING FOUND
+  notFound();
 }

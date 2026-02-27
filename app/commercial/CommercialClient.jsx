@@ -192,7 +192,7 @@ const applyCommercialFilters = ({
 
 /* ================= PAGE ================= */
 export default function CommercialPage({ apartments = [] }) {
-  const BASE_ROUTE = "/commercial";
+  const BASE_ROUTE = "/commercial-property-in-gurgaon";
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -434,11 +434,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
           <div className="
                    relative w-full 
-            h-[120px] 
-            sm:h-[180px] 
-            md:h-[210px] 
-            lg:h-[280px] 
-            xl:h-[360px] 
+           h-[120px] 
+                sm:h-[120px] 
+                md:h-[150px] 
+                lg:h-[210px] 
+                xl:h-[270px]  
             rounded-2xl 
             overflow-hidden 
            bg-transparent
@@ -760,7 +760,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
           {currentApartments.map((item) => (
             <PropertyCard
               key={item.id}
-              baseRoute="commercial"
+              baseRoute=""
               property={{
                 title: item.title,
                 builder: item.developer,

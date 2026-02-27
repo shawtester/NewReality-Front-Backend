@@ -83,7 +83,7 @@ export default function PropertyCard({ property = {} }) {
   return (
     <>
       {/* ================= CARD ================= */}
-      <Link href={slug ? `/${propertyType}/${slug}` : "#"}>
+      <Link href={slug ? `/${slug}` : "#"}>
 
 
         <div

@@ -16,16 +16,18 @@ const defaultPages = [
   { label: "Contact Us", slug: "contact-us", path: "/contact-us" },
   { label: "Careers", slug: "careers", path: "/careers" },
   { label: "Services", slug: "services", path: "/services" },
+  { label: "FAQ", slug: "faqs", path: "/faqs" },
+  { label: "Terms & Conditions", slug: "terms-condition", path: "/terms-condition" },
 
   // Commercial
-  { label: "Commercial Main", slug: "commercial", path: "/commercial" },
-  { label: "Commercial Retail", slug: "commercial-retail-shops", path: "/commercial?type=retail-shops" },
-  { label: "Commercial SCO", slug: "commercial-sco-plots", path: "/commercial?type=sco-plots" },
+  { label: "Commercial Main", slug: "commercial-property-in-gurgaon", path: "/commercial-property-in-gurgaon" },
+  { label: "Commercial Retail", slug: "commercial-retail-shops", path: "/commercial-property-in-gurgaon?type=retail-shops" },
+  { label: "Commercial SCO", slug: "commercial-sco-plots", path: "/commercial-property-in-gurgaon?type=sco-plots" },
 
   // Residential
-  { label: "Residential Main", slug: "residential", path: "/residential" },
-  { label: "Residential Apartments", slug: "residential-apartments", path: "/residential?type=apartments" },
-  { label: "Residential Builder Floor", slug: "residential-builder-floor", path: "/residential?type=builder-floor" },
+  { label: "Residential Main", slug: "residential-property-in-gurgaon", path: "/residential-property-in-gurgaon" },
+  { label: "Residential Apartments", slug: "residential-apartments", path: "/residential-property-in-gurgaon?type=apartments" },
+  { label: "Residential Builder Floor", slug: "residential-builder-floor", path: "/residential-property-in-gurgaon?type=builder-floor" },
 ];
 
 export default function SEOAdminPage() {
@@ -207,7 +209,7 @@ export default function SEOAdminPage() {
           onChange={handleChange}
           className="border p-2 w-full mt-1"
         />
-      </label>  
+      </label>
 
       <button
         onClick={handleSave}

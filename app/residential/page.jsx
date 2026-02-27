@@ -1,19 +1,21 @@
 import { Suspense } from "react";
 import ApartmentsPage from "./ResidentialClient";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
-import { getSEOPage } from "@/lib/firestore/seo/read_server";
+import { getSEO } from "@/lib/firestore/seo/read"; // ✅ SAME SEO FUNCTION
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+/* =========================
+   ✅ DYNAMIC SEO
+========================= */
 export async function generateMetadata({ searchParams }) {
   const type = searchParams?.type;
 
-  let seoSlug = "residential";
-  if (type) {
-    seoSlug = `residential-${type}`;
-  }
+  // 🔥 SLUG MATCH FIRESTORE EXACTLY
+  const seoSlug = type ? `residential-${type}` : "residential";
 
-  const seo = await getSEOPage(seoSlug);
+  const seo = await getSEO(seoSlug);
 
   const baseUrl = "https://www.neevrealty.com/residential";
 
@@ -21,9 +23,11 @@ export async function generateMetadata({ searchParams }) {
     title:
       seo?.title ||
       "Best Residential Projects in Gurgaon | Residential Property",
+
     description:
       seo?.description ||
       "Explore the best residential projects in Gurgaon.",
+
     alternates: {
       canonical:
         seo?.canonical ||
@@ -32,24 +36,24 @@ export async function generateMetadata({ searchParams }) {
   };
 }
 
+/* =========================
+   ✅ PAGE FILTER LOGIC
+========================= */
 export default async function ResidentialPage({ searchParams }) {
   const type = searchParams?.type;
 
   const allProperties = await getAllProperties();
 
-  // ✅ Main residential filter
   let residentialProperties = (allProperties || []).filter(
     (property) =>
       !property.propertyType ||
       property.propertyType === "residential"
   );
 
-  // ✅ Type filter (MATCH CLIENT LOGIC)
   const PROPERTY_TYPE_MAP = {
-    apartment: "isApartment",
+    apartments: "isApartment",
     "builder-floor": "isBuilderFloor",
-    villa: "isVilla",
-    plot: "isPlot",
+    
   };
 
   if (type && PROPERTY_TYPE_MAP[type]) {

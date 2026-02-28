@@ -191,7 +191,7 @@ const applyCommercialFilters = ({
 };
 
 /* ================= PAGE ================= */
-export default function CommercialPage({ apartments = [] }) {
+export default function CommercialPage({ apartments = [], forcedTypeSlug }) {
   const BASE_ROUTE = "/commercial-property-in-gurgaon";
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -263,20 +263,35 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   }, [currentImageIndex, getCurrentImageLink, banner]);
 
   /* ================= FILTER HANDLER ================= */
-  const handleFilterChange = useCallback((filterName, value) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(filterName, value);
-    } else {
-      params.delete(filterName);
-    }
-    params.set('page', '1');
-    router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
-  }, [searchParams, router]);
+const handleFilterChange = useCallback((filterName, value) => {
 
-  const handleClearFilters = () => {
-    router.push(BASE_ROUTE, { scroll: false });
+  const TYPE_SLUG_MAP = {
+    "retail-shops": "retail-shops-in-gurgaon",
+    "sco-plots": "sco-plots-in-gurgaon",
   };
+
+  // 🔥 Direct slug redirect (NO QUERY PARAM FLASH)
+  if (filterName === "type" && value) {
+    const targetSlug = TYPE_SLUG_MAP[value];
+    if (targetSlug) {
+      router.replace(`/${targetSlug}`); // 👈 replace instead of push
+      return;
+    }
+  }
+
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (value) {
+    params.set(filterName, value);
+  } else {
+    params.delete(filterName);
+  }
+
+  params.set("page", "1");
+
+  router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
+
+}, [searchParams, router]);
 
 
   /* ================= URL FILTER LOGIC ================= */
@@ -325,10 +340,16 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   /* ================= BANNER FETCH - ROBUST ✅ ================= */
   useEffect(() => {
     let category = "commercial";
-    const urlType = searchParams.get("type");
 
-    if (urlType === "retail-shops") category = "retail";
-    else if (urlType === "sco-plots") category = "sco";
+    // 🔥 FIRST: Check SEO Slug (new system)
+    const COMMERCIAL_SLUG_TO_CATEGORY = {
+      "retail-shops-in-gurgaon": "retail",
+      "sco-plots-in-gurgaon": "sco",
+    };
+
+    if (forcedTypeSlug && COMMERCIAL_SLUG_TO_CATEGORY[forcedTypeSlug]) {
+      category = COMMERCIAL_SLUG_TO_CATEGORY[forcedTypeSlug];
+    }
 
     const fetchBanner = async () => {
       try {
@@ -394,6 +415,14 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
   const displayTitle = banner?.pageTitle || pageTitleDynamic;
   const totalImages = banner?.images?.length || 0;
+
+  // 🔥 Hide Type Filter For Specific SEO Slugs
+  const HIDE_TYPE_FOR_SLUGS = [
+    "retail-shops-in-gurgaon",
+    "sco-plots-in-gurgaon",
+  ];
+
+  const shouldHideTypeFilter = HIDE_TYPE_FOR_SLUGS.includes(forcedTypeSlug);
 
   return (
     <>
@@ -629,15 +658,17 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 placeholder="Enter Keyword"
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 outline-none text-sm flex-1 min-w-0"
               />
-              <select
-                value={type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
-              >
-                <option value="" disabled hidden>Type</option>
-                <option value="retail-shops">Retail Shops</option>
-                <option value="sco-plots">SCO Plots</option>
-              </select>
+              {!shouldHideTypeFilter && (
+                <select
+                  value={type}
+                  onChange={(e) => handleFilterChange('type', e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
+                >
+                  <option value="" disabled hidden>Type</option>
+                  <option value="retail-shops">Retail Shops</option>
+                  <option value="sco-plots">SCO Plots</option>
+                </select>
+              )}
               <select
                 value={status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -724,19 +755,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 className="flex-1 px-5 py-3 rounded-full bg-gray-50 outline-none text-sm min-w-0"
               />
 
-              <div className="relative flex-1 min-w-[110px]">
-
-                <select
-                  value={type}
-                  onChange={(e) => handleFilterChange('type', e.target.value)}
-                  className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
-                >
-                  <option value="" disabled hidden>Type</option>
-                  <option value="retail-shops">Retail Shops</option>
-                  <option value="sco-plots">SCO Plots</option>
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
-              </div>
+              {!shouldHideTypeFilter && (
+                <div className="relative flex-1 min-w-[110px]">
+                  <select
+                    value={type}
+                    onChange={(e) => handleFilterChange('type', e.target.value)}
+                    className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
+                  >
+                    <option value="" disabled hidden>Type</option>
+                    <option value="retail-shops">Retail Shops</option>
+                    <option value="sco-plots">SCO Plots</option>
+                  </select>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    ▾
+                  </span>
+                </div>
+              )}
 
               <div className="relative flex-1 min-w-[110px]">
                 <select

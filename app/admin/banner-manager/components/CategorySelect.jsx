@@ -11,7 +11,7 @@ const CATEGORIES = [
     bg: "bg-blue-50",
   },
   {
-    label: "Apartment",
+    label: "Luxury Apartment",
     value: "apartment",
     icon: "🏢",
     color: "from-indigo-500 to-indigo-600",
@@ -72,10 +72,9 @@ export default function CategoryCards({ category, setCategory }) {
               className={`
                 relative rounded-2xl p-6 text-center transition-all duration-300
                 border-2 focus:outline-none
-                ${
-                  isSelected
-                    ? `border-[#F5A300] ${item.bg} shadow-2xl scale-[1.03]`
-                    : "border-gray-200 hover:border-[#F5A300] hover:shadow-lg"
+                ${isSelected
+                  ? `border-[#F5A300] ${item.bg} shadow-2xl scale-[1.03]`
+                  : "border-gray-200 hover:border-[#F5A300] hover:shadow-lg"
                 }
               `}
             >
@@ -93,9 +92,8 @@ export default function CategoryCards({ category, setCategory }) {
 
               {/* LABEL */}
               <h3
-                className={`font-bold text-lg ${
-                  isSelected ? "text-[#F5A300]" : "text-gray-900"
-                }`}
+                className={`font-bold text-lg ${isSelected ? "text-[#F5A300]" : "text-gray-900"
+                  }`}
               >
                 {item.label}
               </h3>

@@ -19,7 +19,7 @@ export default function StickyIcons() {
 
   return (
     <>
-      {/* ================= STICKY BAR (CLICK-THROUGH FIXED) ================= */}
+      {/* ================= STICKY BAR ================= */}
       <div className="fixed bottom-0 left-0 z-50 w-full pointer-events-none">
 
         {/* ========= MOBILE ========= */}
@@ -68,7 +68,7 @@ export default function StickyIcons() {
               <button
                 type="button"
                 onClick={() => setShowEnquiryPopup(true)}
-                className="bg-[#DBA40D] text-white px-6 py-3 rounded-2xl font-semibold shadow-lg inline-flex items-center gap-2 hover:brightness-105 hover:shadow-xl transition-all"
+                className="bg-[#DBA40D] text-white px-6 py-3 rounded-2xl font-semibold shadow-lg inline-flex items-center gap-2 hover:brightness-105 hover:shadow-xl transition-all animate-attention"
               >
                 <FiMail size={20} />
                 Enquire Now!
@@ -97,7 +97,6 @@ export default function StickyIcons() {
         open={showEnquiryPopup}
         onClose={() => setShowEnquiryPopup(false)}
       />
-
     </>
   );
 }

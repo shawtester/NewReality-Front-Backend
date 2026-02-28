@@ -4,6 +4,8 @@ import { getBuilderById } from "@/lib/firestore/builders/read_server";
 import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
 import { getAmenitiesByIds } from "@/lib/firestore/amenities/read_server";
 
+import Link from "next/link";
+
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
 import MobileGallery from "./components/MobileGallery";
@@ -165,6 +167,47 @@ export default async function PropertyPage({ params }) {
   return (
     <ApartmentClient>
       <AutoPopup propertyTitle={cleanProperty.title} />
+
+
+      {/* ✅ BREADCRUMB */}
+<section className="bg-white ml-12">
+  <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
+    <nav className="flex flex-wrap items-center gap-2">
+
+      <Link href="/" className="hover:text-[#F5A300]">
+        Home
+      </Link>
+
+      <span className="text-gray-400">/</span>
+
+      <Link
+        href="/residential-property-in-gurgaon"
+        className="hover:text-[#F5A300]"
+      >
+        Residential
+      </Link>
+
+      {cleanProperty.locationName && (
+        <>
+          <span className="text-gray-400">/</span>
+          <Link
+            href={`/residential-property-in-gurgaon?locality=${cleanProperty.locationName.toLowerCase().replace(/\s+/g, "-")}`}
+            className="hover:text-[#F5A300]"
+          >
+            {cleanProperty.locationName}
+          </Link>
+        </>
+      )}
+
+      <span className="text-gray-400">/</span>
+
+      <span className="text-gray-800 font-medium">
+        {cleanProperty.title}
+      </span>
+
+    </nav>
+  </div>
+</section>
 
       <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
         {/* LEFT */}

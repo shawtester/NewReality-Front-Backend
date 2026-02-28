@@ -58,6 +58,24 @@ export default function FAQPage() {
     <>
       <Navbar />
 
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqData.map((faq) => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer,
+        },
+      })),
+    }),
+  }}
+/>
+
       <section className="py-10 px-4 sm:px-6 lg:px-0">
         <div className="max-w-[1173px] mx-auto text-gray-900">
 

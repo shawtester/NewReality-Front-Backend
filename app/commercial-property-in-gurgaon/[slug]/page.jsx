@@ -225,6 +225,63 @@ const propertyUrl = type
   /* ================== RENDER ================== */
 
   return (
+
+    <>
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+
+        // ✅ PRODUCT SCHEMA
+        {
+          "@type": "Product",
+          "name": cleanProperty.title,
+          "image": cleanProperty.images,
+          "description": `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
+          "brand": {
+            "@type": "Brand",
+            "name": "Neev Realty"
+          },
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "INR",
+            "price": cleanProperty.price || "",
+            "availability": "https://schema.org/InStock",
+            "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`
+          }
+        },
+
+        // ✅ BREADCRUMB SCHEMA
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.neevrealty.com"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Commercial",
+              "item": "https://www.neevrealty.com/commercial-property-in-gurgaon"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": cleanProperty.title
+            }
+          ]
+        }
+
+      ]
+    })
+  }}
+/>
+
     <ApartmentClient>
       {/* SCHEMA INJECTION */}
       <script
@@ -268,5 +325,6 @@ const propertyUrl = type
 
       <Footer />
     </ApartmentClient>
+    </>
   );
 }

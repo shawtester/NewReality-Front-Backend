@@ -425,7 +425,7 @@ export default function SearchCard() {
                   <li
                     key={item.objectID || item.id}
                     onClick={() => {
-                      router.push(`/residential/${item.id || item.slug}`);
+                      router.push(`/${item.slug || item.id}`);
                       setResults([]);
                       setQuery("");
                     }}

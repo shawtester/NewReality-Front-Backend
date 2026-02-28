@@ -30,12 +30,12 @@ const navLinks = [
     hasDropdown: true,
     children: [
       {
-        label: "Apartments",
-        href: "/residential-property-in-gurgaon?type=apartment",
+        label: "Luxury Apartments",
+        href: "/luxury-apartments-in-gurgaon",
       },
       {
         label: "Builder Floor",
-        href: "/residential-property-in-gurgaon?type=builder-floor",
+        href: "/builder-floor-in-gurgaon",
       },
     ],
   },
@@ -47,11 +47,11 @@ const navLinks = [
     children: [
       {
         label: "Retail",
-        href: "/commercial-property-in-gurgaon?type=retail-shops",
+        href: "/retail-shops-in-gurgaon",
       },
       {
         label: "SCO",
-        href: "/commercial-property-in-gurgaon?type=sco-plots",
+        href: "/sco-plots-in-gurgaon",
       },
     ],
   },

@@ -65,25 +65,7 @@ export default async function sitemap() {
       )
     );
 
-    /* ---------- Builders ---------- */
-    const buildersSnapshot = await db.collection("builders").get();
-    const builderEntries = buildersSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/builder/${doc.data().slug || doc.id}`,
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.7
-      )
-    );
-
-    /* ---------- Locations ---------- */
-    const locationsSnapshot = await db.collection("locations").get();
-    const locationEntries = locationsSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/location/${doc.data().slug || doc.id}`,
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.7
-      )
-    );
+  
 
     /* ---------- SEO Landing Pages ---------- */
     const seoSnapshot = await db.collection("seo").get();
@@ -95,24 +77,13 @@ export default async function sitemap() {
       )
     );
 
-    /* ---------- Jobs ---------- */
-    const jobsSnapshot = await db.collection("jobs").get();
-    const jobEntries = jobsSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/careers/${doc.data().slug || doc.id}`,
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.6
-      )
-    );
+  
 
     return [
       ...staticEntries,
       ...blogEntries,
-      ...propertyEntries,
-      ...builderEntries,
-      ...locationEntries,
+      ...propertyEntries,,
       ...seoEntries,
-      ...jobEntries,
     ];
   } catch (error) {
     console.error("Sitemap generation error:", error);

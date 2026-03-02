@@ -6,7 +6,8 @@ import {
 } from "@/lib/firestore/products/read_server";
 
 import FooterSeoPageClient from "./FooterSeoPageClient";
-import PropertyPage from "@/app/residential-property-in-gurgaon/[slug]/page";
+import ResidentialPropertyPage from "@/app/residential-property-in-gurgaon/[slug]/page";
+import CommercialPropertyPage from "@/app/commercial-property-in-gurgaon/[slug]/page";
 import CommercialClient from "@/app/commercial-property-in-gurgaon/CommercialClient";
 import ResidentialClient from "@/app/residential-property-in-gurgaon/ResidentialClient";
 
@@ -85,7 +86,11 @@ export default async function Page({ params }) {
   const property = await getPropertyBySlugOrId(slug);
 
   if (property) {
-    return <PropertyPage params={params} />;
+    if (property.propertyType === "commercial") {
+      return <CommercialPropertyPage params={params} />;
+    }
+
+    return <ResidentialPropertyPage params={params} />;
   }
 
   const allProperties = await getAllProperties();

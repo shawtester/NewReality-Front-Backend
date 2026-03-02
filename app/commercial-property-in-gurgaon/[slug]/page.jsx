@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBuilderById } from "@/lib/firestore/builders/read_server";
 import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
 import { getAmenitiesByIds } from "@/lib/firestore/amenities/read_server";
+import { getSEO } from "@/lib/firestore/seo/read";
 
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
@@ -22,27 +25,25 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
-import { getSEO } from "@/lib/firestore/seo/read";
-
 export const dynamic = "force-dynamic";
 
-/* ================== METADATA ================== */
+/* ================= METADATA ================= */
 export async function generateMetadata({ params }) {
   const slug = params.slug;
   const property = await getPropertyBySlugOrId(slug);
 
   if (!property) {
-    return {
-      title: "Property Not Found",
-      description: "",
-    };
+    return { title: "Property Not Found" };
   }
 
   const seo = await getSEO(slug);
 
   const baseUrl = "https://www.neevrealty.com";
+
   const canonicalURL =
-seo?.canonical || `${baseUrl}/commercial/${property.slug}`;
+    seo?.canonical ||
+    `${baseUrl}/commercial-property-in-gurgaon/${property.slug}`;
+
   const title =
     seo?.title ||
     property.metaTitle ||
@@ -53,36 +54,19 @@ seo?.canonical || `${baseUrl}/commercial/${property.slug}`;
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords =
-    seo?.keywords ||
-    property.metaKeywords ||
-    `${property.title}, ${property.location}, real estate`;
-
   return {
     title,
     description,
-    keywords,
-    alternates: {
-      canonical: canonicalURL,
-    },
-    openGraph: {
-      title,
-      description,
-      url: canonicalURL,
-    },
-    twitter: {
-      card: "summary",
-      title,
-      description,
-    },
+    alternates: { canonical: canonicalURL },
+    openGraph: { title, description },
+    twitter: { card: "summary", title, description },
   };
 }
 
-/* ================== PAGE ================== */
-export default async function PropertyPage({ params, searchParams }) {
+/* ================= PAGE ================= */
+export default async function PropertyPage({ params }) {
+   console.log("🚀 COMMERCIAL PAGE HIT");
   const slug = params.slug;
-const type = searchParams?.type || "";
-
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
 
@@ -95,237 +79,176 @@ const type = searchParams?.type || "";
 
   const amenitiesData = await getAmenitiesByIds(property.amenities || []);
 
-  const locationString =
-    [property.sector, property.locationName].filter(Boolean).join(", ") ||
-    property.location ||
-    "";
+  /* 🔥 Parent Detection (Commercial Version) */
+  let parentSlug = "commercial-property-in-gurgaon";
+  let parentLabel = "Commercial";
 
-  /* ================== CLEAN PROPERTY ================== */
+  if (property?.isRetail) {
+    parentSlug = "retail-shops-in-gurgaon";
+    parentLabel = "Retail Shops";
+  }
+
+  if (property?.isSCO) {
+    parentSlug = "sco-plots-in-gurgaon";
+    parentLabel = "SCO Plots";
+  }
+
+  const currentBaseRoute = `/${parentSlug}`;
+
+  /* ================= CLEAN PROPERTY ================= */
   const cleanProperty = {
-    id: property.id,
-    slug: property.slug,
-    title: property.title,
-    location: locationString,
-    builderName: property.developer || "",
-    price: property.priceRange || "",
+    ...property,
     images: [
       ...(property.mainImage?.url ? [property.mainImage.url] : []),
       ...(property.gallery?.map((g) => g.url) || []),
     ],
-    overview: property.overview || {},
+    amenities: amenitiesData,
+    builder: builder || null,
     faq: (property.faq || []).map((f) => ({
       q: f.question,
       a: f.answer,
     })),
   };
 
-  /* ================== PRICE CLEANING ================== */
-  const numericPrice =
-    cleanProperty.price?.replace(/[^0-9]/g, "") || "";
-
-  /* ================== SCHEMA ================== */
-
+  /* ================= SCHEMA ================= */
   const baseUrl = "https://www.neevrealty.com";
-const propertyUrl = type
-  ? `${baseUrl}/commercial/${cleanProperty.slug}?type=${type}`
-  : `${baseUrl}/commercial/${cleanProperty.slug}`;
 
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      /* ===== Breadcrumb ===== */
- {
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Home",
-      item: baseUrl,
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Commercial",
-      item: `${baseUrl}/commercial`,
-    },
-
-    ...(type
-      ? [
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: type
-              .replace(/-/g, " ")
-              .replace(/\b\w/g, (l) => l.toUpperCase()),
-            item: `${baseUrl}/commercial?type=${type}`,
-          },
-          {
-            "@type": "ListItem",
-            position: 4,
-            name: cleanProperty.title,
-            item: propertyUrl,
-          },
-        ]
-      : [
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: cleanProperty.title,
-            item: propertyUrl,
-          },
-        ]),
-  ],
-},
-
-      /* ===== Product ===== */
       {
         "@type": "Product",
-        "@id": propertyUrl,
         name: cleanProperty.title,
         image: cleanProperty.images,
-        description:
-          cleanProperty.overview?.description ||
-          cleanProperty.title,
-
-        brand: {
-          "@type": "Brand",
-          name: cleanProperty.builderName || "Neev Realty",
-        },
-
+        description: `${cleanProperty.title} located in ${cleanProperty.location}`,
+        brand: { "@type": "Brand", name: "Neev Realty" },
         offers: {
           "@type": "Offer",
-          url: propertyUrl,
           priceCurrency: "INR",
-          price: numericPrice,
+          price: cleanProperty.priceRange || "",
           availability: "https://schema.org/InStock",
-        },
-
-        seller: {
-          "@type": "RealEstateAgent",
-          name: "Neev Realty",
-          url: baseUrl,
+          url: `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
         },
       },
-
-      /* ===== FAQ ===== */
-      cleanProperty.faq?.length > 0 && {
-        "@type": "FAQPage",
-        mainEntity: cleanProperty.faq.map((item) => ({
-          "@type": "Question",
-          name: item.q,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item.a,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: baseUrl,
           },
-        })),
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Commercial",
+            item: `${baseUrl}/commercial-property-in-gurgaon`,
+          },
+          ...(parentSlug !== "commercial-property-in-gurgaon"
+            ? [
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: parentLabel,
+                  item: `${baseUrl}${currentBaseRoute}`,
+                },
+              ]
+            : []),
+          {
+            "@type": "ListItem",
+            position:
+              parentSlug !== "commercial-property-in-gurgaon" ? 4 : 3,
+            name: cleanProperty.title,
+          },
+        ],
       },
-    ].filter(Boolean),
+    ],
   };
 
-  /* ================== RENDER ================== */
-
   return (
-
     <>
       <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@graph": [
-
-        // ✅ PRODUCT SCHEMA
-        {
-          "@type": "Product",
-          "name": cleanProperty.title,
-          "image": cleanProperty.images,
-          "description": `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-          "brand": {
-            "@type": "Brand",
-            "name": "Neev Realty"
-          },
-          "offers": {
-            "@type": "Offer",
-            "priceCurrency": "INR",
-            "price": cleanProperty.price || "",
-            "availability": "https://schema.org/InStock",
-            "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`
-          }
-        },
-
-        // ✅ BREADCRUMB SCHEMA
-        {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://www.neevrealty.com"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Commercial",
-              "item": "https://www.neevrealty.com/commercial-property-in-gurgaon"
-            },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "name": cleanProperty.title
-            }
-          ]
-        }
-
-      ]
-    })
-  }}
-/>
-
-    <ApartmentClient>
-      {/* SCHEMA INJECTION */}
-      <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(schema),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      <AutoPopup propertyTitle={cleanProperty.title} />
+      <ApartmentClient>
+        <AutoPopup propertyTitle={cleanProperty.title} />
 
-      <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
-        <div className="lg:col-span-2 space-y-6">
-          <MobileGallery
-            images={cleanProperty.images}
-            title={cleanProperty.title}
-          />
+        {/* ✅ BREADCRUMB (Residential Style) */}
+        <section className="bg-white ml-12">
+          <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
+            <nav className="flex flex-wrap items-center gap-2">
+              <Link href="/" className="hover:text-[#F5A300]">
+                Home
+              </Link>
 
-          <TitleBlockWithBrochure property={property} />
-          <ScrollTabs />
-          <OverviewSection overview={property.overview} />
-          <FloorPlanSection floorPlans={property.floorPlans} />
-          <PaymentPlanSection paymentPlan={property.paymentPlan} />
-          <AmenitiesSection amenities={amenitiesData} />
-          <LocationSection />
-          <EmiCalculatorSection />
-          <FAQSection faq={cleanProperty.faq} />
+              <span>/</span>
 
-          {builder && <DeveloperSection builder={builder} />}
+              <Link
+                href="/commercial-property-in-gurgaon"
+                className="hover:text-[#F5A300]"
+              >
+                Commercial
+              </Link>
 
-          <SimilarProjectsSection
-            projects={allProjects}
-            currentSlug={cleanProperty.slug}
-          />
+              {parentSlug !== "commercial-property-in-gurgaon" && (
+                <>
+                  <span>/</span>
+                  <Link
+                    href={currentBaseRoute}
+                    className="hover:text-[#F5A300]"
+                  >
+                    {parentLabel}
+                  </Link>
+                </>
+              )}
 
-          <DisclaimerSection text={property.disclaimer} />
-        </div>
+              <span>/</span>
 
-        <RightSidebar property={property} />
-      </section>
+              <span className="font-medium text-gray-800">
+                {cleanProperty.title}
+              </span>
+            </nav>
+          </div>
+        </section>
 
-      <Footer />
-    </ApartmentClient>
+        {/* PAGE CONTENT SAME AS BEFORE */}
+        <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
+          <div className="lg:col-span-2 space-y-6">
+            <MobileGallery
+              images={cleanProperty.images}
+              title={cleanProperty.title}
+            />
+
+            <TitleBlockWithBrochure property={cleanProperty} />
+            <ScrollTabs />
+            <OverviewSection overview={cleanProperty.overview} />
+            <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
+            <PaymentPlanSection paymentPlan={cleanProperty.paymentPlan} />
+            <AmenitiesSection amenities={cleanProperty.amenities} />
+            <LocationSection />
+            <EmiCalculatorSection />
+            <FAQSection faq={cleanProperty.faq} />
+
+            {cleanProperty.builder && (
+              <DeveloperSection builder={cleanProperty.builder} />
+            )}
+
+            <SimilarProjectsSection
+              projects={allProjects}
+              currentSlug={cleanProperty.slug}
+            />
+
+            <DisclaimerSection text={cleanProperty.disclaimer} />
+          </div>
+
+          <RightSidebar property={cleanProperty} />
+        </section>
+
+        <Footer />
+      </ApartmentClient>
     </>
   );
 }

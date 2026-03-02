@@ -34,20 +34,20 @@ export async function generateMetadata({ params }) {
   const slug = params.slug;
 
   // 🔥 Parent Category Detection
-const parentSlug = "residential-property-in-gurgaon"; 
-// If in future you create dynamic parent routing,
-// replace this with actual parent slug logic.
+  const parentSlug = "residential-property-in-gurgaon";
+  // If in future you create dynamic parent routing,
+  // replace this with actual parent slug logic.
 
-const SLUG_LABEL_MAP = {
-  "residential-property-in-gurgaon": "Residential",
-  "luxury-apartments-in-gurgaon": "Luxury Apartments",
-  "builder-floor-in-gurgaon": "Builder Floor",
-};
+  const SLUG_LABEL_MAP = {
+    "residential-property-in-gurgaon": "Residential",
+    "luxury-apartments-in-gurgaon": "Luxury Apartments",
+    "builder-floor-in-gurgaon": "Builder Floor",
+  };
 
-const currentSlugLabel =
-  SLUG_LABEL_MAP[parentSlug] || "Residential";
+  const currentSlugLabel =
+    SLUG_LABEL_MAP[parentSlug] || "Residential";
 
-const currentBaseRoute = `/${parentSlug}`;
+  const currentBaseRoute = `/${parentSlug}`;
 
   // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
@@ -103,28 +103,33 @@ const currentBaseRoute = `/${parentSlug}`;
 
 // ================== PAGE COMPONENT ==================
 export default async function PropertyPage({ params }) {
+  console.log("🔥 RESIDENTIAL PAGE HIT");
   const slug = params.slug;
 
-  // ✅ Parent Category Setup
-  const parentSlug = "residential-property-in-gurgaon";
 
-  const SLUG_LABEL_MAP = {
-    "residential-property-in-gurgaon": "Residential",
-    "luxury-apartments-in-gurgaon": "Luxury Apartments",
-    "builder-floor-in-gurgaon": "Builder Floor",
-  };
-
-  const currentSlugLabel =
-    SLUG_LABEL_MAP[parentSlug] || "Residential";
-
-  const currentBaseRoute = `/${parentSlug}`;
 
   // 🔥 Detect Parent Category from URL
-const pathnameParts = params?.slug ? [] : [];
+  const pathnameParts = params?.slug ? [] : [];
 
   // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
+
+  // 🔥 NOW detect parent (after property exists)
+  let parentSlug = "residential-property-in-gurgaon";
+  let parentLabel = "Residential";
+
+  if (property?.isApartment) {
+    parentSlug = "luxury-apartments-in-gurgaon";
+    parentLabel = "Luxury Apartments";
+  }
+
+  if (property?.isBuilderFloor) {
+    parentSlug = "builder-floor-in-gurgaon";
+    parentLabel = "Builder Floor";
+  }
+
+  const currentBaseRoute = `/${parentSlug}`;
 
   // 2️⃣ Fetch all properties for "Similar Projects"
   const allProjects = await getAllProperties();
@@ -198,154 +203,176 @@ const pathnameParts = params?.slug ? [] : [];
 
   // ================== RENDER ==================
   return (
-     <>
-    
-    <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@graph": [
+    <>
 
-        // ✅ PRODUCT SCHEMA
-        {
-          "@type": "Product",
-          "name": cleanProperty.title,
-          "image": cleanProperty.images,
-          "description": `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-          "brand": {
-            "@type": "Brand",
-            "name": "Neev Realty"
-          },
-          "offers": {
-            "@type": "Offer",
-            "priceCurrency": "INR",
-            "price": cleanProperty.price || "",
-            "availability": "https://schema.org/InStock",
-            "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`
-          }
-        },
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
 
-        // ✅ BREADCRUMB SCHEMA
-        {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://www.neevrealty.com"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-             "name": currentSlugLabel,
-                "item": `https://www.neevrealty.com${currentBaseRoute}`
-            },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "name": cleanProperty.title
-            }
-          ]
-        }
+              // ✅ PRODUCT SCHEMA
+              {
+                "@type": "Product",
+                "name": cleanProperty.title,
+                "image": cleanProperty.images,
+                "description": `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
+                "brand": {
+                  "@type": "Brand",
+                  "name": "Neev Realty"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "priceCurrency": "INR",
+                  "price": cleanProperty.price || "",
+                  "availability": "https://schema.org/InStock",
+                  "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`
+                }
+              },
 
-      ]
-    })
-  }}
-/>
+              // ✅ BREADCRUMB SCHEMA
+              {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.neevrealty.com"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Residential",
+                    "item": "https://www.neevrealty.com/residential-property-in-gurgaon"
+                  },
+                  ...(parentSlug !== "residential-property-in-gurgaon"
+                    ? [{
+                      "@type": "ListItem",
+                      "position": 3,
+                      "name": parentLabel,
+                      "item": `https://www.neevrealty.com${currentBaseRoute}`
+                    }]
+                    : []),
+                  {
+                    "@type": "ListItem",
+                    "position": parentSlug !== "residential-property-in-gurgaon" ? 4 : 3,
+                    "name": cleanProperty.title
+                  }
+                ]
+              }
+
+            ]
+          })
+        }}
+      />
 
 
-    <ApartmentClient>
-      <AutoPopup propertyTitle={cleanProperty.title} />
+      <ApartmentClient>
+        <AutoPopup propertyTitle={cleanProperty.title} />
 
 
-      {/* ✅ BREADCRUMB */}
-<section className="bg-white ml-12">
-  <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
-    <nav className="flex flex-wrap items-center gap-2">
+        {/* ✅ BREADCRUMB */}
+        <section className="bg-white ml-12">
+          <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
+            <nav className="flex flex-wrap items-center gap-2">
 
-      <Link href="/" className="hover:text-[#F5A300]">
-        Home
-      </Link>
+              <Link href="/" className="hover:text-[#F5A300]">
+                Home
+              </Link>
 
-      <span className="text-gray-400">/</span>
+              <span className="text-gray-400">/</span>
 
-    <Link
-  href={currentBaseRoute}
-  className="hover:text-[#F5A300]"
->
-  {currentSlugLabel}
-</Link>
+              {/* Residential Always */}
+              <Link
+                href="/residential-property-in-gurgaon"
+                className="hover:text-[#F5A300]"
+              >
+                Residential
+              </Link>
 
-      {cleanProperty.locationName && (
-        <>
-          <span className="text-gray-400">/</span>
-          <Link
-            href={`/residential-property-in-gurgaon?locality=${cleanProperty.locationName.toLowerCase().replace(/\s+/g, "-")}`}
-            className="hover:text-[#F5A300]"
-          >
-            {cleanProperty.locationName}
-          </Link>
-        </>
-      )}
+              {/* Sub Category (Only if not base residential) */}
+              {parentSlug !== "residential-property-in-gurgaon" && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <Link
+                    href={currentBaseRoute}
+                    className="hover:text-[#F5A300]"
+                  >
+                    {parentLabel}
+                  </Link>
+                </>
+              )}
 
-      <span className="text-gray-400">/</span>
+              {cleanProperty.locationName && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <Link
+                    href={`/residential-property-in-gurgaon?locality=${cleanProperty.locationName.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="hover:text-[#F5A300]"
+                  >
+                    {cleanProperty.locationName}
+                  </Link>
+                </>
+              )}
 
-      <span className="text-gray-800 font-medium">
-        {cleanProperty.title}
-      </span>
+              <span className="text-gray-400">/</span>
 
-    </nav>
-  </div>
-</section>
+              <span className="text-gray-800 font-medium">
+                {cleanProperty.title}
+              </span>
 
-      <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-6">
-          <MobileGallery images={cleanProperty.images} title={cleanProperty.title} />
+            </nav>
+          </div>
+        </section>
 
-          <TitleBlockWithBrochure property={cleanProperty} />
+        <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-6">
+            <MobileGallery images={cleanProperty.images} title={cleanProperty.title} />
 
-          <div className="sticky top-[64px] md:top-[96px] z-30 bg-white">
-            <ScrollTabs />
+            <TitleBlockWithBrochure property={cleanProperty} />
+
+            <div className="sticky top-[64px] md:top-[96px] z-30 bg-white">
+              <ScrollTabs />
+            </div>
+
+            <OverviewSection overview={cleanProperty.overview} propertyTitle={cleanProperty.title} />
+
+            <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
+
+            <PaymentPlanSection paymentPlan={cleanProperty.paymentPlan} />
+
+            <AmenitiesSection amenities={cleanProperty.amenities} />
+
+            <LocationSection
+              mapQuery={cleanProperty.mapQuery}
+              locationImage={cleanProperty.locationImage}
+              locationPoints={cleanProperty.locationPoints}
+            />
+
+            <EmiCalculatorSection />
+
+            <FAQSection faq={cleanProperty.faq} />
+
+            {cleanProperty.builder && <DeveloperSection builder={cleanProperty.builder} />}
+
+            <SimilarProjectsSection
+              projects={allProjects}
+              currentSlug={cleanProperty.slug}
+              currentDeveloper={cleanProperty.builderName}
+            />
+
+            <DisclaimerSection text={cleanProperty.disclaimer} />
           </div>
 
-          <OverviewSection overview={cleanProperty.overview} propertyTitle={cleanProperty.title} />
+          {/* RIGHT */}
+          <RightSidebar property={cleanProperty} />
+        </section>
 
-          <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
-
-          <PaymentPlanSection paymentPlan={cleanProperty.paymentPlan} />
-
-          <AmenitiesSection amenities={cleanProperty.amenities} />
-
-          <LocationSection
-            mapQuery={cleanProperty.mapQuery}
-            locationImage={cleanProperty.locationImage}
-            locationPoints={cleanProperty.locationPoints}
-          />
-
-          <EmiCalculatorSection />
-
-          <FAQSection faq={cleanProperty.faq} />
-
-          {cleanProperty.builder && <DeveloperSection builder={cleanProperty.builder} />}
-
-          <SimilarProjectsSection
-            projects={allProjects}
-            currentSlug={cleanProperty.slug}
-            currentDeveloper={cleanProperty.builderName}
-          />
-
-          <DisclaimerSection text={cleanProperty.disclaimer} />
-        </div>
-
-        {/* RIGHT */}
-        <RightSidebar property={cleanProperty} />
-      </section>
-
-      <Footer />
-    </ApartmentClient>
+        <Footer />
+      </ApartmentClient>
     </>
   );
 }

@@ -20,8 +20,8 @@ const defaultPages = [
 
   // Commercial
   { label: "Commercial Main", slug: "commercial-property-in-gurgaon", path: "/commercial-property-in-gurgaon" },
-  { label: "Commercial Retail", slug: "commercial-retail-shops", path: "/retail-shops-in-gurgaon" },
-  { label: "Commercial SCO", slug: "commercial-sco-plots", path: "/sco-plots-in-gurgaon" },
+  { label: "Commercial Retail", slug: "retail-shops-in-gurgaon", path: "/retail-shops-in-gurgaon" },
+  { label: "Commercial SCO", slug: "sco-plots-in-gurgaon", path: "/sco-plots-in-gurgaon" },
 
   // Residential
   { label: "Residential Main", slug: "residential-property-in-gurgaon", path: "/residential-property-in-gurgaon" },

@@ -82,7 +82,7 @@ export default async function sitemap() {
     return [
       ...staticEntries,
       ...blogEntries,
-      ...propertyEntries,,
+      ...propertyEntries,
       ...seoEntries,
     ];
   } catch (error) {

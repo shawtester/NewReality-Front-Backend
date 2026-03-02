@@ -25,8 +25,8 @@ const defaultPages = [
 
   // Residential
   { label: "Residential Main", slug: "residential-property-in-gurgaon", path: "/residential-property-in-gurgaon" },
-  { label: "Residential Apartments", slug: "residential-apartments", path: "/luxury-apartments-in-gurgaon" },
-  { label: "Residential Builder Floor", slug: "residential-builder-floor", path: "/builder-floor-in-gurgaon" },
+  { label: "Residential Apartments", slug: "luxury-apartments-in-gurgaon", path: "/luxury-apartments-in-gurgaon" },
+  { label: "Residential Builder Floor", slug: "builder-floor-in-gurgaon", path: "/builder-floor-in-gurgaon" },
 ];
 
 export default function SEOAdminPage() {

@@ -18,7 +18,6 @@ const staticRoutes = [
   { path: "/commercial-property-in-gurgaon", priority: 0.9 },
   { path: "/residential-property-in-gurgaon", priority: 0.9 },
   { path: "/blog", priority: 0.9 },
-  // ❌ removed "/residential" because duplicate/unused
 ];
 
 /* ===============================
@@ -80,7 +79,7 @@ export default async function sitemap() {
         propertyMap.set(
           slug,
           formatEntry(
-            `/${slug}`, // keeping your root slug structure SAME
+            `/${slug}`, // keeping root slug SAME (no structure change)
             data.updatedAt?.toDate?.() || new Date(),
             0.9
           )
@@ -90,7 +89,7 @@ export default async function sitemap() {
 
     const propertyEntries = Array.from(propertyMap.values());
 
-    /* ---------- SEO Landing Pages (unique) ---------- */
+    /* ---------- SEO Landing Pages (fixed path mapping) ---------- */
     const seoSnapshot = await db.collection("seo").get();
 
     const seoMap = new Map();
@@ -98,11 +97,21 @@ export default async function sitemap() {
     seoSnapshot.docs.forEach((doc) => {
       const slug = doc.id;
 
-      if (!seoMap.has(slug)) {
+      // Check if slug matches a static route
+      const staticMatch = staticRoutes.find(
+        (route) =>
+          route.path === `/${slug}` ||
+          route.path.replace("/", "") === slug
+      );
+
+      // Use correct path if exists, otherwise fallback
+      const finalPath = staticMatch ? staticMatch.path : `/${slug}`;
+
+      if (!seoMap.has(finalPath)) {
         seoMap.set(
-          slug,
+          finalPath,
           formatEntry(
-            `/${slug}`,
+            finalPath,
             doc.data().updatedAt?.toDate?.() || new Date(),
             0.8
           )

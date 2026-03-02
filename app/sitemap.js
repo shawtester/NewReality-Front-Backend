@@ -2,8 +2,6 @@ import { db } from "@/lib/firebase_admin";
 
 const BASE_URL = "https://www.neevrealty.com";
 
-
-
 /* ===============================
    Static Pages
 ================================ */
@@ -20,7 +18,7 @@ const staticRoutes = [
   { path: "/commercial-property-in-gurgaon", priority: 0.9 },
   { path: "/residential-property-in-gurgaon", priority: 0.9 },
   { path: "/blog", priority: 0.9 },
-  { path: "/residential", priority: 0.9 },
+  // ❌ removed "/residential" because duplicate/unused
 ];
 
 /* ===============================
@@ -38,56 +36,97 @@ function formatEntry(path, lastModified = new Date(), priority = 0.7) {
    Main Sitemap Function
 ================================ */
 export default async function sitemap() {
-    console.log("SITEMAP RUNNING");
+  console.log("SITEMAP RUNNING");
+
   try {
     /* ---------- Static ---------- */
     const staticEntries = staticRoutes.map((route) =>
       formatEntry(route.path, new Date(), route.priority)
     );
 
-    /* ---------- Blogs ---------- */
+    /* ---------- Blogs (unique) ---------- */
     const blogsSnapshot = await db.collection("blogs").get();
-    const blogEntries = blogsSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/blog/${doc.data().slug || doc.id}`,
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.8
-      )
-    );
 
-    /* ---------- Properties (🔥 FIXED HERE) ---------- */
+    const blogMap = new Map();
+
+    blogsSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const slug = data.slug || doc.id;
+
+      if (!blogMap.has(slug)) {
+        blogMap.set(
+          slug,
+          formatEntry(
+            `/blog/${slug}`,
+            data.updatedAt?.toDate?.() || new Date(),
+            0.8
+          )
+        );
+      }
+    });
+
+    const blogEntries = Array.from(blogMap.values());
+
+    /* ---------- Properties (unique) ---------- */
     const propertiesSnapshot = await db.collection("properties").get();
-    const propertyEntries = propertiesSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/${doc.data().slug || doc.id}`,   // ✅ DIRECT ROOT SLUG
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.9
-      )
-    );
 
-  
+    const propertyMap = new Map();
 
-    /* ---------- SEO Landing Pages ---------- */
+    propertiesSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const slug = data.slug || doc.id;
+
+      if (!propertyMap.has(slug)) {
+        propertyMap.set(
+          slug,
+          formatEntry(
+            `/${slug}`, // keeping your root slug structure SAME
+            data.updatedAt?.toDate?.() || new Date(),
+            0.9
+          )
+        );
+      }
+    });
+
+    const propertyEntries = Array.from(propertyMap.values());
+
+    /* ---------- SEO Landing Pages (unique) ---------- */
     const seoSnapshot = await db.collection("seo").get();
-    const seoEntries = seoSnapshot.docs.map((doc) =>
-      formatEntry(
-        `/${doc.id}`,
-        doc.data().updatedAt?.toDate?.() || new Date(),
-        0.8
-      )
-    );
 
-  
+    const seoMap = new Map();
 
-    return [
+    seoSnapshot.docs.forEach((doc) => {
+      const slug = doc.id;
+
+      if (!seoMap.has(slug)) {
+        seoMap.set(
+          slug,
+          formatEntry(
+            `/${slug}`,
+            doc.data().updatedAt?.toDate?.() || new Date(),
+            0.8
+          )
+        );
+      }
+    });
+
+    const seoEntries = Array.from(seoMap.values());
+
+    /* ---------- Merge & Final Deduplicate by Full URL ---------- */
+    const allEntries = [
       ...staticEntries,
       ...blogEntries,
       ...propertyEntries,
       ...seoEntries,
     ];
+
+    const uniqueEntries = Array.from(
+      new Map(allEntries.map((item) => [item.url, item])).values()
+    );
+
+    return uniqueEntries;
   } catch (error) {
     console.error("Sitemap generation error:", error);
     return [];
   }
 }
-

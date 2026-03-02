@@ -458,9 +458,94 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
 
     const shouldHideTypeFilter = HIDE_TYPE_FOR_SLUGS.includes(forcedTypeSlug);
 
+
+ // ✅ 2-Level Residential Breadcrumb Setup
+const RESIDENTIAL_SLUG_LABEL_MAP = {
+  "luxury-apartments-in-gurgaon": "Luxury Apartments",
+  "builder-floor-in-gurgaon": "Builder Floor",
+};
+
+const isSubCategory = Boolean(
+  forcedTypeSlug && RESIDENTIAL_SLUG_LABEL_MAP[forcedTypeSlug]
+);
+
+const subCategoryLabel =
+  RESIDENTIAL_SLUG_LABEL_MAP[forcedTypeSlug] || "";
+
+const residentialBaseRoute = "/residential-property-in-gurgaon";
+const subCategoryRoute = `/${forcedTypeSlug}`;
+
     return (
         <>
             <Header />
+   <div className="ml-28">
+  <nav className="flex flex-wrap items-center gap-2">
+
+  {/* Home */}
+  <span
+    onClick={() => router.push("/")}
+    className="cursor-pointer hover:text-[#F5A300]"
+  >
+    Home
+  </span>
+
+  <span className="text-gray-400">/</span>
+
+  {/* Residential Main */}
+  <span
+    onClick={() => router.push(residentialBaseRoute)}
+    className="cursor-pointer hover:text-[#F5A300]"
+  >
+    Residential
+  </span>
+
+  {/* Sub Category */}
+  {isSubCategory && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span
+        onClick={() => router.push(subCategoryRoute)}
+        className="cursor-pointer hover:text-[#F5A300]"
+      >
+        {subCategoryLabel}
+      </span>
+    </>
+  )}
+
+  {/* Status */}
+  {status && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {formatFilterName(status)}
+      </span>
+    </>
+  )}
+
+  {/* Locality */}
+  {locality && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {formatFilterName(locality)}
+      </span>
+    </>
+  )}
+
+  {/* Budget */}
+  {budget && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {budget.replace(/-/g, " ").toUpperCase()}
+      </span>
+    </>
+  )}
+
+</nav>
+</div>
+
+
 
             {/* PAGE INTRO */}
             <section className="bg-[#F6FBFF]">

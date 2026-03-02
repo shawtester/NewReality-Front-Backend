@@ -80,6 +80,7 @@ seo?.canonical || `${baseUrl}/commercial/${property.slug}`;
 
 /* ================== PAGE ================== */
 export default async function PropertyPage({ params, searchParams }) {
+  const slug = params.slug;
 const type = searchParams?.type || "";
 
   const property = await getPropertyBySlugOrId(slug);

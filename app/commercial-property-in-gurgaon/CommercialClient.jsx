@@ -424,79 +424,91 @@ const handleFilterChange = useCallback((filterName, value) => {
 
   const shouldHideTypeFilter = HIDE_TYPE_FOR_SLUGS.includes(forcedTypeSlug);
 
+// ✅ 2-Level Commercial Breadcrumb Setup
+const COMMERCIAL_SLUG_LABEL_MAP = {
+  "retail-shops-in-gurgaon": "Retail Shops",
+  "sco-plots-in-gurgaon": "SCO Plots",
+};
+
+const isSubCategory = Boolean(
+  forcedTypeSlug && COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug]
+);
+
+const subCategoryLabel =
+  COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug] || "";
+
+const commercialBaseRoute = "/commercial-property-in-gurgaon";
+const subCategoryRoute = `/${forcedTypeSlug}`;
+
   return (
     <>
       <Header />
+ <div className="ml-28">
+<nav className="flex flex-wrap   items-center gap-2 ">
 
-      {/* ✅ BREADCRUMB */}
-<section className="bg-white ml-10">
-  <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
-    <nav className="flex flex-wrap items-center gap-2">
+  {/* Home */}
+  <span
+    onClick={() => router.push("/")}
+    className="cursor-pointer hover:text-[#F5A300]"
+  >
+    Home
+  </span>
 
-      {/* Home */}
-      <span
-        onClick={() => router.push("/")}
-        className="cursor-pointer hover:text-[#F5A300]"
-      >
-        Home
-      </span>
+  <span className="text-gray-400">/</span>
 
+  {/* Commercial Main */}
+  <span
+    onClick={() => router.push(commercialBaseRoute)}
+    className="cursor-pointer hover:text-[#F5A300]"
+  >
+    Commercial
+  </span>
+
+  {/* Sub Category */}
+  {isSubCategory && (
+    <>
       <span className="text-gray-400">/</span>
-
-      {/* Commercial */}
       <span
-        onClick={() => router.push(BASE_ROUTE)}
+        onClick={() => router.push(subCategoryRoute)}
         className="cursor-pointer hover:text-[#F5A300]"
       >
-        Commercial
+        {subCategoryLabel}
       </span>
+    </>
+  )}
 
-      {/* Type */}
-      {type && (
-        <>
-          <span className="text-gray-400">/</span>
-          <span
-            onClick={() => handleFilterChange("type", type)}
-            className="cursor-pointer hover:text-[#F5A300]"
-          >
-            {formatFilterName(type)}
-          </span>
-        </>
-      )}
+  {/* Status */}
+  {status && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {formatFilterName(status)}
+      </span>
+    </>
+  )}
 
-      {/* Status */}
-      {status && (
-        <>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-800">
-            {formatFilterName(status)}
-          </span>
-        </>
-      )}
+  {/* Locality */}
+  {locality && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {formatFilterName(locality)}
+      </span>
+    </>
+  )}
 
-      {/* Locality */}
-      {locality && (
-        <>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-800">
-            {formatFilterName(locality)}
-          </span>
-        </>
-      )}
+  {/* Budget */}
+  {budget && (
+    <>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-800">
+        {budget.replace(/-/g, " ").toUpperCase()}
+      </span>
+    </>
+  )}
 
-      {/* Budget */}
-      {budget && (
-        <>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-800">
-            {budget.replace(/-/g, " ").toUpperCase()}
-          </span>
-        </>
-      )}
-
-    </nav>
-  </div>
-</section>
+</nav>
+</div>
 
       {/* PAGE INTRO */}
       <section className="bg-[#F6FBFF]">

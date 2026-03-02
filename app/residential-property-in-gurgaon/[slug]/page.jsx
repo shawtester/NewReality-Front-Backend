@@ -33,6 +33,22 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }) {
   const slug = params.slug;
 
+  // 🔥 Parent Category Detection
+const parentSlug = "residential-property-in-gurgaon"; 
+// If in future you create dynamic parent routing,
+// replace this with actual parent slug logic.
+
+const SLUG_LABEL_MAP = {
+  "residential-property-in-gurgaon": "Residential",
+  "luxury-apartments-in-gurgaon": "Luxury Apartments",
+  "builder-floor-in-gurgaon": "Builder Floor",
+};
+
+const currentSlugLabel =
+  SLUG_LABEL_MAP[parentSlug] || "Residential";
+
+const currentBaseRoute = `/${parentSlug}`;
+
   // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
 
@@ -88,6 +104,23 @@ export async function generateMetadata({ params }) {
 // ================== PAGE COMPONENT ==================
 export default async function PropertyPage({ params }) {
   const slug = params.slug;
+
+  // ✅ Parent Category Setup
+  const parentSlug = "residential-property-in-gurgaon";
+
+  const SLUG_LABEL_MAP = {
+    "residential-property-in-gurgaon": "Residential",
+    "luxury-apartments-in-gurgaon": "Luxury Apartments",
+    "builder-floor-in-gurgaon": "Builder Floor",
+  };
+
+  const currentSlugLabel =
+    SLUG_LABEL_MAP[parentSlug] || "Residential";
+
+  const currentBaseRoute = `/${parentSlug}`;
+
+  // 🔥 Detect Parent Category from URL
+const pathnameParts = params?.slug ? [] : [];
 
   // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
@@ -206,8 +239,8 @@ export default async function PropertyPage({ params }) {
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Residential",
-              "item": "https://www.neevrealty.com/residential-property-in-gurgaon"
+             "name": currentSlugLabel,
+                "item": `https://www.neevrealty.com${currentBaseRoute}`
             },
             {
               "@type": "ListItem",
@@ -238,12 +271,12 @@ export default async function PropertyPage({ params }) {
 
       <span className="text-gray-400">/</span>
 
-      <Link
-        href="/residential-property-in-gurgaon"
-        className="hover:text-[#F5A300]"
-      >
-        Residential
-      </Link>
+    <Link
+  href={currentBaseRoute}
+  className="hover:text-[#F5A300]"
+>
+  {currentSlugLabel}
+</Link>
 
       {cleanProperty.locationName && (
         <>

@@ -14,8 +14,23 @@ export default function StickyIcons() {
   // ❌ Hide completely on admin routes
   if (pathname.startsWith("/admin")) return null;
 
-  // ❌ Hide enquire button on residential slug pages
-  const isSlugPage = pathname.startsWith("/residential/");
+  const segments = pathname.split("/").filter(Boolean);
+
+  const staticPages = [
+    "about-us",
+    "our-services",
+    "blog",
+    "faqs",
+    "contact-us",
+    "privacy",
+    "terms-condition",
+    "residential-property-in-gurgaon",
+    "commercial-property-in-gurgaon",
+  ];
+
+  // ✅ Detect property detail page
+  const isSlugPage =
+    segments.length === 1 && !staticPages.includes(segments[0]);
 
   return (
     <>
@@ -62,7 +77,7 @@ export default function StickyIcons() {
             </a>
           </div>
 
-          {/* Enquire Now (hidden on slug pages) */}
+          {/* Enquire Now (hidden on property detail pages) */}
           {!isSlugPage && (
             <div className="absolute right-1 -translate-x-1/2 bottom-6 pointer-events-auto">
               <button

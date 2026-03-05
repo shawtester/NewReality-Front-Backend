@@ -192,7 +192,9 @@ const applyCommercialFilters = ({
 
 /* ================= PAGE ================= */
 export default function CommercialPage({ apartments = [], forcedTypeSlug }) {
-  const BASE_ROUTE = "/commercial-property-in-gurgaon";
+  const BASE_ROUTE = forcedTypeSlug
+    ? `/${forcedTypeSlug}`
+    : "/commercial-property-in-gurgaon";
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -263,35 +265,50 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   }, [currentImageIndex, getCurrentImageLink, banner]);
 
   /* ================= FILTER HANDLER ================= */
-const handleFilterChange = useCallback((filterName, value) => {
+  const handleFilterChange = useCallback((filterName, value) => {
 
-  const TYPE_SLUG_MAP = {
-    "retail-shops": "retail-shops-in-gurgaon",
-    "sco-plots": "sco-plots-in-gurgaon",
-  };
 
-  // 🔥 Direct slug redirect (NO QUERY PARAM FLASH)
-  if (filterName === "type" && value) {
-    const targetSlug = TYPE_SLUG_MAP[value];
-    if (targetSlug) {
-      router.replace(`/${targetSlug}`); // 👈 replace instead of push
-      return;
+
+    const TYPE_SLUG_MAP = {
+      "retail-shops": "retail-shops-in-gurgaon",
+      "sco-plots": "sco-plots-in-gurgaon",
+    };
+
+    // 🔥 Direct slug redirect (NO QUERY PARAM FLASH)
+    if (filterName === "type" && value) {
+      const targetSlug = TYPE_SLUG_MAP[value];
+      if (targetSlug) {
+        router.replace(`/${targetSlug}`); // 👈 replace instead of push
+        return;
+      }
     }
-  }
 
-  const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams.toString());
 
-  if (value) {
-    params.set(filterName, value);
-  } else {
-    params.delete(filterName);
-  }
+    if (value) {
+      params.set(filterName, value);
+    } else {
+      params.delete(filterName);
+    }
 
-  params.set("page", "1");
+    params.set("page", "1");
 
-  router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
+    router.push(`${BASE_ROUTE}?${params.toString()}`, { scroll: false });
 
-}, [searchParams, router]);
+  }, [searchParams, router, BASE_ROUTE]);
+
+  const handleClearFilters = useCallback(() => {
+
+    setKeyword("");
+    setType("");
+    setStatus("");
+    setLocality("");
+    setBudget("");
+    setBhk("");
+
+    router.push(BASE_ROUTE, { scroll: false });
+
+  }, [router, BASE_ROUTE]);
 
 
   /* ================= URL FILTER LOGIC ================= */
@@ -424,91 +441,91 @@ const handleFilterChange = useCallback((filterName, value) => {
 
   const shouldHideTypeFilter = HIDE_TYPE_FOR_SLUGS.includes(forcedTypeSlug);
 
-// ✅ 2-Level Commercial Breadcrumb Setup
-const COMMERCIAL_SLUG_LABEL_MAP = {
-  "retail-shops-in-gurgaon": "Retail Shops",
-  "sco-plots-in-gurgaon": "SCO Plots",
-};
+  // ✅ 2-Level Commercial Breadcrumb Setup
+  const COMMERCIAL_SLUG_LABEL_MAP = {
+    "retail-shops-in-gurgaon": "Retail Shops",
+    "sco-plots-in-gurgaon": "SCO Plots",
+  };
 
-const isSubCategory = Boolean(
-  forcedTypeSlug && COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug]
-);
+  const isSubCategory = Boolean(
+    forcedTypeSlug && COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug]
+  );
 
-const subCategoryLabel =
-  COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug] || "";
+  const subCategoryLabel =
+    COMMERCIAL_SLUG_LABEL_MAP[forcedTypeSlug] || "";
 
-const commercialBaseRoute = "/commercial-property-in-gurgaon";
-const subCategoryRoute = `/${forcedTypeSlug}`;
+  const commercialBaseRoute = "/commercial-property-in-gurgaon";
+  const subCategoryRoute = `/${forcedTypeSlug}`;
 
   return (
     <>
       <Header />
- <div className="ml-28">
-<nav className="flex flex-wrap   items-center gap-2 ">
+      <div className="ml-28">
+        <nav className="flex flex-wrap   items-center gap-2 ">
 
-  {/* Home */}
-  <span
-    onClick={() => router.push("/")}
-    className="cursor-pointer hover:text-[#F5A300]"
-  >
-    Home
-  </span>
+          {/* Home */}
+          <span
+            onClick={() => router.push("/")}
+            className="cursor-pointer hover:text-[#F5A300]"
+          >
+            Home
+          </span>
 
-  <span className="text-gray-400">/</span>
+          <span className="text-gray-400">/</span>
 
-  {/* Commercial Main */}
-  <span
-    onClick={() => router.push(commercialBaseRoute)}
-    className="cursor-pointer hover:text-[#F5A300]"
-  >
-    Commercial
-  </span>
+          {/* Commercial Main */}
+          <span
+            onClick={() => router.push(commercialBaseRoute)}
+            className="cursor-pointer hover:text-[#F5A300]"
+          >
+            Commercial
+          </span>
 
-  {/* Sub Category */}
-  {isSubCategory && (
-    <>
-      <span className="text-gray-400">/</span>
-      <span
-        onClick={() => router.push(subCategoryRoute)}
-        className="cursor-pointer hover:text-[#F5A300]"
-      >
-        {subCategoryLabel}
-      </span>
-    </>
-  )}
+          {/* Sub Category */}
+          {isSubCategory && (
+            <>
+              <span className="text-gray-400">/</span>
+              <span
+                onClick={() => router.push(subCategoryRoute)}
+                className="cursor-pointer hover:text-[#F5A300]"
+              >
+                {subCategoryLabel}
+              </span>
+            </>
+          )}
 
-  {/* Status */}
-  {status && (
-    <>
-      <span className="text-gray-400">/</span>
-      <span className="text-gray-800">
-        {formatFilterName(status)}
-      </span>
-    </>
-  )}
+          {/* Status */}
+          {status && (
+            <>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-800">
+                {formatFilterName(status)}
+              </span>
+            </>
+          )}
 
-  {/* Locality */}
-  {locality && (
-    <>
-      <span className="text-gray-400">/</span>
-      <span className="text-gray-800">
-        {formatFilterName(locality)}
-      </span>
-    </>
-  )}
+          {/* Locality */}
+          {locality && (
+            <>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-800">
+                {formatFilterName(locality)}
+              </span>
+            </>
+          )}
 
-  {/* Budget */}
-  {budget && (
-    <>
-      <span className="text-gray-400">/</span>
-      <span className="text-gray-800">
-        {budget.replace(/-/g, " ").toUpperCase()}
-      </span>
-    </>
-  )}
+          {/* Budget */}
+          {budget && (
+            <>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-800">
+                {budget.replace(/-/g, " ").toUpperCase()}
+              </span>
+            </>
+          )}
 
-</nav>
-</div>
+        </nav>
+      </div>
 
       {/* PAGE INTRO */}
       <section className="bg-[#F6FBFF]">

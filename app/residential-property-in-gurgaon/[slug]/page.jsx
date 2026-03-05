@@ -274,7 +274,7 @@ export default async function PropertyPage({ params }) {
 
 
         {/* ✅ BREADCRUMB */}
-        <section className="bg-white ml-12">
+        <section className="bg-white">
           <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
             <nav className="flex flex-wrap items-center gap-2">
 

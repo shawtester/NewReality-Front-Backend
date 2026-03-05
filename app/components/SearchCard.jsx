@@ -379,7 +379,7 @@ export default function SearchCard() {
                   onClick={() => {
                     setPropertyType(tab.value);
                     setResults([]);
-                    router.push(tab.value === "residential" ? "/residential" : "/commercial");
+                    router.push(tab.value === "residential" ? "/residential-property-in-gurgaon" : "/commercial-property-in-gurgaon");
                   }}
                   className={`rounded-full px-4 py-1 text-xs sm:text-sm font-medium transition-all ${propertyType === tab.value
                     ? "bg-white shadow-md text-gray-900"

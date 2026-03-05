@@ -480,7 +480,8 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
     return (
         <>
             <Header />
-            <div className="ml-28">
+            
+            <div className="max-w-[1240px] mx-auto px-4">
                 <nav className="flex flex-wrap items-center gap-2">
 
                     {/* Home */}

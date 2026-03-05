@@ -25,6 +25,36 @@ export async function generateMetadata({ params }) {
 }
 
 /* ================= PAGE ================= */
-export default function Page({ params }) {
-  return <BlogDetailClient params={params} />;
+export default async function Page({ params }) {
+  const blog = await getBlogBySlug({ slug: params.slug });
+
+  return (
+    <>
+      {blog && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              headline: blog.title,
+              description: blog.metaDescription || blog.excerpt,
+              image: blog.image?.url || "",
+              author: {
+                "@type": "Organization",
+                name: "Neev Realty",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "Neev Realty",
+              },
+              mainEntityOfPage: `https://www.neevrealty.com/blog/${blog.slug}`,
+            }),
+          }}
+        />
+      )}
+
+      <BlogDetailClient params={params} />
+    </>
+  );
 }

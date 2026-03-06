@@ -98,7 +98,7 @@ export default async function Page({ params }) {
   /* ================= COMMERCIAL TYPE ================= */
   const COMMERCIAL_TYPE_FIELD_MAP = {
     "retail-shops-in-gurgaon": "isRetail",
-    "sco-plots-in-gurgaon": "isScoPlot",
+    "sco-plots-in-gurgaon": "isSCO",
   };
 
   if (COMMERCIAL_TYPE_FIELD_MAP[slug]) {

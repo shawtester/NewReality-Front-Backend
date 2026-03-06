@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const seo = await getSEOServer("home");
+  const seo = await getSEOServer("/"); 
 
   const title =
     seo?.title || "Neev Realty | Best Real Estate Company in Gurgaon";

@@ -124,7 +124,7 @@ export default function PropertyCard({ property = {} }) {
               By <span className="font-medium text-gray-700">{builder}</span>
             </p>
 
-            <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
+            <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500 line-clamp-1">
               {[sector, locationName].filter(Boolean).join(", ")}
             </p>
 

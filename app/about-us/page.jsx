@@ -12,7 +12,7 @@ export async function generateMetadata() {
   const slug = "about"; // 🔥 Must match Firestore document ID
 
   try {
-    const seo = await getSEO(slug);
+    const seo = await getSEO(slug); 
 
     const title = seo?.title || "About Us — Neev Realty";
 

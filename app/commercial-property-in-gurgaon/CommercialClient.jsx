@@ -269,19 +269,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
 
 
-    const TYPE_SLUG_MAP = {
-      "retail-shops": "retail-shops-in-gurgaon",
-      "sco-plots": "sco-plots-in-gurgaon",
-    };
-
-    // 🔥 Direct slug redirect (NO QUERY PARAM FLASH)
-    if (filterName === "type" && value) {
-      const targetSlug = TYPE_SLUG_MAP[value];
-      if (targetSlug) {
-        router.replace(`/${targetSlug}`); // 👈 replace instead of push
-        return;
-      }
-    }
+    
 
     const params = new URLSearchParams(searchParams.toString());
 

@@ -13,7 +13,7 @@ import TitleBlockWithBrochure from "./components/TitleBlockWithBrochure";
 import ScrollTabs from "./components/ScrollTabs";
 import OverviewSection from "./components/OverviewSection";
 import FloorPlanSection from "./components/FloorPlanSection";
-import PaymentPlanSection from "./components/PaymentPlanSection";
+import PaymentPlanSection from "./components/PaymentPlanSection"; 
 import AmenitiesSection from "./components/AmenitiesSection";
 import LocationSection from "./components/LocationSection";
 import EmiCalculatorSection from "./components/EmiCalculatorSection";

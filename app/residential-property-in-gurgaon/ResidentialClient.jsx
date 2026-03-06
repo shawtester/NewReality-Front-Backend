@@ -302,20 +302,7 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
     // ✅ FILTER HANDLER
     const handleFilterChange = useCallback((filterName, value) => {
 
-        const TYPE_SLUG_MAP = {
-            apartment: "luxury-apartments-in-gurgaon",
-            "luxury-apartment": "luxury-apartments-in-gurgaon",
-            "builder-floor": "builder-floor-in-gurgaon",
-        };
-
-        // 🔥 If type filter selected → direct slug redirect
-        if (filterName === "type" && value) {
-            const targetSlug = TYPE_SLUG_MAP[value];
-            if (targetSlug) {
-                router.push(`/${targetSlug}`);
-                return;
-            }
-        }
+        
 
         const params = new URLSearchParams(searchParams.toString());
 

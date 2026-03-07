@@ -327,11 +327,16 @@ export default function BlogContent({ blog, onHeadingsReady }) {
       {/* ================= BLOG BODY ================= */}
       <div className="max-w-[1240px] mx-auto px-4 mt-8">
         <article
-          ref={wrapperRef}
-          id="blog-wrapper"
-          className="bg-white rounded-lg p-6 md:p-8 shadow-sm prose prose-lg max-w-none prose-headings:scroll-mt-32 prose-img:rounded-xl prose-a:text-black hover:prose-a:underline"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
-        />
+  ref={wrapperRef}
+  id="blog-wrapper"
+  className="bg-white rounded-lg p-6 md:p-8 shadow-sm 
+  prose max-w-none
+  [&_p]:my-3
+  prose-headings:scroll-mt-32
+  prose-img:rounded-xl
+  prose-a:text-black hover:prose-a:underline"
+  dangerouslySetInnerHTML={{ __html: blog.content }}
+/>
 
 
         {/* ================= SOURCE ================= */}

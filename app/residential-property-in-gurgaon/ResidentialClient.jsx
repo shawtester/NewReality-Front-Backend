@@ -502,36 +502,7 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
                         </>
                     )}
 
-                    {/* Status */}
-                    {status && (
-                        <>
-                            <span className="text-gray-400">/</span>
-                            <span className="text-gray-800">
-                                {formatFilterName(status)}
-                            </span>
-                        </>
-                    )}
-
-                    {/* Locality */}
-                    {locality && (
-                        <>
-                            <span className="text-gray-400">/</span>
-                            <span className="text-gray-800">
-                                {formatFilterName(locality)}
-                            </span>
-                        </>
-                    )}
-
-                    {/* Budget */}
-                    {budget && (
-                        <>
-                            <span className="text-gray-400">/</span>
-                            <span className="text-gray-800">
-                                {budget.replace(/-/g, " ").toUpperCase()}
-                            </span>
-                        </>
-                    )}
-
+                    
                 </nav>
             </div>
 

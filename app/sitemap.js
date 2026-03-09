@@ -32,128 +32,123 @@ function formatEntry(path, lastModified = new Date(), priority = 0.7) {
 }
 
 /* ===============================
+   Fetch Footer Links
+================================ */
+async function getFooterLinks() {
+
+  const footerCollections = [
+    "projects_by_location",
+    "projects_by_budget",
+    "projects_by_size",
+    "projects_by_status",
+    "property_by_type",
+  ];
+
+  const links = [];
+
+  for (const col of footerCollections) {
+
+    const snapshot = await db
+      .collection("footer_links")
+      .doc(col)
+      .collection("items")
+      .get()
+      .catch(() => null);
+
+    if (!snapshot) continue;
+
+    snapshot.docs.forEach((doc) => {
+
+      const data = doc.data();
+
+      if (data?.value) {
+        links.push(
+          formatEntry(
+            `/${data.value}`,
+            new Date(),
+            0.8
+          )
+        );
+      }
+
+    });
+
+  }
+
+  return links;
+}
+
+/* ===============================
    Main Sitemap Function
 ================================ */
 export default async function sitemap() {
+
   console.log("SITEMAP RUNNING");
 
   try {
 
-    /* ===============================
-       STATIC ROUTES
-    ============================== */
+    /* ---------- Static ---------- */
     const staticEntries = staticRoutes.map((route) =>
       formatEntry(route.path, new Date(), route.priority)
     );
 
-    /* ===============================
-       BLOGS
-    ============================== */
+    /* ---------- Blogs ---------- */
     const blogsSnapshot = await db.collection("blogs").get();
 
-    const blogMap = new Map();
+    const blogEntries = blogsSnapshot.docs.map((doc) => {
 
-    blogsSnapshot.docs.forEach((doc) => {
       const data = doc.data();
       const slug = data.slug || doc.id;
 
-      if (!slug) return;
+      return formatEntry(
+        `/blog/${slug}`,
+        data.updatedAt?.toDate?.() || new Date(),
+        0.8
+      );
 
-      if (!blogMap.has(slug)) {
-        blogMap.set(
-          slug,
-          formatEntry(
-            `/blog/${slug}`,
-            data.updatedAt?.toDate?.() || new Date(),
-            0.8
-          )
-        );
-      }
     });
 
-    const blogEntries = Array.from(blogMap.values());
-
-    /* ===============================
-       PROPERTIES
-    ============================== */
+    /* ---------- Properties ---------- */
     const propertiesSnapshot = await db.collection("properties").get();
 
-    const propertyMap = new Map();
+    const propertyEntries = propertiesSnapshot.docs.map((doc) => {
 
-    propertiesSnapshot.docs.forEach((doc) => {
       const data = doc.data();
       const slug = data.slug || doc.id;
 
-      if (!slug) return;
-
-      if (!propertyMap.has(slug)) {
-        propertyMap.set(
-          slug,
-          formatEntry(
-            `/${slug}`,
-            data.updatedAt?.toDate?.() || new Date(),
-            0.9
-          )
-        );
-      }
-    });
-
-    const propertyEntries = Array.from(propertyMap.values());
-
-    /* ===============================
-       SEO FOOTER LANDING PAGES
-       (Automatically from Firestore)
-    ============================== */
-    const seoSnapshot = await db.collection("footer_links").get();
-
-    const seoMap = new Map();
-
-    seoSnapshot.docs.forEach((doc) => {
-
-      const slug = doc.id;
-
-      if (!slug) return;
-
-      const path = `/${slug}`;
-
-      if (!seoMap.has(path)) {
-        seoMap.set(
-          path,
-          formatEntry(
-            path,
-            doc.data()?.updatedAt?.toDate?.() || new Date(),
-            0.8
-          )
-        );
-      }
+      return formatEntry(
+        `/${slug}`,
+        data.updatedAt?.toDate?.() || new Date(),
+        0.9
+      );
 
     });
 
-    const seoEntries = Array.from(seoMap.values());
+    /* ---------- Footer Links ---------- */
+    const footerEntries = await getFooterLinks();
 
-    /* ===============================
-       MERGE ALL URLS
-    ============================== */
+    /* ---------- Merge ---------- */
     const allEntries = [
       ...staticEntries,
       ...blogEntries,
       ...propertyEntries,
-      ...seoEntries,
+      ...footerEntries,
     ];
 
-    /* ===============================
-       REMOVE DUPLICATE URLS
-    ============================== */
+    /* ---------- Remove Duplicate URLs ---------- */
     const uniqueEntries = Array.from(
       new Map(allEntries.map((item) => [item.url, item])).values()
     );
 
-    console.log("Total URLs in sitemap:", uniqueEntries.length);
+    console.log("Total URLs:", uniqueEntries.length);
 
     return uniqueEntries;
 
   } catch (error) {
+
     console.error("Sitemap generation error:", error);
     return [];
+
   }
+
 }

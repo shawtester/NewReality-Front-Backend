@@ -10,14 +10,14 @@ import StatsBar from "./components/StatsBar";
 
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";
-import { getSEOServer } from "@/lib/firestore/seo/read_server_rest";
+import { getSEOServer } from "@/lib/firestore/seo/read_server";
 
 export const dynamic = "force-dynamic";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
   const seo = await getSEOServer("home"); 
-
+  console.log("SEO DATA:", seo); 
   const title =
     seo?.title || "Neev Realty | Best Real Estate Company in Gurgaon";
 

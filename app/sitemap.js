@@ -104,7 +104,7 @@ export default async function sitemap() {
        SEO FOOTER LANDING PAGES
        (Automatically from Firestore)
     ============================== */
-    const seoSnapshot = await db.collection("seo").get();
+    const seoSnapshot = await db.collection("footer_links").get();
 
     const seoMap = new Map();
 

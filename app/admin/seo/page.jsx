@@ -6,7 +6,7 @@ import { saveSEO } from "@/lib/firestore/seo/write";
 
 const defaultPages = [
   // Static Pages
-  { label: "Home", slug: "", path: "/" },
+  { label: "Home", slug: "home", path: "/home" },
   { label: "Blog", slug: "blog", path: "/blog" },
   { label: "About", slug: "about-us", path: "/about-us" },
 

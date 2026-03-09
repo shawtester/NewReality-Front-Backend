@@ -8,7 +8,7 @@ export default function GTMPageView() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const url = pathname + searchParams.toString();
+    const url = pathname + (searchParams?.toString() || "");
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({

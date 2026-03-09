@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import Conditionalstickyicons from "@/app/components/Conditionalstickyicons";
-import GTMPageView from "@/app/components/GTMPageView";
+import AnalyticsWrapper from "@/app/components/AnalyticsWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -47,45 +47,45 @@ export default function RootLayout({ children }) {
               "@graph": [
                 {
                   "@type": "Organization",
-                  "name": "Neev Realty",
-                  "url": "https://www.neevrealty.com",
-                  "logo": "https://www.neevrealty.com/logo.png",
-                  "sameAs": []
+                  name: "Neev Realty",
+                  url: "https://www.neevrealty.com",
+                  logo: "https://www.neevrealty.com/logo.png",
+                  sameAs: [],
                 },
                 {
                   "@type": "WebSite",
-                  "url": "https://www.neevrealty.com/",
-                  "name": "Neev Realty",
-                  "potentialAction": {
+                  url: "https://www.neevrealty.com/",
+                  name: "Neev Realty",
+                  potentialAction: {
                     "@type": "SearchAction",
-                    "target":
+                    target:
                       "https://www.neevrealty.com/search?q={search_term_string}",
-                    "query-input": "required name=search_term_string"
-                  }
+                    "query-input": "required name=search_term_string",
+                  },
                 },
                 {
                   "@type": "RealEstateAgent",
-                  "name": "Neev Realty",
-                  "url": "https://www.neevrealty.com",
-                  "address": {
+                  name: "Neev Realty",
+                  url: "https://www.neevrealty.com",
+                  address: {
                     "@type": "PostalAddress",
-                    "addressLocality": "Varanasi",
-                    "addressRegion": "UP",
-                    "addressCountry": "IN"
-                  }
+                    addressLocality: "Varanasi",
+                    addressRegion: "UP",
+                    addressCountry: "IN",
+                  },
                 },
                 {
                   "@type": "LocalBusiness",
-                  "name": "Neev Realty",
-                  "image": "https://www.neevrealty.com/logo.png",
-                  "address": {
+                  name: "Neev Realty",
+                  image: "https://www.neevrealty.com/logo.png",
+                  address: {
                     "@type": "PostalAddress",
-                    "addressLocality": "Varanasi",
-                    "addressRegion": "UP",
-                    "addressCountry": "IN"
-                  }
-                }
-              ]
+                    addressLocality: "Varanasi",
+                    addressRegion: "UP",
+                    addressCountry: "IN",
+                  },
+                },
+              ],
             }),
           }}
         />
@@ -102,15 +102,15 @@ export default function RootLayout({ children }) {
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-            (function(w,d,s,l,i){w[l]=w[l]||[];
-            w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-            var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-            j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;
-            f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-M25MQ9BL');
-          `,
+              (function(w,d,s,l,i){w[l]=w[l]||[];
+              w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+              var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+              j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+              f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-M25MQ9BL');
+            `,
           }}
         />
       </head>
@@ -132,8 +132,8 @@ export default function RootLayout({ children }) {
 
         <NextUIProvider>
 
-          {/* PAGE VIEW TRACKING */}
-          <GTMPageView />
+          {/* NEXTJS ROUTE TRACKING */}
+          <AnalyticsWrapper />
 
           <main className="pt-[70px] min-[800px]:pt-[102px] min-h-screen">
             {children}

@@ -165,7 +165,7 @@ export default function BlogDetailPage({ params }) {
 
   return (
     <main className="bg-[#f5f5f5] w-full">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 md:py-1">
+      <div className="mx-auto max-w-7xl px-1 sm:px-4 lg:px-8 py-6 md:py-1">
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-8 lg:gap-1">
 
           {/* LEFT COLUMN */}

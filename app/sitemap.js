@@ -36,46 +36,41 @@ function formatEntry(path, lastModified = new Date(), priority = 0.7) {
 ================================ */
 async function getFooterLinks() {
 
-  const footerCollections = [
-    "projects_by_location",
+  const docs = [
     "projects_by_budget",
+    "projects_by_location",
     "projects_by_size",
     "projects_by_status",
     "property_by_type",
   ];
 
-  const links = [];
+  const urls = [];
 
-  for (const col of footerCollections) {
+  for (const name of docs) {
 
-    const snapshot = await db
-      .collection("footer_links")
-      .doc(col)
-      .collection("items")
-      .get()
-      .catch(() => null);
+    const snap = await db.collection("footer_links").doc(name).get();
 
-    if (!snapshot) continue;
+    if (!snap.exists) continue;
 
-    snapshot.docs.forEach((doc) => {
+    const data = snap.data();
 
-      const data = doc.data();
+    const links = data?.links || [];
 
-      if (data?.value) {
-        links.push(
-          formatEntry(
-            `/${data.value}`,
-            new Date(),
-            0.8
-          )
+    links.forEach((link) => {
+
+      if (link?.value) {
+
+        urls.push(
+          formatEntry(`/${link.value}`, new Date(), 0.8)
         );
+
       }
 
     });
 
   }
 
-  return links;
+  return urls;
 }
 
 /* ===============================
@@ -83,16 +78,14 @@ async function getFooterLinks() {
 ================================ */
 export default async function sitemap() {
 
-  console.log("SITEMAP RUNNING");
-
   try {
 
-    /* ---------- Static ---------- */
+    /* STATIC */
     const staticEntries = staticRoutes.map((route) =>
       formatEntry(route.path, new Date(), route.priority)
     );
 
-    /* ---------- Blogs ---------- */
+    /* BLOGS */
     const blogsSnapshot = await db.collection("blogs").get();
 
     const blogEntries = blogsSnapshot.docs.map((doc) => {
@@ -108,7 +101,7 @@ export default async function sitemap() {
 
     });
 
-    /* ---------- Properties ---------- */
+    /* PROPERTIES */
     const propertiesSnapshot = await db.collection("properties").get();
 
     const propertyEntries = propertiesSnapshot.docs.map((doc) => {
@@ -124,10 +117,10 @@ export default async function sitemap() {
 
     });
 
-    /* ---------- Footer Links ---------- */
+    /* FOOTER LINKS */
     const footerEntries = await getFooterLinks();
 
-    /* ---------- Merge ---------- */
+    /* MERGE */
     const allEntries = [
       ...staticEntries,
       ...blogEntries,
@@ -135,18 +128,16 @@ export default async function sitemap() {
       ...footerEntries,
     ];
 
-    /* ---------- Remove Duplicate URLs ---------- */
+    /* REMOVE DUPLICATES */
     const uniqueEntries = Array.from(
       new Map(allEntries.map((item) => [item.url, item])).values()
     );
-
-    console.log("Total URLs:", uniqueEntries.length);
 
     return uniqueEntries;
 
   } catch (error) {
 
-    console.error("Sitemap generation error:", error);
+    console.error("Sitemap error:", error);
     return [];
 
   }

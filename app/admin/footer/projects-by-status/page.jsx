@@ -164,6 +164,24 @@ export default function AdminFooterProjectStatus() {
                   </p>
                 </div>
 
+                {/* Canonical URL */}
+                <div className="col-span-12 md:col-span-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Canonical URL
+                  </label>
+                  <input
+                    value={item.canonical || ""}
+                    onChange={(e) =>
+                      updateField(item.id, "canonical", e.target.value)
+                    }
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#DBA40D]"
+                    placeholder="https://www.neevrealty.com/new-launch-projects"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use full URL to avoid duplicate content issues
+                  </p>
+                </div>
+
                 {/* Meta Keywords */}
                 <div className="col-span-12 md:col-span-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

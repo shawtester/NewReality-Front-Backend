@@ -38,12 +38,17 @@ export default async function sitemap() {
   console.log("SITEMAP RUNNING");
 
   try {
-    /* ---------- Static ---------- */
+
+    /* ===============================
+       STATIC ROUTES
+    ============================== */
     const staticEntries = staticRoutes.map((route) =>
       formatEntry(route.path, new Date(), route.priority)
     );
 
-    /* ---------- Blogs (unique) ---------- */
+    /* ===============================
+       BLOGS
+    ============================== */
     const blogsSnapshot = await db.collection("blogs").get();
 
     const blogMap = new Map();
@@ -51,6 +56,8 @@ export default async function sitemap() {
     blogsSnapshot.docs.forEach((doc) => {
       const data = doc.data();
       const slug = data.slug || doc.id;
+
+      if (!slug) return;
 
       if (!blogMap.has(slug)) {
         blogMap.set(
@@ -66,7 +73,9 @@ export default async function sitemap() {
 
     const blogEntries = Array.from(blogMap.values());
 
-    /* ---------- Properties (unique) ---------- */
+    /* ===============================
+       PROPERTIES
+    ============================== */
     const propertiesSnapshot = await db.collection("properties").get();
 
     const propertyMap = new Map();
@@ -75,11 +84,13 @@ export default async function sitemap() {
       const data = doc.data();
       const slug = data.slug || doc.id;
 
+      if (!slug) return;
+
       if (!propertyMap.has(slug)) {
         propertyMap.set(
           slug,
           formatEntry(
-            `/${slug}`, // keeping root slug SAME (no structure change)
+            `/${slug}`,
             data.updatedAt?.toDate?.() || new Date(),
             0.9
           )
@@ -89,39 +100,40 @@ export default async function sitemap() {
 
     const propertyEntries = Array.from(propertyMap.values());
 
-    /* ---------- SEO Landing Pages (fixed path mapping) ---------- */
+    /* ===============================
+       SEO FOOTER LANDING PAGES
+       (Automatically from Firestore)
+    ============================== */
     const seoSnapshot = await db.collection("seo").get();
 
     const seoMap = new Map();
 
     seoSnapshot.docs.forEach((doc) => {
+
       const slug = doc.id;
 
-      // Check if slug matches a static route
-      const staticMatch = staticRoutes.find(
-        (route) =>
-          route.path === `/${slug}` ||
-          route.path.replace("/", "") === slug
-      );
+      if (!slug) return;
 
-      // Use correct path if exists, otherwise fallback
-      const finalPath = staticMatch ? staticMatch.path : `/${slug}`;
+      const path = `/${slug}`;
 
-      if (!seoMap.has(finalPath)) {
+      if (!seoMap.has(path)) {
         seoMap.set(
-          finalPath,
+          path,
           formatEntry(
-            finalPath,
-            doc.data().updatedAt?.toDate?.() || new Date(),
+            path,
+            doc.data()?.updatedAt?.toDate?.() || new Date(),
             0.8
           )
         );
       }
+
     });
 
     const seoEntries = Array.from(seoMap.values());
 
-    /* ---------- Merge & Final Deduplicate by Full URL ---------- */
+    /* ===============================
+       MERGE ALL URLS
+    ============================== */
     const allEntries = [
       ...staticEntries,
       ...blogEntries,
@@ -129,11 +141,17 @@ export default async function sitemap() {
       ...seoEntries,
     ];
 
+    /* ===============================
+       REMOVE DUPLICATE URLS
+    ============================== */
     const uniqueEntries = Array.from(
       new Map(allEntries.map((item) => [item.url, item])).values()
     );
 
+    console.log("Total URLs in sitemap:", uniqueEntries.length);
+
     return uniqueEntries;
+
   } catch (error) {
     console.error("Sitemap generation error:", error);
     return [];

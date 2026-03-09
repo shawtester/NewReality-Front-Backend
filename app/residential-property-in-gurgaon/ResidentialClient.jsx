@@ -28,8 +28,7 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
             <div
                 ref={textRef}
                 className="leading-relaxed
-        [&>p]:mb-0
-        [&>p]:mt-0
+        [&_p]:my-2
         [&>h1]:text-2xl
         [&>h2]:text-xl
         [&>h3]:text-lg
@@ -638,10 +637,10 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
             {/* HERO + SEARCH */}
             <section className="lg:bg-[#F6FBFF] pt-4 relative">
                 <div className="lg:hidden mb-6 text-center px-2">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
                         Your <span className="text-[#F5A300]">Property</span>, <br />
                         Our Priority.
-                    </h1>
+                    </h2>
                 </div>
 
                 <div className="max-w-[1240px] mx-auto px-4">

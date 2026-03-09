@@ -4,8 +4,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import PropertyCard from "@/app/components/property/PropertyCard";
+import Link from "next/link";
 
 /* ================= EXPANDABLE TEXT ================= */
+
 const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -16,6 +18,7 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
       const element = textRef.current;
       const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
       const maxHeight = lineHeight * maxLines;
+
       setIsOverflowing(element.scrollHeight > maxHeight);
     }
   }, [html, maxLines]);
@@ -25,8 +28,7 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
       <div
         ref={textRef}
         className="leading-relaxed
-        [&>p]:mb-0
-        [&>p]:mt-0
+        [&_p]:my-2
         [&>h1]:text-2xl
         [&>h2]:text-xl
         [&>h3]:text-lg
@@ -61,6 +63,7 @@ export default function FooterSeoPageClient({
   properties = [],
   seoData,
 }) {
+
   const { slug } = params;
 
   const [search, setSearch] = useState("");
@@ -69,6 +72,7 @@ export default function FooterSeoPageClient({
   const heading = seoData?.heading || "";
 
   /* ================= NORMALIZED SLUG ================= */
+
   const normalizedSlug = slug
     .toLowerCase()
     .replace("-in-gurgaon", "")
@@ -76,8 +80,12 @@ export default function FooterSeoPageClient({
     .replace("-properties", "")
     .replace("-projects", "");
 
+  const readableSlug = slug.replaceAll("-", " ");
+
   /* ================= PRICE RANGE PARSER ================= */
+
   const extractPriceRange = (priceRange = "") => {
+
     if (!priceRange) return null;
 
     const cleaned = priceRange
@@ -93,12 +101,23 @@ export default function FooterSeoPageClient({
     if (!/\d/.test(cleaned)) return null;
 
     if (cleaned.includes("-")) {
-      const [min, max] = cleaned.split("-").map((v) => parseFloat(v.trim()));
-      return { min: min || 0, max: max || min || 0 };
+
+      const [min, max] = cleaned
+        .split("-")
+        .map((v) => parseFloat(v.trim()));
+
+      return {
+        min: min || 0,
+        max: max || min || 0,
+      };
     }
 
     const value = parseFloat(cleaned);
-    return { min: value, max: value };
+
+    return {
+      min: value,
+      max: value,
+    };
   };
 
   /* ================= FILTERING ================= */
@@ -106,82 +125,121 @@ export default function FooterSeoPageClient({
   let filtered = [...properties].filter((p) => p.isActive === true);
 
   /* SIZE FILTER */
+
   if (normalizedSlug.includes("bhk")) {
+
     filtered = filtered.filter((p) => {
+
       if (!p.configurations) return false;
 
       if (normalizedSlug === "above-5-bhk") {
+
         return p.configurations.some((cfg) => {
+
           const match = cfg.match(/\d+(\.\d+)?/);
+
           return match && parseFloat(match[0]) > 5;
+
         });
+
       }
 
       const selectedBhk = parseFloat(normalizedSlug);
 
       return p.configurations.some((cfg) => {
+
         const match = cfg.match(/\d+(\.\d+)?/);
+
         return match && parseFloat(match[0]) === selectedBhk;
+
       });
+
     });
+
   }
 
   /* STATUS FILTER */
+
   const statusMap = {
+
     "new-launch": "isNewLaunch",
     "ready-to-move": "isReadyToMove",
     "under-construction": "isUnderConstruction",
     "pre-launch": "isPreLaunch",
-    trending: "isTrending",
+    "trending": "isTrending",
+
   };
 
   if (statusMap[normalizedSlug]) {
+
     filtered = filtered.filter((p) => p[statusMap[normalizedSlug]] === true);
+
   }
 
   /* TYPE FILTER */
+
   const typeMap = {
+
     "retail-shops": "isRetail",
     "sco-plots": "isSCO",
     "builder-floor": "isBuilderFloor",
     "luxury-apartment": "isApartment",
+
   };
 
   if (typeMap[normalizedSlug]) {
+
     filtered = filtered.filter((p) => p[typeMap[normalizedSlug]] === true);
+
   }
 
   /* PROPERTY TYPE */
+
   if (normalizedSlug === "residential") {
+
     filtered = filtered.filter((p) => p.propertyType === "residential");
+
   }
 
   if (normalizedSlug === "commercial") {
+
     filtered = filtered.filter((p) => p.propertyType === "commercial");
+
   }
 
   /* BUDGET FILTER */
+
   if (normalizedSlug.includes("cr")) {
+
     filtered = filtered.filter((p) => {
+
       const range = extractPriceRange(p.priceRange);
+
       if (!range) return false;
 
       const { min: propertyMin, max: propertyMax } = range;
 
       if (normalizedSlug === "above-8-cr") {
+
         return propertyMax >= 8;
+
       }
 
       const parts = normalizedSlug.replace("-cr", "").split("-");
+
       const min = parseFloat(parts[0]);
       const max = parseFloat(parts[1]);
 
       return propertyMax >= min && propertyMin <= max;
+
     });
+
   }
 
   /* LOCATION FILTER */
+
   const locationSlugs = [
+
     "dwarka-expressway",
     "golf-course-road",
     "golf-course-extension",
@@ -190,38 +248,52 @@ export default function FooterSeoPageClient({
     "old-gurgaon",
     "spr",
     "nh8",
+
   ];
 
   if (locationSlugs.includes(normalizedSlug)) {
+
     filtered = filtered.filter((p) =>
       p.location
         ?.toLowerCase()
         .includes(normalizedSlug.replaceAll("-", " "))
     );
+
   }
 
   /* SEARCH + SORT */
+
   const finalFiltered = useMemo(() => {
+
     let result = [...filtered];
 
     if (search) {
+
       const keyword = search.toLowerCase();
+
       result = result.filter(
+
         (p) =>
           p.title?.toLowerCase().includes(keyword) ||
           p.developer?.toLowerCase().includes(keyword) ||
           p.location?.toLowerCase().includes(keyword) ||
           p.sector?.toLowerCase().includes(keyword)
+
       );
+
     }
 
     result.sort((a, b) => {
+
       const dateA = a?.timestampCreate || 0;
       const dateB = b?.timestampCreate || 0;
+
       return dateB - dateA;
+
     });
 
     return result;
+
   }, [search, filtered]);
 
   /* ================= RENDER ================= */
@@ -232,29 +304,57 @@ export default function FooterSeoPageClient({
 
       <section className="bg-[#F6FBFF]">
         <div className="max-w-[1240px] mx-auto px-4 py-6">
+
+          {/* BREADCRUMB */}
+
+          <div className="text-sm text-gray-500 mb-2">
+
+            <Link href="/" className="hover:text-[#F5A300]">
+              Home
+            </Link>
+
+            <span className="mx-2">/</span>
+
+            <span className="capitalize text-gray-700">
+              {readableSlug}
+            </span>
+
+          </div>
+
           <div className="flex items-start justify-between gap-4">
+
             <h1 className="text-xl md:text-[26px] font-semibold text-gray-900 capitalize">
+
               {heading || `${slug.replaceAll("-", " ")} Properties`}
+
             </h1>
 
             <div className="text-sm text-gray-500 whitespace-nowrap pt-1">
+
               {finalFiltered.length} results
+
             </div>
+
           </div>
 
           {description && (
+
             <ExpandableText
               maxLines={2}
               className="mt-3 text-sm sm:text-[15px] text-gray-600"
             >
               {description}
             </ExpandableText>
+
           )}
+
         </div>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-4 py-16">
+
         <div className="mb-8 flex justify-center">
+
           <input
             type="text"
             placeholder="Search property, developer or location..."
@@ -262,13 +362,19 @@ export default function FooterSeoPageClient({
             onChange={(e) => setSearch(e.target.value)}
             className="w-full max-w-xl border rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#F5A300]"
           />
+
         </div>
 
         {finalFiltered.length === 0 ? (
+
           <p>No properties found</p>
+
         ) : (
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
             {finalFiltered.map((p) => (
+
               <PropertyCard
                 key={p.id}
                 property={{
@@ -285,9 +391,13 @@ export default function FooterSeoPageClient({
                   isRera: p.isRera,
                 }}
               />
+
             ))}
+
           </div>
+
         )}
+
       </section>
 
       <Footer />

@@ -70,6 +70,9 @@ export async function generateMetadata({ params }) {
       title: seoData.metaTitle || seoData.heading || slug,
       description: seoData.metaDescription || "",
       keywords: seoData.metaKeywords || "",
+      alternates: {
+      canonical: seoData?.canonical || `https://www.neevrealty.com/${params.slug}`,
+    },
     };
   }
 

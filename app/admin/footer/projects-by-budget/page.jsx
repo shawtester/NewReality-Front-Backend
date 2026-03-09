@@ -137,6 +137,7 @@ export default function AdminFooterProjectBudget() {
               </h4>
 
               <div className="grid grid-cols-12 gap-6">
+
                 {/* Meta Title */}
                 <div className="col-span-12 md:col-span-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -158,6 +159,24 @@ export default function AdminFooterProjectBudget() {
                     }`}
                   >
                     {(item.metaTitle || "").length}/60 characters
+                  </p>
+                </div>
+
+                {/* Canonical URL */}
+                <div className="col-span-12 md:col-span-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Canonical URL
+                  </label>
+                  <input
+                    value={item.canonical || ""}
+                    onChange={(e) =>
+                      updateField(item.id, "canonical", e.target.value)
+                    }
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#DBA40D]"
+                    placeholder="https://www.neevrealty.com/projects-under-50-lakh"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use full URL to avoid duplicate content issues
                   </p>
                 </div>
 
@@ -200,8 +219,10 @@ export default function AdminFooterProjectBudget() {
                     {(item.metaDescription || "").length}/160 characters
                   </p>
                 </div>
+
               </div>
             </div>
+
           </div>
         ))}
       </div>

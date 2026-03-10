@@ -5,9 +5,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Toaster } from "react-hot-toast";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import Conditionalstickyicons from "@/app/components/Conditionalstickyicons";
-import AnalyticsWrapper from "@/app/components/AnalyticsWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,7 +36,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
 
-        {/* SEO SCHEMA */}
+        {/* Schema JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -47,56 +45,55 @@ export default function RootLayout({ children }) {
               "@graph": [
                 {
                   "@type": "Organization",
-                  name: "Neev Realty",
-                  url: "https://www.neevrealty.com",
-                  logo: "https://www.neevrealty.com/logo.png",
-                  sameAs: [],
+                  "name": "Neev Realty",
+                  "url": "https://www.neevrealty.com",
+                  "logo": "https://www.neevrealty.com/logo.png",
+                  "sameAs": []
                 },
                 {
                   "@type": "WebSite",
-                  url: "https://www.neevrealty.com/",
-                  name: "Neev Realty",
-                  potentialAction: {
+                  "url": "https://www.neevrealty.com/",
+                  "name": "Neev Realty",
+                  "potentialAction": {
                     "@type": "SearchAction",
-                    target:
-                      "https://www.neevrealty.com/search?q={search_term_string}",
-                    "query-input": "required name=search_term_string",
-                  },
+                    "target": "https://www.neevrealty.com/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                  }
                 },
                 {
                   "@type": "RealEstateAgent",
-                  name: "Neev Realty",
-                  url: "https://www.neevrealty.com",
-                  address: {
+                  "name": "Neev Realty",
+                  "url": "https://www.neevrealty.com",
+                  "address": {
                     "@type": "PostalAddress",
-                    addressLocality: "Varanasi",
-                    addressRegion: "UP",
-                    addressCountry: "IN",
-                  },
+                    "addressLocality": "Varanasi",
+                    "addressRegion": "UP",
+                    "addressCountry": "IN"
+                  }
                 },
                 {
                   "@type": "LocalBusiness",
-                  name: "Neev Realty",
-                  image: "https://www.neevrealty.com/logo.png",
-                  address: {
+                  "name": "Neev Realty",
+                  "image": "https://www.neevrealty.com/logo.png",
+                  "address": {
                     "@type": "PostalAddress",
-                    addressLocality: "Varanasi",
-                    addressRegion: "UP",
-                    addressCountry: "IN",
-                  },
-                },
-              ],
-            }),
+                    "addressLocality": "Varanasi",
+                    "addressRegion": "UP",
+                    "addressCountry": "IN"
+                  }
+                }
+              ]
+            })
           }}
         />
 
-        {/* Google Search Console */}
+        {/* Google Search Console Verification */}
         <meta
           name="google-site-verification"
           content="qehkTwAMVJUDTMNaCSLYCQKMVHOcK8QByWq2Ykwv9PY"
         />
 
-        {/* Google Tag Manager HEAD */}
+        {/* Google Tag Manager */}
         <Script
           id="gtm-head"
           strategy="beforeInteractive"
@@ -113,12 +110,14 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
+
       </head>
 
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Google Tag Manager NOSCRIPT */}
+
+        {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M25MQ9BL"
@@ -131,18 +130,15 @@ export default function RootLayout({ children }) {
         <Toaster />
 
         <NextUIProvider>
-
-          {/* NEXTJS ROUTE TRACKING */}
-          <AnalyticsWrapper />
-
           <main className="pt-[70px] min-[800px]:pt-[102px] min-h-screen">
             {children}
           </main>
-
         </NextUIProvider>
 
         <Conditionalstickyicons />
+
       </body>
     </html>
   );
 }
+

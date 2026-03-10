@@ -457,7 +457,7 @@ export default function SearchCard() {
             return (
               <button
                 key={tag}
-                onClick={() => router.push(`/${slug}`)}
+                onClick={() => router.push(`/project-in-${slug}`)}
                 className="whitespace-nowrap rounded-2xl border-2 border-gray-200 px-4 py-2 text-xs bg-white hover:bg-gray-50 hover:border-[#DBA40D] hover:text-[#DBA40D] shadow-sm hover:shadow-md transition-all duration-200 flex-shrink-0"
               >
                 {tag}

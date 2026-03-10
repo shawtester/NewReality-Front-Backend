@@ -21,6 +21,7 @@
     "algoliasearch": "^4.25.3",
     "canvas-confetti": "^1.9.3",
     "chart.js": "^4.4.4",
+    "critters": "^0.0.23",
     "dotenv": "^17.2.3",
     "firebase": "^10.13.1",
     "firebase-admin": "^12.5.0",

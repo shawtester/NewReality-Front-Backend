@@ -1,7 +1,21 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/app/components/Header";
 
 export default function NotFound() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push("/");
+    }, 5000); // 5 seconds
+
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
     <>
       <Header />
@@ -17,6 +31,10 @@ export default function NotFound() {
           The page you are looking for does not exist.
         </p>
 
+        <p className="mt-2 text-sm text-gray-400">
+          Redirecting to homepage in 5 seconds...
+        </p>
+
         <Link
           href="/"
           className="mt-6 inline-block bg-[#DBA40D] text-white px-6 py-3 rounded-lg shadow hover:opacity-90 transition"
@@ -27,3 +45,4 @@ export default function NotFound() {
     </>
   );
 }
+

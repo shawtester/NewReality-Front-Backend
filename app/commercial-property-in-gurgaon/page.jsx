@@ -9,7 +9,7 @@ export const revalidate = 0;
 
 /* ================= METADATA ================= */
 export async function generateMetadata() {
-  const seo = await getSEO("commercial");
+  const seo = await getSEO("commercial-property-in-gurgaon");
 
   const baseUrl =
     "https://www.neevrealty.com/commercial-property-in-gurgaon";

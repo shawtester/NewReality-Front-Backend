@@ -11,7 +11,7 @@ export const revalidate = 0;
    ✅ CLEAN SEO (NO QUERY CANONICAL)
 ========================= */
 export async function generateMetadata() {
-  const seo = await getSEO("residential");
+  const seo = await getSEO("residential-property-in-gurgaon");
 
   const baseUrl =
     "https://www.neevrealty.com/residential-property-in-gurgaon";

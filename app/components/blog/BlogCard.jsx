@@ -5,19 +5,42 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function BlogCard({ blog }) {
+
   const [imgSrc, setImgSrc] = useState(
-    typeof blog.image === "string"
-      ? blog.image
-      : blog.image?.url ||
-        blog.coverImage ||
-        "/images/placeholder.jpg"
+    blog.image?.url || blog.image || "/images/placeholder.jpg"
   );
 
-  const blogId = blog.id;
+  /* ===== SAFE DATE FORMATTER ===== */
+  const formatBlogDate = (timestamp) => {
+    if (!timestamp) return null;
+
+    try {
+      // Firestore Timestamp
+      if (typeof timestamp?.toDate === "function") {
+        return timestamp.toDate();
+      }
+
+      // Firestore object { seconds }
+      if (timestamp?.seconds) {
+        return new Date(timestamp.seconds * 1000);
+      }
+
+      // If already number
+      if (typeof timestamp === "number") {
+        return new Date(timestamp);
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const formattedDate = formatBlogDate(blog.timestampCreate);
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition">
-      
+
       {/* IMAGE */}
       <div className="relative w-full h-[220px] bg-gray-100">
         <Image
@@ -25,6 +48,7 @@ export default function BlogCard({ blog }) {
           alt={blog.title || "Blog"}
           fill
           className="object-cover"
+          sizes="(max-width:768px) 100vw, 33vw"
           onError={() => setImgSrc("/images/placeholder.jpg")}
         />
       </div>
@@ -41,10 +65,8 @@ export default function BlogCard({ blog }) {
 
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-gray-400">
-            {blog.timestampCreate
-              ? new Date(
-                  blog.timestampCreate * 1000
-                ).toLocaleDateString("en-US", {
+            {formattedDate
+              ? formattedDate.toLocaleDateString("en-US", {
                   month: "short",
                   day: "2-digit",
                 })
@@ -52,7 +74,7 @@ export default function BlogCard({ blog }) {
           </span>
 
           <Link
-            href={`/blog/${blogId}`}
+            href={`/blog/${blog.slug}`}
             className="text-sm font-medium text-[#DBA40D] hover:underline"
           >
             Read More →
@@ -62,4 +84,3 @@ export default function BlogCard({ blog }) {
     </div>
   );
 }
-

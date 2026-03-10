@@ -646,10 +646,10 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
                 <div className="max-w-[1240px] mx-auto px-4">
                     <div className="relative hidden lg:flex items-start gap-10">
                         <div className="flex-1 ml-10">
-                            <h1 className="text-[42px] sm:text-[52px] font-extrabold text-gray-900 leading-tight">
+                            <h2 className="text-[42px] sm:text-[52px] font-extrabold text-gray-900 leading-tight">
                                 Your <span className="text-[#F5A300]">Property</span>, <br />
                                 Our Priority.
-                            </h1>
+                            </h2>
                         </div>
                         <div className="flex-1 flex p-4 justify-center self-end relative z-10">
                             <div className="relative w-[240px] h-[240px] sm:w-[310px] sm:h-[310px] md:w-[370px] md:h-[370px] lg:w-[450px] lg:h-[420px] rounded-[40px] lg:rounded-[60px] overflow-hidden shadow-xl">

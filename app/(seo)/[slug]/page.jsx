@@ -4,7 +4,7 @@ import {
   getPropertyBySlugOrId,
   getAllProperties,
 } from "@/lib/firestore/products/read_server";
-
+import { getSEO } from "@/lib/firestore/seo/read";
 import FooterSeoPageClient from "./FooterSeoPageClient";
 import ResidentialPropertyPage from "@/app/residential-property-in-gurgaon/[slug]/page";
 import CommercialPropertyPage from "@/app/commercial-property-in-gurgaon/[slug]/page";
@@ -39,11 +39,25 @@ export async function generateMetadata({ params }) {
   };
 
   if (COMMERCIAL_TYPE_MAP[slug]) {
+
+    const seo = await getSEO(slug);
+
     return {
-      title: `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`,
-      description: `Explore the best ${COMMERCIAL_TYPE_MAP[
-        slug
-      ].toLowerCase()} available for sale in Gurgaon.`,
+      title:
+        seo?.title ||
+        `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`,
+
+      description:
+        seo?.description ||
+        `Explore the best ${COMMERCIAL_TYPE_MAP[
+          slug
+        ].toLowerCase()} available for sale in Gurgaon.`,
+
+      alternates: {
+        canonical:
+          seo?.canonical ||
+          `https://www.neevrealty.com/${slug}`,
+      },
     };
   }
 
@@ -52,13 +66,26 @@ export async function generateMetadata({ params }) {
     "luxury-apartments-in-gurgaon": "Luxury Apartments in Gurgaon",
     "builder-floor-in-gurgaon": "Builder Floors in Gurgaon",
   };
-
   if (RESIDENTIAL_TYPE_META_MAP[slug]) {
+
+    const seo = await getSEO(slug);
+
     return {
-      title: `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`,
-      description: `Explore the best ${RESIDENTIAL_TYPE_META_MAP[
-        slug
-      ].toLowerCase()} available for sale in Gurgaon.`,
+      title:
+        seo?.title ||
+        `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`,
+
+      description:
+        seo?.description ||
+        `Explore the best ${RESIDENTIAL_TYPE_META_MAP[
+          slug
+        ].toLowerCase()} available for sale in Gurgaon.`,
+
+      alternates: {
+        canonical:
+          seo?.canonical ||
+          `https://www.neevrealty.com/${slug}`,
+      },
     };
   }
 
@@ -71,8 +98,8 @@ export async function generateMetadata({ params }) {
       description: seoData.metaDescription || "",
       keywords: seoData.metaKeywords || "",
       alternates: {
-      canonical: seoData?.canonical || `https://www.neevrealty.com/${params.slug}`,
-    },
+        canonical: seoData?.canonical || `https://www.neevrealty.com/${params.slug}`,
+      },
     };
   }
 

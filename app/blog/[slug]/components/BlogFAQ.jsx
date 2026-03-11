@@ -17,7 +17,7 @@ export default function BlogFAQ({ faqs }) {
 
       {/* ================= HEADING ================= */}
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 pt-2">
           Frequently Asked Questions
         </h2>
         <p className="text-gray-500 mt-2 text-sm">

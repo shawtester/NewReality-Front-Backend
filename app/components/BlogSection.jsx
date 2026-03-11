@@ -146,7 +146,7 @@ export default function BlogSection({ blogs = [] }) {
               {/* IMAGE */}
               <div className="relative w-full h-[200px]">
                 <Image
-                  src={blog.image || "/images/blog/placeholder.jpg"}
+                  src={blog?.image?.url || "/images/blog/placeholder.jpg"}
                   alt={blog.title}
                   fill
                   className="object-cover"
@@ -168,7 +168,7 @@ export default function BlogSection({ blogs = [] }) {
                 <div className="mt-auto pt-4 flex items-center justify-between">
                   <span className="text-xs text-gray-400">
                     {blog.timestampCreate
-                      ? new Date(blog.timestampCreate * 1000).toLocaleDateString(
+                      ? new Date(blog.timestampCreate).toLocaleDateString(
                         "en-US",
                         { month: "short", day: "2-digit" }
                       )

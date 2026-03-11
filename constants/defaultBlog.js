@@ -14,9 +14,7 @@ export const defaultBlog = {
   source: "",
   isActive: true,
 
-  metaTitle: "",
-  metaDescription: "",
-  metaKeywords: "",
+
 
 
   /* 🔹 MEDIA */

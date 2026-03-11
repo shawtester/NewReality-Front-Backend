@@ -22,6 +22,11 @@ export default function BlogPage({ blogs = [] }) {
         return new Date(timestamp.seconds * 1000);
       }
 
+      // ISO string (MOST IMPORTANT FIX)
+      if (typeof timestamp === "string") {
+        return new Date(timestamp);
+      }
+
       // If already number (milliseconds)
       if (typeof timestamp === "number") {
         return new Date(timestamp);
@@ -96,13 +101,16 @@ export default function BlogPage({ blogs = [] }) {
 
                     {/* DATE */}
                     {formattedDate && (
-                      <div className="absolute -bottom-6 right-4 bg-white rounded-2xl px-4 py-2 text-center shadow">
-                        <span className="text-xs text-gray-600">
-                          {formattedDate.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "2-digit",
-                          })}
-                        </span>
+                      <div className="absolute -bottom-6 right-4 bg-white rounded-xl px-3 py-2 text-center shadow">
+
+                        <p className="text-[10px] uppercase text-gray-500 leading-none">
+                          {formattedDate.toLocaleDateString("en-US", { month: "short" })}
+                        </p>
+
+                        <p className="text-sm font-semibold text-gray-800 leading-none mt-1">
+                          {formattedDate.toLocaleDateString("en-US", { day: "2-digit" })}
+                        </p>
+
                       </div>
                     )}
                   </div>

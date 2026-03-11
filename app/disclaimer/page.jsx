@@ -1,6 +1,61 @@
 import Navbar from "../components/Header";
 import Footer from "../components/Footer";
+import { getSEO } from "@/lib/firestore/seo/read";
 
+/* ✅ PROFESSIONAL DYNAMIC SEO */
+export async function generateMetadata() {
+  const slug = "disclaimer"; // 🔥 Firestore document ID
+
+  try {
+    const seo = await getSEO(slug);
+
+    const title =
+      seo?.title || "Disclaimer — Neev Realty";
+
+    const description =
+      seo?.description ||
+      "Read the disclaimer of Neev Realty regarding property listings, information accuracy, third-party links, and limitations of liability.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/disclaimer";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+        "neev realty disclaimer",
+        "real estate disclaimer india",
+        "property website disclaimer",
+      ];
+
+    return {
+      title,
+      description,
+      keywords,
+      alternates: {
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Disclaimer — Neev Realty",
+      description:
+        "Disclaimer for Neev Realty regarding property listings, accuracy of information, and liability limitations.",
+    };
+  }
+}
 export default function PrivacyPolicy() {
   return (
     <>

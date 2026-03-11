@@ -8,7 +8,7 @@ import { getSEO } from "@/lib/firestore/seo/read";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "contact"; // 🔥 Must match Firestore document ID
+  const slug = "contact-us"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);

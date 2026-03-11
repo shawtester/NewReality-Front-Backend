@@ -9,7 +9,7 @@ import { MapPin } from "lucide-react";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "about"; // 🔥 Must match Firestore document ID
+  const slug = "about-us"; // 🔥 Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug); 

@@ -14,7 +14,7 @@ const defaultPages = [
   { label: "Disclaimer", slug: "disclaimer", path: "/disclaimer" },
   { label: "Contact Us", slug: "contact-us", path: "/contact-us" },
   { label: "Careers", slug: "careers", path: "/careers" },
-  { label: "Services", slug: "services", path: "/services" },
+  { label: "Services", slug: "our-services", path: "/our-services" },
   { label: "FAQ", slug: "faqs", path: "/faqs" },
   { label: "Terms & Conditions", slug: "terms-condition", path: "/terms-condition" },
 

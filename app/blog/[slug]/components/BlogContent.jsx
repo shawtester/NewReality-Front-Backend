@@ -325,7 +325,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
       </div>
 
       {/* ================= BLOG BODY ================= */}
-      <div className="max-w-[1240px] mx-auto px-4 mt-8">
+      <div className="max-w-[1240px] mx-auto px-2 mt-8">
         <article
   ref={wrapperRef}
   id="blog-wrapper"
@@ -341,7 +341,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
 
         {/* ================= SOURCE ================= */}
         {blog.source && blog.source.trim() !== "" && (
-          <div className="max-w-[1240px] mx-auto px-4 pb-6 mt-0 border-t pt-4 text-sm text-gray-600">
+          <div className="max-w-[1240px] mx-auto px-2 pb-6 mt-0 border-t pt-4 text-sm text-gray-600">
             <span className="font-medium text-gray-800">Source: </span>
             <span className="break-all text-gray-700">
               {blog.source}

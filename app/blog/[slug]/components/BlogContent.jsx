@@ -329,7 +329,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
         <article
   ref={wrapperRef}
   id="blog-wrapper"
-  className="bg-white rounded-lg p-6 md:p-8 shadow-sm 
+  className="bg-white rounded-lg p-2 md:p-4 shadow-sm 
   prose max-w-none
   [&_p]:my-3
   prose-headings:scroll-mt-32

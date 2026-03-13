@@ -70,7 +70,7 @@ export default function StickyIcons() {
 
           {/* Phone */}
           <div className="group absolute left-4 md:left-16 pointer-events-auto">
-            <a href="tel:+919876543210">
+            <a href="tel:+918824966966">
               <div className="border-2 border-[#DBA40D]/50 bg-white/80 backdrop-blur-sm rounded-2xl p-3 shadow-lg hover:scale-110 hover:border-[#DBA40D] transition-all cursor-pointer">
                 <FaPhoneAlt size={20} />
               </div>

@@ -4,6 +4,11 @@ export default function robots() {
       {
         userAgent: "*",
         allow: "/",
+        disallow: [
+          "/admin",
+          "/login",
+          "/dashboard",
+        ],
       },
     ],
     sitemap: "https://www.neevrealty.com/sitemap.xml",

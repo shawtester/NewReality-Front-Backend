@@ -3,7 +3,8 @@ import Career from "./components/section1";
 import LifeAtNeev from "./components/section2";
 import WhatWeOffer from "./components/section3";
 import Footer from "../components/Footer";
-
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import { getSEO } from "@/lib/firestore/seo/read";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */

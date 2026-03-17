@@ -56,14 +56,15 @@ export async function generateMetadata({ params }) {
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords =
-    seo?.keywords ||
+  const keywords = Array.isArray(seo?.keywords)
+    ? seo.keywords.join(", ")
+    : seo?.keywords ||
     property.metaKeywords ||
-    `${property.title}, ${property.location}, commercial property`;
+    `${property.title}, ${property.location}, real estate`;
 
   const canonicalURL =
-    seo?.canonical ||
-    `${baseUrl}/commercial-property-in-gurgaon/${property.slug}`;
+    seo?.canonical || `https://www.neevrealty.com/${property.slug}`;
+
 
   return {
     title,
@@ -234,13 +235,13 @@ export default async function PropertyPage({ params }) {
 
           ...(parentSlug !== "commercial-property-in-gurgaon"
             ? [
-                {
-                  "@type": "ListItem",
-                  position: 3,
-                  name: parentLabel,
-                  item: `${baseUrl}${currentBaseRoute}`,
-                },
-              ]
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: parentLabel,
+                item: `${baseUrl}${currentBaseRoute}`,
+              },
+            ]
             : []),
 
           {

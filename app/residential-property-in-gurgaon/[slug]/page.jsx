@@ -13,7 +13,7 @@ import TitleBlockWithBrochure from "./components/TitleBlockWithBrochure";
 import ScrollTabs from "./components/ScrollTabs";
 import OverviewSection from "./components/OverviewSection";
 import FloorPlanSection from "./components/FloorPlanSection";
-import PaymentPlanSection from "./components/PaymentPlanSection"; 
+import PaymentPlanSection from "./components/PaymentPlanSection";
 import AmenitiesSection from "./components/AmenitiesSection";
 import LocationSection from "./components/LocationSection";
 import EmiCalculatorSection from "./components/EmiCalculatorSection";
@@ -73,14 +73,15 @@ export async function generateMetadata({ params }) {
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords =
-    seo?.keywords ||
+  const keywords = Array.isArray(seo?.keywords)
+    ? seo.keywords.join(", ")
+    : seo?.keywords ||
     property.metaKeywords ||
     `${property.title}, ${property.location}, real estate`;
 
   // ✅ Replace OG image with canonical URL
   const canonicalURL =
-    seo?.canonical || `https://yourdomain.com/residential/${property.slug}`;
+    seo?.canonical || `https://www.neevrealty.com/${property.slug}`;
 
   return {
     title,

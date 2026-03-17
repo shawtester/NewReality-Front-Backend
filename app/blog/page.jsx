@@ -1,22 +1,60 @@
 import BlogClient from "./BlogClient";
-import { getSEOServer } from "@/lib/firestore/seo/read_server_rest";
+import { getSEO } from "@/lib/firestore/seo/read"; // ✅ SAME as Contact
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // optional but safe
 
+/* ✅ SAME PATTERN AS CONTACT PAGE */
 export async function generateMetadata() {
-  const seo = await getSEOServer("blog");
+  const slug = "blog"; // 🔥 Must match Firestore document ID
 
-  return {
-    title: seo?.title || "Blog | Neev Realty",
-    description:
+  try {
+    const seo = await getSEO(slug);
+
+    const title =
+      seo?.title || "Blog | Neev Realty";
+
+    const description =
       seo?.description ||
-      "Latest real estate insights from Neev Realty.",
-    alternates: {
-      canonical:
-        seo?.canonical ||
-        "https://www.neevrealty.com/blog",
-    },
-  };
+      "Latest real estate insights from Neev Realty.";
+
+    const canonicalURL =
+      seo?.canonical ||
+      "https://www.neevrealty.com/blog";
+
+    const keywords = Array.isArray(seo?.keywords)
+      ? seo.keywords
+      : seo?.keywords?.split(",").map((k) => k.trim()) || [
+          "neev realty blog",
+          "real estate blog gurgaon",
+          "property insights india",
+        ];
+
+    return {
+      title,
+      description,
+      keywords,
+      alternates: {
+        canonical: canonicalURL,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Blog | Neev Realty",
+      description: "Latest real estate insights from Neev Realty.",
+    };
+  }
 }
 
 export default function BlogPage() {

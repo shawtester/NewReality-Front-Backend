@@ -25,7 +25,8 @@ export default function NewLaunchProjects({ properties = [] }) {
       const dateB = b?.timestampCreate || 0;
 
       return dateB - dateA; // Latest first
-    });
+    })
+    .slice(0, 12); // 👈 ONLY 12 latest
 
   if (!newLaunch.length) return null;
 

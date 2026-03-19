@@ -79,9 +79,7 @@ export async function generateMetadata({ params }) {
     property.metaKeywords ||
     `${property.title}, ${property.location}, real estate`;
 
-  // ✅ Replace OG image with canonical URL
-  const canonicalURL =
-    seo?.canonical || `https://www.neevrealty.com/${property.slug}`;
+  const canonicalURL = `https://www.neevrealty.com/${property.slug}`;
 
   return {
     title,

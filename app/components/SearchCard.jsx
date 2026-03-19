@@ -366,9 +366,9 @@ export default function SearchCard() {
       <div className="absolute left-1/2 -translate-x-1/2 top-[380px] max-sm:top-[200px] w-full max-w-[990px] px-4 z-30">
         <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-4 pb-5">
           <div className="mb-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <h2 className="text-sm sm:text-base font-semibold text-gray-800">
+            <h1 className="text-sm sm:text-base font-semibold text-gray-800">
               Find your perfect home with <span className="text-[#DBA40D]">Neev Realty</span>
-            </h2>
+            </h1>
             <div className="flex rounded-full bg-gray-100">
               {[
                 { label: "Residential", value: "residential" },

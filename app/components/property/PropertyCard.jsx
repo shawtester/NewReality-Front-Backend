@@ -120,7 +120,7 @@ export default function PropertyCard({ property = {} }) {
               )}
             </div>
 
-            <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500">
+            <p className="mt-1 text-[11px] md:text-xs lg:text-sm text-gray-500 line-clamp-1">
               By <span className="font-medium text-gray-700">{builder}</span>
             </p>
 
@@ -128,14 +128,21 @@ export default function PropertyCard({ property = {} }) {
               {[sector, locationName].filter(Boolean).join(", ")}
             </p>
 
-            <div className="mt-2 flex items-center justify-between text-[11px] md:text-xs lg:text-sm text-gray-500">
-              <span>{bhk}</span>
-              <span>{size}</span>
+            <div className="mt-2 flex items-center justify-between gap-2 text-[11px] md:text-xs lg:text-sm text-gray-500">
+
+              <span className="truncate max-w-[50%]">
+                {bhk}
+              </span>
+
+              <span className="truncate max-w-[50%] text-right">
+                {size}
+              </span>
+
             </div>
 
             <div className="my-2 md:my-3 lg:my-4 h-px w-full bg-gray-200" />
 
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 line-clamp-1">
               <p className="text-xs md:text-sm lg:text-base font-semibold text-gray-900">
                 {price}
               </p>

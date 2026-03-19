@@ -116,7 +116,7 @@ export default function RightSidebar({ property }) {
       {/* ================= DESKTOP ================= */}
       <div className="w-[390px] hidden lg:flex flex-col gap-4">
         {(mainImage || galleryImages.length > 0 || videoUrl) && (
-          <div className="bg-white rounded-xl overflow-hidden flex flex-col h-[420px]">
+          <div className="bg-white rounded-xl overflow-hidden flex flex-col h-[400px]">
 
             {/* TOP IMAGES */}
             <div className="grid grid-cols-2 gap-2 px-2">
@@ -193,7 +193,7 @@ export default function RightSidebar({ property }) {
         )}
 
         {/* ================= QUICK FACTS ================= */}
-        <div className="bg-white rounded-xl p-5 shadow-sm">
+        <div className="bg-white rounded-xl px-5 shadow-sm">
           <h3 className="font-semibold mb-3 border-b pb-2">Quick Facts</h3>
 
           <div className="text-sm space-y-2 text-gray-600">

@@ -1,11 +1,15 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 import { NextUIProvider } from "@nextui-org/react";
-import { Toaster } from "react-hot-toast";
+
+/* ✅ DYNAMIC IMPORTS FOR PERFORMANCE */
+const Toaster = dynamic(() => import("react-hot-toast").then((mod) => mod.Toaster), { ssr: false });
+const Conditionalstickyicons = dynamic(() => import("@/app/components/Conditionalstickyicons"), { ssr: false });
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Conditionalstickyicons from "@/app/components/Conditionalstickyicons";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -118,10 +122,10 @@ export default function RootLayout({ children }) {
           content="qehkTwAMVJUDTMNaCSLYCQKMVHOcK8QByWq2Ykwv9PY"
         />
 
-        {/* Google Tag Manager */}
+        {/* Google Tag Manager - LOAD AFTER INTERACTIVE */}
         <Script
           id="gtm-head"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function(w,d,s,l,i){w[l]=w[l]||[];
@@ -166,4 +170,5 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
 

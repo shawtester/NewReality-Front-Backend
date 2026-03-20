@@ -1,16 +1,23 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import SearchCard from "./components/SearchCard";
+import dynamic from "next/dynamic";
+
+// ✅ ABOVE THE FOLD: load normally
 import NewLaunchProjects from "./components/property/NewLaunchProjects";
-import TrendingProjects from "./components/property/TrendingProjects";
-import WhyChooseNeev from "./components/WhyChooseNeev";
-import DevelopersSection from "./components/DevelopersSection";
-import BlogSection from "./components/BlogSection";
-import StatsBar from "./components/StatsBar";
+
+// ✅ BELOW THE FOLD: load lazily to reduce initial JS bundle
+const TrendingProjects = dynamic(() => import("./components/property/TrendingProjects"), { ssr: true });
+const WhyChooseNeev = dynamic(() => import("./components/WhyChooseNeev"), { ssr: true });
+const DevelopersSection = dynamic(() => import("./components/DevelopersSection"), { ssr: true });
+const BlogSection = dynamic(() => import("./components/BlogSection"), { ssr: true });
+const StatsBar = dynamic(() => import("./components/StatsBar"), { ssr: true });
 
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";
 import { getSEOServer } from "@/lib/firestore/seo/read_server";
+import { getHeroServer } from "@/lib/firestore/hero/read_server";
+
 
 export const dynamic = "force-dynamic";
 
@@ -60,12 +67,14 @@ export async function generateMetadata() {
 export default async function Home() {
   const properties = await getAllProperties();
   const blogs = await getBlogsForHome();
+  const hero = await getHeroServer();
 
   return (
     <main className="w-full overflow-x-hidden">
       <Header />
-      <SearchCard />
+      <SearchCard initialHeroData={hero} />
       <NewLaunchProjects properties={properties} />
+
       <TrendingProjects properties={properties} />
       <WhyChooseNeev />
       <DevelopersSection />

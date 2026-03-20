@@ -25,7 +25,7 @@ const VIDEO_SIZES = {
   mobile: { maxWidth: "105px", height: "190px" },
 };
 
-export default function SearchCard() {
+export default function SearchCard({ initialHeroData }) {
   const router = useRouter();
 
   const [propertyType, setPropertyType] = useState("residential");
@@ -35,7 +35,7 @@ export default function SearchCard() {
   const controllerRef = useRef(null);
 
 
-  const [hero, setHero] = useState(null);
+  const [hero, setHero] = useState(initialHeroData || null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playMobileVideo, setPlayMobileVideo] = useState(false);
   const [desktopVideoPlaying, setDesktopVideoPlaying] = useState(true);
@@ -44,37 +44,46 @@ export default function SearchCard() {
   const [isMobileView, setIsMobileView] = useState(false);
 
 
-  /* ================= FETCH HERO ================= */
+  /* ================= FETCH HERO (FALLBACK) ================= */
   useEffect(() => {
-    const fetchHero = async () => {
-      try {
-        const res = await getHero();
-        if (!res) return;
+    const updateImages = () => {
+      const isMobile = window.innerWidth < 768;
+      const fullHero = initialHeroData || hero;
 
-        const updateImages = () => {
-          const isMobile = window.innerWidth < 768;
+      if (!fullHero) return;
 
-          const images = isMobile
-            ? res.mobileImages || []
-            : res.desktopImages || [];
+      const images = isMobile
+        ? fullHero.mobileImages || []
+        : fullHero.desktopImages || [];
 
-          setHero({
-            ...res,
-            images,
-          });
-        };
-
-        updateImages();
-        window.addEventListener("resize", updateImages);
-
-        return () => window.removeEventListener("resize", updateImages);
-      } catch (error) {
-        console.error("Hero fetch failed:", error);
-      }
+      setHero({
+        ...fullHero,
+        images,
+      });
     };
 
-    fetchHero();
-  }, []);
+    updateImages();
+    window.addEventListener("resize", updateImages);
+
+    if (!initialHeroData) {
+      const fetchHero = async () => {
+        try {
+          const res = await getHero();
+          if (res) {
+             const isMobile = window.innerWidth < 768;
+             const images = isMobile ? res.mobileImages || [] : res.desktopImages || [];
+             setHero({ ...res, images });
+          }
+        } catch (error) {
+          console.error("Hero fetch failed:", error);
+        }
+      };
+      fetchHero();
+    }
+
+    return () => window.removeEventListener("resize", updateImages);
+  }, [initialHeroData]);
+
 
   /* ================= SCREEN SIZE WATCH ================= */
   useEffect(() => {

@@ -71,12 +71,29 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description,
+
+    // ✅ FIX KEYWORDS
     keywords: keywords
-  ? keywords.split(",").map((k) => k.trim())
-  : [],
-    alternates: { canonical: canonicalURL },
-    openGraph: { title, description },
-    twitter: { card: "summary", title, description },
+      ? keywords.split(",").map((k) => k.trim())
+      : [],
+
+    // ✅ IMPORTANT: FULL URL USE KAR
+    openGraph: {
+      title,
+      description,
+      url: canonicalURL,
+    },
+
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+
+    // ✅ MOST IMPORTANT (THIS FIXES CANONICAL)
+    alternates: {
+      canonical: canonicalURL,
+    },
   };
 }
 

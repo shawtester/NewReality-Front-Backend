@@ -86,7 +86,9 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description,
-    keywords,
+    keywords: keywords
+  ? keywords.split(",").map((k) => k.trim())
+  : [],
     openGraph: {
       title,
       description,

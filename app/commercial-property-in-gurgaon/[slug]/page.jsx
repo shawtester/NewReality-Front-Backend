@@ -71,7 +71,9 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description,
-    keywords,
+    keywords: keywords
+  ? keywords.split(",").map((k) => k.trim())
+  : [],
     alternates: { canonical: canonicalURL },
     openGraph: { title, description },
     twitter: { card: "summary", title, description },

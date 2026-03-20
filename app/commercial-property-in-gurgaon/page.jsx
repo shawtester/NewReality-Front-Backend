@@ -43,9 +43,59 @@ export default async function CommercialPage({ searchParams }) {
       property.propertyType === "commercial"
   );
 
+  const baseUrl = "https://www.neevrealty.com";
+  const pageUrl = `${baseUrl}/commercial-property-in-gurgaon`;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Neev Realty",
+        "url": baseUrl,
+        "logo": `${baseUrl}/logo.png`
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": baseUrl
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Commercial Property in Gurgaon",
+            "item": pageUrl
+          }
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "name": "Commercial Properties in Gurgaon",
+        "description": "Explore premium commercial properties and investment-ready commercial projects in Gurgaon.",
+        "url": pageUrl,
+        "itemListElement": filteredProperties.slice(0, 12).map((property, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "url": `${baseUrl}/commercial-property-in-gurgaon/${property.slug}`,
+          "name": property.title
+        }))
+      }
+    ]
+  };
+
   return (
-    <Suspense fallback={<div className="p-10">Loading...</div>}>
-      <CommercialClient apartments={filteredProperties} />
-    </Suspense>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <Suspense fallback={<div className="p-10">Loading...</div>}>
+        <CommercialClient apartments={filteredProperties} />
+      </Suspense>
+    </>
   );
 }

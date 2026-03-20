@@ -45,9 +45,59 @@ export default async function ResidentialPage({ searchParams }) {
       property.propertyType === "residential"
   );
 
+  const baseUrl = "https://www.neevrealty.com";
+  const pageUrl = `${baseUrl}/residential-property-in-gurgaon`;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Neev Realty",
+        "url": baseUrl,
+        "logo": `${baseUrl}/logo.png`
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": baseUrl
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Residential Property in Gurgaon",
+            "item": pageUrl
+          }
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "name": "Residential Properties in Gurgaon",
+        "description": "List of premium residential projects, apartments, and builder floors in Gurgaon.",
+        "url": pageUrl,
+        "itemListElement": residentialProperties.slice(0, 12).map((property, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "url": `${baseUrl}/residential-property-in-gurgaon/${property.slug}`,
+          "name": property.title
+        }))
+      }
+    ]
+  };
+
   return (
-    <Suspense fallback={<div className="p-10">Loading...</div>}>
-      <ApartmentsPage apartments={residentialProperties} />
-    </Suspense>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <Suspense fallback={<div className="p-10">Loading...</div>}>
+        <ApartmentsPage apartments={residentialProperties} />
+      </Suspense>
+    </>
   );
 }

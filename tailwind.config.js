@@ -1,5 +1,4 @@
 const { nextui } = require("@nextui-org/react");
-const lineClamp = require("@tailwindcss/line-clamp");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -37,6 +36,5 @@ module.exports = {
   darkMode: "class",
   plugins: [
     nextui(),
-    lineClamp,
   ],
 };

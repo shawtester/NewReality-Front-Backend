@@ -48,7 +48,24 @@ export default function RootLayout({ children }) {
                   "name": "Neev Realty",
                   "url": "https://www.neevrealty.com",
                   "logo": "https://www.neevrealty.com/logo.png",
-                  "sameAs": []
+                  "image": "https://www.neevrealty.com/logo.png",
+                  "telephone": "+91-9999999999",
+                  "priceRange": "₹₹ - ₹₹₹",
+                  "contactPoint": [
+                    {
+                      "@type": "ContactPoint",
+                      "telephone": "+91-9999999999",
+                      "contactType": "sales",
+                      "areaServed": "IN",
+                      "availableLanguage": ["en", "hi"]
+                    }
+                  ],
+                  "sameAs": [
+                    "https://www.facebook.com/neevrealty",
+                    "https://www.instagram.com/neevrealty",
+                    "https://twitter.com/neevrealty",
+                    "https://www.linkedin.com/company/neevrealty"
+                  ]
                 },
                 {
                   "@type": "WebSite",
@@ -64,10 +81,14 @@ export default function RootLayout({ children }) {
                   "@type": "RealEstateAgent",
                   "name": "Neev Realty",
                   "url": "https://www.neevrealty.com",
+                  "image": "https://www.neevrealty.com/logo.png",
+                  "telephone": "+91-9999999999",
+                  "priceRange": "₹₹ - ₹₹₹",
                   "address": {
                     "@type": "PostalAddress",
-                    "addressLocality": "Varanasi",
-                    "addressRegion": "UP",
+                    "addressLocality": "Gurgaon",
+                    "addressRegion": "Haryana",
+                    "postalCode": "122001",
                     "addressCountry": "IN"
                   }
                 },
@@ -75,10 +96,14 @@ export default function RootLayout({ children }) {
                   "@type": "LocalBusiness",
                   "name": "Neev Realty",
                   "image": "https://www.neevrealty.com/logo.png",
+                  "url": "https://www.neevrealty.com",
+                  "telephone": "+91-9999999999",
+                  "priceRange": "₹₹ - ₹₹₹",
                   "address": {
                     "@type": "PostalAddress",
-                    "addressLocality": "Varanasi",
-                    "addressRegion": "UP",
+                    "addressLocality": "Gurgaon",
+                    "addressRegion": "Haryana",
+                    "postalCode": "122001",
                     "addressCountry": "IN"
                   }
                 }

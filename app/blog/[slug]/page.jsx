@@ -36,19 +36,46 @@ export default async function Page({ params }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Article",
-              headline: blog.title,
-              description: blog.metaDescription || blog.excerpt,
-              image: blog.image?.url || "",
-              author: {
-                "@type": "Organization",
-                name: "Neev Realty",
-              },
-              publisher: {
-                "@type": "Organization",
-                name: "Neev Realty",
-              },
-              mainEntityOfPage: `https://www.neevrealty.com/blog/${blog.slug}`,
+              "@graph": [
+                {
+                  "@type": "Article",
+                  "headline": blog.title,
+                  "description": blog.metaDescription || blog.excerpt,
+                  "image": blog.image?.url || "",
+                  "author": {
+                    "@type": "Organization",
+                    "name": "Neev Realty",
+                  },
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "Neev Realty",
+                  },
+                  "mainEntityOfPage": `https://www.neevrealty.com/blog/${blog.slug}`,
+                },
+                {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": "https://www.neevrealty.com"
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Blog",
+                      "item": "https://www.neevrealty.com/blog"
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 3,
+                      "name": blog.title,
+                      "item": `https://www.neevrealty.com/blog/${blog.slug}`
+                    }
+                  ]
+                }
+              ]
             }),
           }}
         />

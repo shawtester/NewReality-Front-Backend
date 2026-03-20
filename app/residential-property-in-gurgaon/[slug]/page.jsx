@@ -44,8 +44,7 @@ export async function generateMetadata({ params }) {
     "builder-floor-in-gurgaon": "Builder Floor",
   };
 
-  const currentSlugLabel =
-    SLUG_LABEL_MAP[parentSlug] || "Residential";
+  const currentSlugLabel = SLUG_LABEL_MAP[parentSlug] || "Residential";
 
   const currentBaseRoute = `/${parentSlug}`;
 
@@ -76,12 +75,12 @@ export async function generateMetadata({ params }) {
   const keywords = Array.isArray(seo?.keywords)
     ? seo.keywords.join(", ")
     : seo?.keywords ||
-    property.metaKeywords ||
-    `${property.title}, ${property.location}, real estate`;
+      property.metaKeywords ||
+      `${property.title}, ${property.location}, real estate`;
 
   const canonicalURL =
-  seo?.canonical ||
-  `https://www.neevrealty.com/residential-property-in-gurgaon/${property.slug}`;
+    seo?.canonical ||
+    `https://www.neevrealty.com/residential-property-in-gurgaon/${property.slug}`;
 
   return {
     title,
@@ -106,8 +105,6 @@ export async function generateMetadata({ params }) {
 export default async function PropertyPage({ params }) {
   console.log("🔥 RESIDENTIAL PAGE HIT");
   const slug = params.slug;
-
-
 
   // 🔥 Detect Parent Category from URL
   const pathnameParts = params?.slug ? [] : [];
@@ -171,10 +168,12 @@ export default async function PropertyPage({ params }) {
 
     mainImage: property.mainImage || null,
     gallery: property.gallery || [],
-    images: [
-      ...(property.mainImage?.url ? [property.mainImage.url] : []),
-      ...(property.gallery?.map((g) => g.url) || []),
-    ],
+    images: Array.from(
+      new Set([
+        ...(property.mainImage?.url ? [property.mainImage.url] : []),
+        ...(property.gallery?.map((g) => g.url) || []),
+      ]),
+    ),
 
     video: property.video || null,
     overview: property.overview || {},
@@ -203,82 +202,100 @@ export default async function PropertyPage({ params }) {
   };
 
   // ================== RENDER ==================
+  const dedupeGraph = (graph) => {
+    const seen = new Set();
+    return graph.filter((item) => {
+      const key = `${item["@type"]}-${item.name || item.item || JSON.stringify(item)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
   return (
     <>
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@graph": [
+            "@graph": dedupeGraph([
+              // ✅ ORGANIZATION SCHEMA
+              {
+                "@type": "Organization",
+                "name": "Neev Realty",
+                "url": "https://www.neevrealty.com",
+                "logo": "https://www.neevrealty.com/logo.png",
+                "image": "https://www.neevrealty.com/logo.png",
+                "telephone": "+91-9999999999",
+                "priceRange": "₹₹ - ₹₹₹"
+              },
 
               // ✅ PRODUCT SCHEMA
               {
                 "@type": "Product",
-                "name": cleanProperty.title,
-                "image": cleanProperty.images,
-                "description": `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-                "brand": {
+                name: cleanProperty.title,
+                image: cleanProperty.images,
+                description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
+                brand: {
                   "@type": "Brand",
-                  "name": "Neev Realty"
+                  name: "Neev Realty",
                 },
-                "offers": {
+                offers: {
                   "@type": "Offer",
-                  "priceCurrency": "INR",
-                  "price": cleanProperty.price || "",
-                  "availability": "https://schema.org/InStock",
-                  "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`
-                }
+                  priceCurrency: "INR",
+                  price: cleanProperty.price || "",
+                  availability: "https://schema.org/InStock",
+                  url: `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
+                },
               },
 
               // ✅ BREADCRUMB SCHEMA
               {
                 "@type": "BreadcrumbList",
-                "itemListElement": [
+                itemListElement: [
                   {
                     "@type": "ListItem",
-                    "position": 1,
-                    "name": "Home",
-                    "item": "https://www.neevrealty.com"
+                    position: 1,
+                    name: "Home",
+                    item: "https://www.neevrealty.com",
                   },
                   {
                     "@type": "ListItem",
-                    "position": 2,
-                    "name": "Residential",
-                    "item": "https://www.neevrealty.com/residential-property-in-gurgaon"
+                    position: 2,
+                    name: "Residential",
+                    item: "https://www.neevrealty.com/residential-property-in-gurgaon",
                   },
                   ...(parentSlug !== "residential-property-in-gurgaon"
-                    ? [{
-                      "@type": "ListItem",
-                      "position": 3,
-                      "name": parentLabel,
-                      "item": `https://www.neevrealty.com${currentBaseRoute}`
-                    }]
+                    ? [
+                        {
+                          "@type": "ListItem",
+                          position: 3,
+                          name: parentLabel,
+                          item: `https://www.neevrealty.com${currentBaseRoute}`,
+                        },
+                      ]
                     : []),
                   {
                     "@type": "ListItem",
-                    "position": parentSlug !== "residential-property-in-gurgaon" ? 4 : 3,
-                    "name": cleanProperty.title
-                  }
-                ]
-              }
-
-            ]
-          })
+                    position:
+                      parentSlug !== "residential-property-in-gurgaon" ? 4 : 3,
+                    name: cleanProperty.title,
+                  },
+                ],
+              },
+            ]),
+          }),
         }}
       />
 
-
       <ApartmentClient>
         <AutoPopup propertyTitle={cleanProperty.title} />
-
 
         {/* ✅ BREADCRUMB */}
         <section className="bg-white">
           <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
             <nav className="flex flex-wrap items-center gap-2">
-
               <Link href="/" className="hover:text-[#F5A300]">
                 Home
               </Link>
@@ -323,7 +340,6 @@ export default async function PropertyPage({ params }) {
               <span className="text-gray-800 font-medium">
                 {cleanProperty.title}
               </span>
-
             </nav>
           </div>
         </section>
@@ -331,7 +347,10 @@ export default async function PropertyPage({ params }) {
         <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
-            <MobileGallery images={cleanProperty.images} title={cleanProperty.title} />
+            <MobileGallery
+              images={cleanProperty.images}
+              title={cleanProperty.title}
+            />
 
             <TitleBlockWithBrochure property={cleanProperty} />
 
@@ -339,7 +358,10 @@ export default async function PropertyPage({ params }) {
               <ScrollTabs />
             </div>
 
-            <OverviewSection overview={cleanProperty.overview} propertyTitle={cleanProperty.title} />
+            <OverviewSection
+              overview={cleanProperty.overview}
+              propertyTitle={cleanProperty.title}
+            />
 
             <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
 
@@ -357,7 +379,9 @@ export default async function PropertyPage({ params }) {
 
             <FAQSection faq={cleanProperty.faq} />
 
-            {cleanProperty.builder && <DeveloperSection builder={cleanProperty.builder} />}
+            {cleanProperty.builder && (
+              <DeveloperSection builder={cleanProperty.builder} />
+            )}
 
             <SimilarProjectsSection
               projects={allProjects}

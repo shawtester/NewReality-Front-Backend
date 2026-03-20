@@ -30,7 +30,6 @@ export const dynamic = "force-dynamic";
 /* ================= METADATA ================= */
 
 export async function generateMetadata({ params }) {
-
   const slug = params.slug;
 
   const property = await getPropertyBySlugOrId(slug);
@@ -59,12 +58,11 @@ export async function generateMetadata({ params }) {
   const keywords = Array.isArray(seo?.keywords)
     ? seo.keywords.join(", ")
     : seo?.keywords ||
-    property.metaKeywords ||
-    `${property.title}, ${property.location}, real estate`;
+      property.metaKeywords ||
+      `${property.title}, ${property.location}, real estate`;
 
   const canonicalURL =
     seo?.canonical || `https://www.neevrealty.com/${property.slug}`;
-
 
   return {
     title,
@@ -79,7 +77,6 @@ export async function generateMetadata({ params }) {
 /* ================= PAGE ================= */
 
 export default async function PropertyPage({ params }) {
-
   console.log("🚀 COMMERCIAL PAGE HIT");
 
   const slug = params.slug;
@@ -126,7 +123,6 @@ export default async function PropertyPage({ params }) {
   /* ================= CLEAN PROPERTY ================= */
 
   const cleanProperty = {
-
     id: property.id,
     slug: property.slug,
     title: property.title,
@@ -153,10 +149,12 @@ export default async function PropertyPage({ params }) {
     mainImage: property.mainImage || null,
     gallery: property.gallery || [],
 
-    images: [
-      ...(property.mainImage?.url ? [property.mainImage.url] : []),
-      ...(property.gallery?.map((g) => g.url) || []),
-    ],
+    images: Array.from(
+      new Set([
+        ...(property.mainImage?.url ? [property.mainImage.url] : []),
+        ...(property.gallery?.map((g) => g.url) || []),
+      ]),
+    ),
 
     video: property.video || null,
 
@@ -191,12 +189,29 @@ export default async function PropertyPage({ params }) {
 
   const baseUrl = "https://www.neevrealty.com";
 
-  const schema = {
+  const dedupeGraph = (graph) => {
+    const seen = new Set();
+    return graph.filter((item) => {
+      const key = `${item["@type"]}-${item.name || item.item || JSON.stringify(item)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
 
+  const schema = {
     "@context": "https://schema.org",
 
-    "@graph": [
-
+    "@graph": dedupeGraph([
+      {
+        "@type": "Organization",
+        "name": "Neev Realty",
+        "url": "https://www.neevrealty.com",
+        "logo": "https://www.neevrealty.com/logo.png",
+        "image": "https://www.neevrealty.com/logo.png",
+        "telephone": "+91-9999999999",
+        "priceRange": "₹₹ - ₹₹₹"
+      },
       {
         "@type": "Product",
         name: cleanProperty.title,
@@ -218,7 +233,6 @@ export default async function PropertyPage({ params }) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-
           {
             "@type": "ListItem",
             position: 1,
@@ -235,38 +249,33 @@ export default async function PropertyPage({ params }) {
 
           ...(parentSlug !== "commercial-property-in-gurgaon"
             ? [
-              {
-                "@type": "ListItem",
-                position: 3,
-                name: parentLabel,
-                item: `${baseUrl}${currentBaseRoute}`,
-              },
-            ]
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: parentLabel,
+                  item: `${baseUrl}${currentBaseRoute}`,
+                },
+              ]
             : []),
 
           {
             "@type": "ListItem",
-            position:
-              parentSlug !== "commercial-property-in-gurgaon"
-                ? 4
-                : 3,
+            position: parentSlug !== "commercial-property-in-gurgaon" ? 4 : 3,
             name: cleanProperty.title,
           },
         ],
       },
-    ],
+    ]),
   };
 
   return (
     <>
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
       <ApartmentClient>
-
         <AutoPopup propertyTitle={cleanProperty.title} />
 
         {/* BREADCRUMB */}
@@ -274,7 +283,6 @@ export default async function PropertyPage({ params }) {
         <section className="bg-white">
           <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
             <nav className="flex flex-wrap items-center gap-2">
-
               <Link href="/" className="hover:text-[#F5A300]">
                 Home
               </Link>
@@ -306,7 +314,6 @@ export default async function PropertyPage({ params }) {
               <span className="font-medium text-gray-800">
                 {cleanProperty.title}
               </span>
-
             </nav>
           </div>
         </section>
@@ -314,9 +321,7 @@ export default async function PropertyPage({ params }) {
         {/* PAGE CONTENT */}
 
         <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
-
           <div className="lg:col-span-2 space-y-6">
-
             <MobileGallery
               images={cleanProperty.images}
               title={cleanProperty.title}
@@ -357,15 +362,12 @@ export default async function PropertyPage({ params }) {
             />
 
             <DisclaimerSection text={cleanProperty.disclaimer} />
-
           </div>
 
           <RightSidebar property={cleanProperty} />
-
         </section>
 
         <Footer />
-
       </ApartmentClient>
     </>
   );

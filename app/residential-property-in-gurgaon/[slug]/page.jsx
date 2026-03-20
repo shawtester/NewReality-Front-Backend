@@ -73,16 +73,16 @@ export async function generateMetadata({ params }) {
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords = Array.isArray(seo?.keywords)
-    ? seo.keywords.join(", ")
-    : seo?.keywords ||
-    property.metaKeywords ||
-    `${property.title}, ${property.location}, real estate`;
+  const keywords =
+    seo?.keywords
+      ? Array.isArray(seo.keywords)
+        ? seo.keywords.join(", ")
+        : seo.keywords
+      : property.metaKeywords || "";
 
   const canonicalURL =
-  seo?.canonical ||
-  `https://www.neevrealty.com/residential-property-in-gurgaon/${property.slug}`;
-
+    seo?.canonical ||
+    `https://www.neevrealty.com/${parentSlug}/${property.slug}`;
   return {
     title,
     description,

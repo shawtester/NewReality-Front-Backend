@@ -168,6 +168,13 @@ export default function BasicDetails({ data, handleData }) {
             placeholder="luxury apartment, gurgaon property..."
           />
 
+          <Input
+            label="Canonical URL"
+            value={data.canonical || ""}
+            onChange={(v) => handleData("canonical", v)}
+            placeholder="https://www.neevrealty.com/projects/project-slug"
+          />
+
         </div>
       </div>
 

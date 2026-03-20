@@ -55,22 +55,47 @@ export async function generateMetadata({ params }) {
     property.metaDescription ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords = Array.isArray(seo?.keywords)
-    ? seo.keywords.join(", ")
-    : seo?.keywords ||
-      property.metaKeywords ||
-      `${property.title}, ${property.location}, real estate`;
+  let parentSlug = "commercial-property-in-gurgaon";
+  if (property?.isRetail) parentSlug = "retail-shops-in-gurgaon";
+  if (property?.isSCO) parentSlug = "sco-plots-in-gurgaon";
+
+  const keywords =
+    seo?.keywords
+      ? Array.isArray(seo.keywords)
+        ? seo.keywords.join(", ")
+        : seo.keywords
+      : property.metaKeywords || "";
 
   const canonicalURL =
-    seo?.canonical || `https://www.neevrealty.com/${property.slug}`;
+    seo?.canonical ||
+    `${baseUrl}/${parentSlug}/${property.slug}`;
 
   return {
     title,
     description,
-    keywords,
-    alternates: { canonical: canonicalURL },
-    openGraph: { title, description },
-    twitter: { card: "summary", title, description },
+
+    // ✅ FIX KEYWORDS
+    keywords: keywords
+      ? keywords.split(",").map((k) => k.trim())
+      : [],
+
+    // ✅ IMPORTANT: FULL URL USE KAR
+    openGraph: {
+      title,
+      description,
+      url: canonicalURL,
+    },
+
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+
+    // ✅ MOST IMPORTANT (THIS FIXES CANONICAL)
+    alternates: {
+      canonical: canonicalURL,
+    },
   };
 }
 

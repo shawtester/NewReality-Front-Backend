@@ -5,6 +5,7 @@ export const defaultProperty = {
     metaTitle: "",
     metaDescription: "",
     metaKeywords: "",
+    canonical: "", 
 
     // 🔹 BASIC
     title: "",

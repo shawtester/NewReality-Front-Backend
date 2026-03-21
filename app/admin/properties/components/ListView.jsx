@@ -186,6 +186,7 @@ function PropertyCard({ item }) {
         <div className="flex justify-between items-center mt-3">
           <Button
             isIconOnly
+            aria-label="Edit Property"
             size="sm"
             className="bg-[#DBA40D] min-w-0 w-7 h-7"
             onClick={() =>
@@ -197,6 +198,7 @@ function PropertyCard({ item }) {
 
           <Button
             isIconOnly
+            aria-label="Delete Property"
             size="sm"
             color="danger"
             className="min-w-0 w-7 h-7"

@@ -50,12 +50,6 @@ export default async function CommercialPage({ searchParams }) {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
-        "name": "Neev Realty",
-        "url": baseUrl,
-        "logo": `${baseUrl}/logo.png`
-      },
-      {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
@@ -86,6 +80,22 @@ export default async function CommercialPage({ searchParams }) {
       }
     ]
   };
+
+  schema["@graph"].push(
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are the best commercial properties in Gurgaon?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Neev Realty features top commercial properties, retail shops, and office spaces for investment in Gurgaon."
+          }
+        }
+      ]
+    }
+  );
 
   return (
     <>

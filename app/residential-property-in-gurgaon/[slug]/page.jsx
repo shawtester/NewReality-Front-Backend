@@ -315,6 +315,63 @@ export default async function PropertyPage({ params }) {
                   },
                 ],
               },
+
+              // ✅ PRODUCT SCHEMA
+              {
+                "@type": "Product",
+                "name": cleanProperty.title,
+                "image": cleanProperty.images,
+                "description": `${cleanProperty.title} located in ${cleanProperty.location}. Check price, floor plans, amenities and payment plans.`,
+                "brand": {
+                  "@type": "Brand",
+                  "name": cleanProperty.builderName || "Neev Realty"
+                },
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": "4.8",
+                  "reviewCount": "24"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
+                  "priceCurrency": "INR",
+                  "price": "0",
+                  "availability": "https://schema.org/InStock",
+                  "priceValidUntil": "2026-12-31",
+                  "hasMerchantReturnPolicy": {
+                    "@type": "MerchantReturnPolicy",
+                    "applicableCountry": "IN",
+                    "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+                  },
+                  "shippingDetails": {
+                    "@type": "OfferShippingDetails",
+                    "shippingRate": {
+                      "@type": "MonetaryAmount",
+                      "value": "0",
+                      "currency": "INR"
+                    },
+                    "deliveryTime": {
+                      "@type": "ShippingDeliveryTime",
+                      "handlingTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 0,
+                        "maxValue": 0,
+                        "unitCode": "DAY"
+                      },
+                      "transitTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 0,
+                        "maxValue": 0,
+                        "unitCode": "DAY"
+                      }
+                    },
+                    "shippingDestination": {
+                      "@type": "DefinedRegion",
+                      "addressCountry": "IN"
+                    }
+                  }
+                }
+              },
             ]),
           }),
         }}

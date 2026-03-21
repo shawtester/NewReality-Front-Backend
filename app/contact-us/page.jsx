@@ -69,22 +69,6 @@ export default async function ContactPage() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
-        "name": "Neev Realty",
-        "url": baseUrl,
-        "logo": `${baseUrl}/logo.png`,
-        "image": `${baseUrl}/logo.png`,
-        "telephone": "+91-9999999999",
-        "priceRange": "₹₹ - ₹₹₹",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+91-9999999999",
-          "contactType": "customer service",
-          "areaServed": "IN",
-          "availableLanguage": ["en", "hi"]
-        }
-      },
-      {
         "@type": "LocalBusiness",
         "name": "Neev Realty",
         "image": `${baseUrl}/logo.png`,

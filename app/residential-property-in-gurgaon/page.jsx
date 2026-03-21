@@ -52,12 +52,6 @@ export default async function ResidentialPage({ searchParams }) {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
-        "name": "Neev Realty",
-        "url": baseUrl,
-        "logo": `${baseUrl}/logo.png`
-      },
-      {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {
@@ -88,6 +82,22 @@ export default async function ResidentialPage({ searchParams }) {
       }
     ]
   };
+
+  schema["@graph"].push(
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are the best residential properties in Gurgaon?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Neev Realty offers a wide range of premium residential apartments, builder floors, and villas in top locations of Gurgaon."
+          }
+        }
+      ]
+    }
+  );
 
   return (
     <>

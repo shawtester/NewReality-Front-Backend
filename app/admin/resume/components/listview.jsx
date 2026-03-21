@@ -121,6 +121,7 @@ export default function AdminResumes() {
                 <td className="border-y bg-white px-3 py-2 rounded-r-lg text-center">
                   <Button
                     isIconOnly
+                    aria-label="Delete Resume"
                     size="sm"
                     className="bg-red-500 text-white"
                     onClick={() => handleDelete(item.id)}

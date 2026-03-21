@@ -168,7 +168,7 @@ export default function Navbar() {
             <Phone size={20} />
           </a>
 
-          <button onClick={() => setMenuOpen(true)}>
+          <button aria-label="Open Menu" onClick={() => setMenuOpen(true)}>
             <Menu size={26} />
           </button>
         </div>

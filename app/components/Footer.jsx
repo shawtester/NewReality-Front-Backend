@@ -124,6 +124,7 @@ export default function Footer() {
         <div className="max-w-[1380px] mx-auto px-6 py-10">
           <div className="flex items-center gap-4 lg:gap-6">
             <button
+              aria-label="Scroll Left"
               onClick={scrollLeft}
               className="hidden lg:flex h-12 w-12 items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg"
             >
@@ -223,6 +224,7 @@ export default function Footer() {
             </div>
 
             <button
+              aria-label="Scroll Right"
               onClick={scrollRight}
               className="hidden lg:flex h-12 w-12 items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg"
             >
@@ -273,6 +275,7 @@ export default function Footer() {
             {socialLinks.map(({ Icon, href }, i) => (
               <Link
                 key={i}
+                aria-label={`Social link ${i + 1}`}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"

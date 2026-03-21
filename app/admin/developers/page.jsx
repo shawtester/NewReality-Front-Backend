@@ -111,6 +111,7 @@ export default function Page() {
                 {/* EDIT LEFT */}
                 <Button
                   isIconOnly
+                  aria-label="Edit Developer"
                   size="sm"
                   className="bg-[#DBA40D]"
                   onClick={() =>
@@ -123,6 +124,7 @@ export default function Page() {
                 {/* DELETE RIGHT */}
                 <Button
                   isIconOnly
+                  aria-label="Delete Developer"
                   size="sm"
                   className="bg-red-500 text-white"
                   onClick={() => handleDelete(dev.id)}

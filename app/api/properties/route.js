@@ -1,4 +1,4 @@
-import { getAllProperties } from "@/lib/firestore/products/count/read_client";
+import { getAllProperties } from "@/lib/firestore/products/read_server";
 
 export async function GET(req) {
   try {

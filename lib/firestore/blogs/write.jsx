@@ -124,7 +124,7 @@ export const updateBlog = async ({ id, data }) => {
     delete data.image.file;
   }
 
-  const title = data.mainTitle || data.title;
+  const title = data.title || data.mainTitle;
 
   if (!title?.trim()) throw new Error("Title required");
   if (!data?.slug?.trim()) throw new Error("Slug required");

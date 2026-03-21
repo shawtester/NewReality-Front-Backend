@@ -24,102 +24,102 @@ import SimilarProjectsSection from "./components/SimilarProjectsSection";
 import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
-
-export const dynamic = "force-static";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
-
-/* ================= METADATA ================= */
+export const dynamic = "force-dynamic";
+// ❌ REMOVE fetchCache
 
 export async function generateMetadata({ params }) {
-  const slug = params.slug;
+  console.log("🔥 METADATA FUNCTION CALLED");
+  try {
+    const slug = params.slug;
 
-  const property = await getPropertyBySlugOrId(slug);
+    const propertyRaw = await getPropertyBySlugOrId(slug);
+    const property = JSON.parse(JSON.stringify(propertyRaw));
+    const seoRaw = await getSEO(slug);
+    const seo = JSON.parse(JSON.stringify(seoRaw));
 
-  if (!property) {
+    if (!property) {
+      return {
+        title: "Property Not Found",
+        description: "",
+      };
+    }
+
+    const baseUrl = "https://www.neevrealty.com";
+
+    const getValid = (v) =>
+      typeof v === "string" && v.trim() !== "" ? v : null;
+
+    // 🔥 Parent slug
+    let parentSlug = "commercial-property-in-gurgaon";
+    if (property?.isRetail) parentSlug = "retail-shops-in-gurgaon";
+    if (property?.isSCO) parentSlug = "sco-plots-in-gurgaon";
+
+    // ✅ TITLE
+    const title =
+      getValid(seo?.title) ||
+      getValid(property.metaTitle) ||
+      `${property.title} in ${property.location} | Price & Details`;
+
+    // ✅ DESCRIPTION
+    const description =
+      getValid(seo?.description) ||
+      getValid(property.metaDescription) ||
+      `Explore ${property.title} located in ${property.location}.`;
+
+    // ✅ KEYWORDS (🔥 FIXED)
+    const keywordsRaw =
+      getValid(seo?.metaKeywords) ||
+      getValid(property.metaKeywords) ||
+      "";
+
+    const keywords = keywordsRaw
+      ? keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean)
+      : [];
+
+    // ✅ CANONICAL (🔥 FIXED)
+    const canonicalURL =
+      getValid(seo?.canonical) ||
+      getValid(property.canonical) ||
+      `${baseUrl}/${parentSlug}/${property.slug}`;
+
+    console.log("FINAL KEYWORDS:", keywords);
+    console.log("FINAL CANONICAL:", canonicalURL);
+
     return {
-      title: "Property Not Found",
-      description: "",
+      metadataBase: new URL(baseUrl),
+
+      title,
+      description,
+
+      // ✅ THIS IS THE REAL FIX
+      keywords: keywords,
+
+      alternates: {
+        canonical: canonicalURL,
+      },
+
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+      },
+
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  } catch (err) {
+    console.error("❌ METADATA ERROR:", err);
+
+    return {
+      title: "Error",
+      description: "Something went wrong",
     };
   }
-
-  const seo = await getSEO(slug);
-
-  console.log("SEO FULL:", seo);
-  console.log("SEO KEYWORDS:", seo?.keywords);
-  console.log("SEO METAKEYWORDS:", seo?.metaKeywords);
-  console.log("PROPERTY META:", property.metaKeywords, property.canonical);
-
-  const baseUrl = "https://www.neevrealty.com";
-
-  // 🔥 SAFE HELPER
-  const getValid = (v) =>
-    typeof v === "string" && v.trim() !== "" ? v : null;
-
-  // 🔥 PARENT SLUG
-  let parentSlug = "commercial-property-in-gurgaon";
-  if (property?.isRetail) parentSlug = "retail-shops-in-gurgaon";
-  if (property?.isSCO) parentSlug = "sco-plots-in-gurgaon";
-
-  // ✅ TITLE
-  const title =
-    getValid(seo?.title) ||
-    getValid(property.metaTitle) ||
-    `${property.title} in ${property.location} | Price & Details`;
-
-  // ✅ DESCRIPTION
-  const description =
-    getValid(seo?.description) ||
-    getValid(property.metaDescription) ||
-    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
-
-  // ✅ KEYWORDS
-  const keywordsRaw =
-
-    getValid(seo?.metaKeywords) ||
-    getValid(property.metaKeywords) ||
-    "";
-
-  const keywords = keywordsRaw
-    ? keywords.split(",").map((k) => k.trim()).filter(Boolean)
-    : [];
-
-  // ✅ CANONICAL (🔥 FIXED)
-  const canonicalURL =
-    getValid(seo?.canonical) ||
-    getValid(property.canonical) || // 🔥 THIS WAS MISSING
-    `${baseUrl}/${parentSlug}/${property.slug}`;
-
-  console.log("FINAL CANONICAL:", canonicalURL);
-
-  return {
-    title,
-    description,
-
-    metadataBase: new URL("https://www.neevrealty.com"),
-
-    alternates: {
-      canonical: canonicalURL,
-    },
-
-    // 🔥 FORCE KEYWORDS (THIS IS FINAL FIX)
-    other: {
-      keywords: keywords.join(", "),
-    },
-
-    openGraph: {
-      title,
-      description,
-      url: canonicalURL,
-    },
-
-    twitter: {
-      card: "summary",
-      title,
-      description,
-    },
-  };
 }
+
 /* ================= PAGE ================= */
 
 export default async function PropertyPage({ params }) {

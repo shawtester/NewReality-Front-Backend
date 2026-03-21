@@ -27,105 +27,117 @@ import Footer from "@/app/components/Footer";
 // 🔥 Firebase SEO import
 import { getSEO } from "@/lib/firestore/seo/read";
 
-export const dynamic = "force-static";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
 
-// ================== METADATA ==================
+// ✅ IMPORTANT
+export const dynamic = "force-dynamic";
+// OR use this instead of above
+// export const revalidate = 60;
+
 export async function generateMetadata({ params }) {
-  const slug = params.slug;
+  console.log("🔥 METADATA FUNCTION CALLED");
+  try {
+    const slug = params.slug;
+    const parentSlug = "residential-property-in-gurgaon";
 
-  const parentSlug = "residential-property-in-gurgaon";
+    // ✅ Fetch Data
+    const propertyRaw = await getPropertyBySlugOrId(slug);
+        const property = JSON.parse(JSON.stringify(propertyRaw));
+        const seoRaw = await getSEO(slug);
+        const seo = JSON.parse(JSON.stringify(seoRaw));
 
-  const SLUG_LABEL_MAP = {
-    "residential-property-in-gurgaon": "Residential",
-    "luxury-apartments-in-gurgaon": "Luxury Apartments",
-    "builder-floor-in-gurgaon": "Builder Floor",
-  };
+    if (!property) {
+      return {
+        title: "Property Not Found",
+        description: "This property does not exist.",
+      };
+    }
 
-  const currentSlugLabel = SLUG_LABEL_MAP[parentSlug] || "Residential";
-  const currentBaseRoute = `/${parentSlug}`;
+    // ✅ Helper
+    const getValid = (v) =>
+      typeof v === "string" && v.trim() !== "" ? v : null;
 
-  // 1️⃣ Fetch property
-  const property = await getPropertyBySlugOrId(slug);
+    // =========================
+    // 🔥 TITLE
+    // =========================
+    const title =
+      getValid(seo?.title) ||
+      getValid(property.metaTitle) ||
+      `${property.title} in ${property.location} | Price & Details`;
 
-  if (!property) {
+    // =========================
+    // 🔥 DESCRIPTION
+    // =========================
+    const description =
+      getValid(seo?.description) ||
+      getValid(property.metaDescription) ||
+      `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and more.`;
+
+    // =========================
+    // 🔥 KEYWORDS (FIXED)
+    // =========================
+    const keywordsRaw =
+      getValid(seo?.metaKeywords) ||
+      getValid(property.metaKeywords) ||
+      "";
+
+    const keywords = keywordsRaw
+      ? keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean)
+      : [];
+
+    // =========================
+    // 🔥 CANONICAL (FIXED)
+    // =========================
+    const canonicalURL =
+      getValid(seo?.canonical) ||
+      getValid(property.canonical) ||
+      `https://www.neevrealty.com/${parentSlug}/${property.slug}`;
+
+    // =========================
+    // 🔥 DEBUG (REMOVE AFTER TEST)
+    // =========================
+    console.log("SEO:", seo);
+    console.log("PROPERTY:", property);
+    console.log("FINAL KEYWORDS:", keywords);
+    console.log("FINAL CANONICAL:", canonicalURL);
+
+    // =========================
+    // 🔥 RETURN METADATA
+    // =========================
     return {
-      title: "Property Not Found",
-      description: "",
+      metadataBase: new URL("https://www.neevrealty.com"),
+
+      title,
+      description,
+
+      // ✅ THIS IS THE REAL FIX
+      keywords: keywords,
+
+      alternates: {
+        canonical: canonicalURL,
+      },
+
+      openGraph: {
+        title,
+        description,
+        url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+    };
+  } catch (error) {
+    console.error("❌ METADATA ERROR:", error);
+
+    return {
+      title: "Error Loading Page",
+      description: "Something went wrong",
     };
   }
-
-  // 2️⃣ Fetch SEO
-  const seo = await getSEO(slug);
-
-  console.log("SEO FULL:", seo);
-  console.log("SEO KEYWORDS:", seo?.keywords);
-  console.log("SEO METAKEYWORDS:", seo?.metaKeywords);
-  console.log("PROPERTY META:", property.metaKeywords, property.canonical);
-
-  // 🔥 SAFE HELPER
-  const getValid = (v) =>
-    typeof v === "string" && v.trim() !== "" ? v : null;
-
-  // 3️⃣ TITLE
-  const title =
-    getValid(seo?.title) ||
-    getValid(property.metaTitle) ||
-    `${property.title} in ${property.location} | Price & Details`;
-
-  // 4️⃣ DESCRIPTION
-  const description =
-    getValid(seo?.description) ||
-    getValid(property.metaDescription) ||
-    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
-
-  // 5️⃣ KEYWORDS
-  const keywordsRaw =
-
-    getValid(seo?.metaKeywords) ||
-    getValid(property.metaKeywords) ||
-    "";
-
-  const keywords = keywordsRaw
-    ? keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean)
-    : [];
-
-  // 6️⃣ CANONICAL (🔥 FIXED)
-  const canonicalURL =
-    getValid(seo?.canonical) ||
-    getValid(property.canonical) || // ✅ THIS WAS MISSING
-    `https://www.neevrealty.com/${parentSlug}/${property.slug}`;
-
-  console.log("FINAL CANONICAL:", canonicalURL);
-
-  return {
-    title,
-    description,
-
-    metadataBase: new URL("https://www.neevrealty.com"),
-
-    alternates: {
-      canonical: canonicalURL,
-    },
-
-    // 🔥 FORCE KEYWORDS (THIS IS FINAL FIX)
-    other: {
-      keywords: keywords.join(", "),
-    },
-
-    openGraph: {
-      title,
-      description,
-      url: canonicalURL,
-    },
-
-    twitter: {
-      card: "summary",
-      title,
-      description,
-    },
-  };
 }
 
 // ================== PAGE COMPONENT ==================

@@ -331,6 +331,10 @@ export default function BlogContent({ blog, onHeadingsReady }) {
   id="blog-wrapper"
   className="bg-white rounded-lg p-2 md:p-4 shadow-sm 
   prose max-w-none
+  [&_ul]:list-disc
+  [&_ol]:list-decimal
+  [&_ul]:pl-5
+  [&_ol]:pl-5
   [&_p]:my-3
   prose-headings:scroll-mt-32
   prose-img:rounded-xl

@@ -73,11 +73,13 @@ export async function generateMetadata({ params }) {
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
   const keywords =
-    seo?.keywords
-      ? Array.isArray(seo.keywords)
-        ? seo.keywords.join(", ")
-        : seo.keywords
-      : property.metaKeywords || "";
+  seo?.keywords !== undefined
+    ? Array.isArray(seo.keywords)
+      ? seo.keywords.join(", ")
+      : seo.keywords
+    : seo?.metaKeywords !== undefined
+    ? seo.metaKeywords
+    : property.metaKeywords || "";
 
   const canonicalURL =
     seo?.canonical ||

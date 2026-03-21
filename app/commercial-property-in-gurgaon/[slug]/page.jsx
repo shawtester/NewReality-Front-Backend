@@ -60,11 +60,13 @@ export async function generateMetadata({ params }) {
   if (property?.isSCO) parentSlug = "sco-plots-in-gurgaon";
 
   const keywords =
-    seo?.keywords
-      ? Array.isArray(seo.keywords)
-        ? seo.keywords.join(", ")
-        : seo.keywords
-      : property.metaKeywords || "";
+  seo?.keywords !== undefined
+    ? Array.isArray(seo.keywords)
+      ? seo.keywords.join(", ")
+      : seo.keywords
+    : seo?.metaKeywords !== undefined
+    ? seo.metaKeywords
+    : property.metaKeywords || "";
 
   const canonicalURL =
     seo?.canonical ||

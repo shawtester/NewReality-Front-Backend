@@ -83,12 +83,6 @@ export default async function CommercialPage({ searchParams }) {
 
   schema["@graph"].push(
     {
-      "@type": "Organization",
-      "@id": "https://www.neevrealty.com/#organization",
-      "name": "Neev Realty",
-      "url": "https://www.neevrealty.com/"
-    },
-    {
       "@type": "FAQPage",
       "mainEntity": [
         {

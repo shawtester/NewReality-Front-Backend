@@ -69,56 +69,8 @@ export default async function Home() {
   const blogs = await getBlogsForHome();
   const hero = await getHeroServer();
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": "https://www.neevrealty.com/#organization",
-        "name": "Neev Realty",
-        "url": "https://www.neevrealty.com/",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://www.neevrealty.com/logo.png"
-        }
-      },
-      {
-        "@type": "WebSite",
-        "@id": "https://www.neevrealty.com/#website",
-        "url": "https://www.neevrealty.com/",
-        "name": "Neev Realty",
-        "publisher": {
-          "@id": "https://www.neevrealty.com/#organization"
-        }
-      },
-      {
-        "@type": "LocalBusiness",
-        "@id": "https://www.neevrealty.com/#localbusiness",
-        "name": "Neev Realty",
-        "url": "https://www.neevrealty.com/",
-        "telephone": "+919999999999",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Gurgaon",
-          "addressRegion": "Haryana",
-          "addressCountry": "IN"
-        }
-      },
-      {
-        "@type": "RealEstateAgent",
-        "@id": "https://www.neevrealty.com/#realestateagent",
-        "name": "Neev Realty",
-        "url": "https://www.neevrealty.com/"
-      }
-    ]
-  };
-
   return (
     <main className="w-full overflow-x-hidden">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <Header />
       <SearchCard initialHeroData={hero} />
       <NewLaunchProjects properties={properties} />

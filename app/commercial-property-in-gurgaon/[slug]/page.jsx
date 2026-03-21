@@ -266,14 +266,6 @@ export default async function PropertyPage({ params }) {
         ],
       },
 
-      // ✅ ORGANIZATION SCHEMA
-      {
-        "@type": "Organization",
-        "@id": "https://www.neevrealty.com/#organization",
-        "name": "Neev Realty",
-        "url": "https://www.neevrealty.com/"
-      },
-
       // ✅ PRODUCT SCHEMA
       {
         "@type": "Product",
@@ -295,7 +287,39 @@ export default async function PropertyPage({ params }) {
           "priceCurrency": "INR",
           "price": "0",
           "availability": "https://schema.org/InStock",
-          "priceValidUntil": "2026-12-31"
+          "priceValidUntil": "2026-12-31",
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "IN",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0",
+              "currency": "INR"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "IN"
+            }
+          }
         }
       },
     ]),

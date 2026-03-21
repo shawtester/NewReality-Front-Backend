@@ -74,6 +74,19 @@ export default async function Page({ params }) {
                       "item": `https://www.neevrealty.com/blog/${blog.slug}`
                     }
                   ]
+                },
+                {
+                  "@type": "FAQPage",
+                  "mainEntity": [
+                    {
+                      "@type": "Question",
+                      "name": "What is this real estate blog about?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "This blog provides insights on real estate trends, property investment tips, and updates on premium properties in Gurgaon."
+                      }
+                    }
+                  ]
                 }
               ]
             }),

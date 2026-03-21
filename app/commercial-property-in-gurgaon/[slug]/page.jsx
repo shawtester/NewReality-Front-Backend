@@ -273,6 +273,33 @@ export default async function PropertyPage({ params }) {
           },
         ],
       },
+
+      // ✅ ORGANIZATION SCHEMA
+      {
+        "@type": "Organization",
+        "@id": "https://www.neevrealty.com/#organization",
+        "name": "Neev Realty",
+        "url": "https://www.neevrealty.com/"
+      },
+
+      // ✅ PRODUCT SCHEMA
+      {
+        "@type": "Product",
+        "name": cleanProperty.title,
+        "image": cleanProperty.images,
+        "description": `${cleanProperty.title} located in ${cleanProperty.location}. Check price, floor plans, amenities and payment plans.`,
+        "brand": {
+          "@type": "Brand",
+          "name": cleanProperty.builderName || "Neev Realty"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
+          "priceCurrency": "INR",
+          "price": "0",
+          "availability": "https://schema.org/InStock"
+        }
+      },
     ]),
   };
 

@@ -84,6 +84,21 @@ export default async function ContactPage() {
           "addressCountry": "IN"
         },
         "url": `${baseUrl}/contact`
+      },
+      {
+        "@type": "Organization",
+        "@id": `${baseUrl}/#organization`,
+        "name": "Neev Realty",
+        "url": baseUrl,
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "+91-9999999999",
+            "contactType": "customer service",
+            "areaServed": "IN",
+            "availableLanguage": ["English", "Hindi"]
+          }
+        ]
       }
     ]
   };

@@ -58,5 +58,49 @@ export async function generateMetadata() {
 }
 
 export default function BlogPage() {
-  return <BlogClient />;
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+             "@type": "ListItem",
+             "position": 1,
+             "name": "Home",
+             "item": "https://www.neevrealty.com"
+          },
+          {
+             "@type": "ListItem",
+             "position": 2,
+             "name": "Blog",
+             "item": "https://www.neevrealty.com/blog"
+          }
+        ]
+      },
+      {
+         "@type": "FAQPage",
+         "mainEntity": [
+           {
+             "@type": "Question",
+             "name": "What topics does the Neev Realty blog cover?",
+             "acceptedAnswer": {
+               "@type": "Answer",
+               "text": "Our blog covers insights on Gurgaon real estate, property investment tips, and updates on luxury and commercial projects."
+             }
+           }
+         ]
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <BlogClient />
+    </>
+  );
 }

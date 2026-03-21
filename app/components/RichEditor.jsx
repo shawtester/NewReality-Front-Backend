@@ -25,6 +25,10 @@ export default function TinyEditor({ value, onChange }) {
 
         directionality: "ltr",
 
+        // ✅ ADD THIS
+        block_formats:
+          "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3",
+
         plugins:
           "advlist autolink lists link image charmap preview anchor " +
           "searchreplace visualblocks code fullscreen " +

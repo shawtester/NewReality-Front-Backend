@@ -5,7 +5,7 @@ import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
 import { getAmenitiesByIds } from "@/lib/firestore/amenities/read_server";
 
 import Link from "next/link";
-
+import Script from "next/script";
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
 import MobileGallery from "./components/MobileGallery";
@@ -27,16 +27,15 @@ import Footer from "@/app/components/Footer";
 // 🔥 Firebase SEO import
 import { getSEO } from "@/lib/firestore/seo/read";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 // ================== METADATA ==================
 export async function generateMetadata({ params }) {
   const slug = params.slug;
 
-  // 🔥 Parent Category Detection
   const parentSlug = "residential-property-in-gurgaon";
-  // If in future you create dynamic parent routing,
-  // replace this with actual parent slug logic.
 
   const SLUG_LABEL_MAP = {
     "residential-property-in-gurgaon": "Residential",
@@ -45,7 +44,6 @@ export async function generateMetadata({ params }) {
   };
 
   const currentSlugLabel = SLUG_LABEL_MAP[parentSlug] || "Residential";
-
   const currentBaseRoute = `/${parentSlug}`;
 
   // 1️⃣ Fetch property
@@ -58,43 +56,64 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  // 2️⃣ Fetch Firebase SEO for this property
+  // 2️⃣ Fetch SEO
   const seo = await getSEO(slug);
 
-  // 3️⃣ Use Firebase SEO if exists, otherwise fallback to property meta fields
+  console.log("SEO FULL:", seo);
+  console.log("SEO KEYWORDS:", seo?.keywords);
+  console.log("SEO METAKEYWORDS:", seo?.metaKeywords);
+  console.log("PROPERTY META:", property.metaKeywords, property.canonical);
+
+  // 🔥 SAFE HELPER
+  const getValid = (v) =>
+    typeof v === "string" && v.trim() !== "" ? v : null;
+
+  // 3️⃣ TITLE
   const title =
-    seo?.title ||
-    property.metaTitle ||
+    getValid(seo?.title) ||
+    getValid(property.metaTitle) ||
     `${property.title} in ${property.location} | Price & Details`;
 
+  // 4️⃣ DESCRIPTION
   const description =
-    seo?.description ||
-    property.metaDescription ||
+    getValid(seo?.description) ||
+    getValid(property.metaDescription) ||
     `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
 
-  const keywords =
-  seo?.keywords !== undefined
-    ? Array.isArray(seo.keywords)
-      ? seo.keywords.join(", ")
-      : seo.keywords
-    : seo?.metaKeywords !== undefined
-    ? seo.metaKeywords
-    : property.metaKeywords || "";
+  // 5️⃣ KEYWORDS
+  const keywordsRaw =
 
+    getValid(seo?.metaKeywords) ||
+    getValid(property.metaKeywords) ||
+    "";
+
+  const keywords = keywordsRaw
+    ? keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean)
+    : [];
+
+  // 6️⃣ CANONICAL (🔥 FIXED)
   const canonicalURL =
-    seo?.canonical ||
+    getValid(seo?.canonical) ||
+    getValid(property.canonical) || // ✅ THIS WAS MISSING
     `https://www.neevrealty.com/${parentSlug}/${property.slug}`;
+
+  console.log("FINAL CANONICAL:", canonicalURL);
 
   return {
     title,
     description,
 
-    // ✅ FIX KEYWORDS
-    keywords: keywords
-      ? keywords.split(",").map((k) => k.trim())
-      : [],
+    metadataBase: new URL("https://www.neevrealty.com"),
 
-    // ✅ IMPORTANT: FULL URL USE KAR
+    alternates: {
+      canonical: canonicalURL,
+    },
+
+    // 🔥 FORCE KEYWORDS (THIS IS FINAL FIX)
+    other: {
+      keywords: keywords.join(", "),
+    },
+
     openGraph: {
       title,
       description,
@@ -105,11 +124,6 @@ export async function generateMetadata({ params }) {
       card: "summary",
       title,
       description,
-    },
-
-    // ✅ MOST IMPORTANT (THIS FIXES CANONICAL)
-    alternates: {
-      canonical: canonicalURL,
     },
   };
 }
@@ -227,8 +241,10 @@ export default async function PropertyPage({ params }) {
 
   return (
     <>
-      <script
+      <Script
+        id="property-schema"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
@@ -236,12 +252,12 @@ export default async function PropertyPage({ params }) {
               // ✅ ORGANIZATION SCHEMA
               {
                 "@type": "Organization",
-                "name": "Neev Realty",
-                "url": "https://www.neevrealty.com",
-                "logo": "https://www.neevrealty.com/logo.png",
-                "image": "https://www.neevrealty.com/logo.png",
-                "telephone": "+91-9999999999",
-                "priceRange": "₹₹ - ₹₹₹"
+                name: "Neev Realty",
+                url: "https://www.neevrealty.com",
+                logo: "https://www.neevrealty.com/logo.png",
+                image: "https://www.neevrealty.com/logo.png",
+                telephone: "+91-9999999999",
+                priceRange: "₹₹ - ₹₹₹",
               },
 
               // ✅ PRODUCT SCHEMA
@@ -279,16 +295,18 @@ export default async function PropertyPage({ params }) {
                     name: "Residential",
                     item: "https://www.neevrealty.com/residential-property-in-gurgaon",
                   },
+
                   ...(parentSlug !== "residential-property-in-gurgaon"
                     ? [
-                        {
-                          "@type": "ListItem",
-                          position: 3,
-                          name: parentLabel,
-                          item: `https://www.neevrealty.com${currentBaseRoute}`,
-                        },
-                      ]
+                      {
+                        "@type": "ListItem",
+                        position: 3,
+                        name: parentLabel,
+                        item: `https://www.neevrealty.com${currentBaseRoute}`,
+                      },
+                    ]
                     : []),
+
                   {
                     "@type": "ListItem",
                     position:

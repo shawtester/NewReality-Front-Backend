@@ -1,17 +1,17 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import SearchCard from "./components/SearchCard";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
 // ✅ ABOVE THE FOLD: load normally
 import NewLaunchProjects from "./components/property/NewLaunchProjects";
 
 // ✅ BELOW THE FOLD: load lazily to reduce initial JS bundle
-const TrendingProjects = dynamic(() => import("./components/property/TrendingProjects"), { ssr: true });
-const WhyChooseNeev = dynamic(() => import("./components/WhyChooseNeev"), { ssr: true });
-const DevelopersSection = dynamic(() => import("./components/DevelopersSection"), { ssr: true });
-const BlogSection = dynamic(() => import("./components/BlogSection"), { ssr: true });
-const StatsBar = dynamic(() => import("./components/StatsBar"), { ssr: true });
+const TrendingProjects = nextDynamic(() => import("./components/property/TrendingProjects"), { ssr: true });
+const WhyChooseNeev = nextDynamic(() => import("./components/WhyChooseNeev"), { ssr: true });
+const DevelopersSection = nextDynamic(() => import("./components/DevelopersSection"), { ssr: true });
+const BlogSection = nextDynamic(() => import("./components/BlogSection"), { ssr: true });
+const StatsBar = nextDynamic(() => import("./components/StatsBar"), { ssr: true });
 
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";

@@ -4,13 +4,20 @@ import Script from "next/script";
 import dynamic from "next/dynamic";
 import { NextUIProvider } from "@nextui-org/react";
 
-/* ✅ DYNAMIC IMPORTS FOR PERFORMANCE */
-const Toaster = dynamic(() => import("react-hot-toast").then((mod) => mod.Toaster), { ssr: false });
-const Conditionalstickyicons = dynamic(() => import("@/app/components/Conditionalstickyicons"), { ssr: false });
+/* ✅ DYNAMIC IMPORTS */
+const Toaster = dynamic(() =>
+  import("react-hot-toast").then((mod) => mod.Toaster),
+  { ssr: false }
+);
+const Conditionalstickyicons = dynamic(
+  () => import("@/app/components/Conditionalstickyicons"),
+  { ssr: false }
+);
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+/* ✅ FONTS */
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -23,106 +30,105 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+/* ✅ METADATA (SAFE + SEO FIX) */
 export const metadata = {
   title: "Neev Realty",
   description:
     "Neev Realty - Premium flats, apartments and commercial spaces in Gurgaon.",
-  keywords: [
-    "Neev Realty",
-    "real estate in gurgaon",
-    "property in gurugram",
-  ],
   metadataBase: new URL("https://www.neevrealty.com"),
+
+  // ✅ Google verification (no manual meta needed)
+  verification: {
+    google: "qehkTwAMVJUDTMNaCSLYCQKMVHOcK8QByWq2Ykwv9PY",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-
-        {/* Schema JSON-LD */}
-        <script
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* ✅ SCHEMA JSON-LD (SAFE WAY) */}
+        <Script
+          id="schema-org"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@graph": [
                 {
                   "@type": "Organization",
-                  "name": "Neev Realty",
-                  "url": "https://www.neevrealty.com",
-                  "logo": "https://www.neevrealty.com/logo.png",
-                  "image": "https://www.neevrealty.com/logo.png",
-                  "telephone": "+91-9999999999",
-                  "priceRange": "₹₹ - ₹₹₹",
-                  "contactPoint": [
+                  name: "Neev Realty",
+                  url: "https://www.neevrealty.com",
+                  logo: "https://www.neevrealty.com/logo.png",
+                  image: "https://www.neevrealty.com/logo.png",
+                  telephone: "+91-9999999999",
+                  priceRange: "₹₹ - ₹₹₹",
+                  contactPoint: [
                     {
                       "@type": "ContactPoint",
-                      "telephone": "+91-9999999999",
-                      "contactType": "sales",
-                      "areaServed": "IN",
-                      "availableLanguage": ["en", "hi"]
-                    }
+                      telephone: "+91-9999999999",
+                      contactType: "sales",
+                      areaServed: "IN",
+                      availableLanguage: ["en", "hi"],
+                    },
                   ],
-                  "sameAs": [
+                  sameAs: [
                     "https://www.facebook.com/neevrealty",
                     "https://www.instagram.com/neevrealty",
                     "https://twitter.com/neevrealty",
-                    "https://www.linkedin.com/company/neevrealty"
-                  ]
+                    "https://www.linkedin.com/company/neevrealty",
+                  ],
                 },
                 {
                   "@type": "WebSite",
-                  "url": "https://www.neevrealty.com/",
-                  "name": "Neev Realty",
-                  "potentialAction": {
+                  url: "https://www.neevrealty.com/",
+                  name: "Neev Realty",
+                  potentialAction: {
                     "@type": "SearchAction",
-                    "target": "https://www.neevrealty.com/search?q={search_term_string}",
-                    "query-input": "required name=search_term_string"
-                  }
+                    target:
+                      "https://www.neevrealty.com/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
                 },
                 {
                   "@type": "RealEstateAgent",
-                  "name": "Neev Realty",
-                  "url": "https://www.neevrealty.com",
-                  "image": "https://www.neevrealty.com/logo.png",
-                  "telephone": "+91-9999999999",
-                  "priceRange": "₹₹ - ₹₹₹",
-                  "address": {
+                  name: "Neev Realty",
+                  url: "https://www.neevrealty.com",
+                  image: "https://www.neevrealty.com/logo.png",
+                  telephone: "+91-9999999999",
+                  priceRange: "₹₹ - ₹₹₹",
+                  address: {
                     "@type": "PostalAddress",
-                    "addressLocality": "Gurgaon",
-                    "addressRegion": "Haryana",
-                    "postalCode": "122001",
-                    "addressCountry": "IN"
-                  }
+                    addressLocality: "Gurgaon",
+                    addressRegion: "Haryana",
+                    postalCode: "122001",
+                    addressCountry: "IN",
+                  },
                 },
                 {
                   "@type": "LocalBusiness",
-                  "name": "Neev Realty",
-                  "image": "https://www.neevrealty.com/logo.png",
-                  "url": "https://www.neevrealty.com",
-                  "telephone": "+91-9999999999",
-                  "priceRange": "₹₹ - ₹₹₹",
-                  "address": {
+                  name: "Neev Realty",
+                  image: "https://www.neevrealty.com/logo.png",
+                  url: "https://www.neevrealty.com",
+                  telephone: "+91-9999999999",
+                  priceRange: "₹₹ - ₹₹₹",
+                  address: {
                     "@type": "PostalAddress",
-                    "addressLocality": "Gurgaon",
-                    "addressRegion": "Haryana",
-                    "postalCode": "122001",
-                    "addressCountry": "IN"
-                  }
-                }
-              ]
-            })
+                    addressLocality: "Gurgaon",
+                    addressRegion: "Haryana",
+                    postalCode: "122001",
+                    addressCountry: "IN",
+                  },
+                },
+              ],
+            }),
           }}
         />
 
-        {/* Google Search Console Verification */}
-        <meta
-          name="google-site-verification"
-          content="qehkTwAMVJUDTMNaCSLYCQKMVHOcK8QByWq2Ykwv9PY"
-        />
-
-        {/* Google Tag Manager - LOAD AFTER INTERACTIVE */}
+        {/* ✅ GOOGLE TAG MANAGER (HEAD SCRIPT SAFE) */}
         <Script
           id="gtm-head"
           strategy="afterInteractive"
@@ -140,13 +146,7 @@ export default function RootLayout({ children }) {
           }}
         />
 
-      </head>
-
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-
-        {/* Google Tag Manager (noscript) */}
+        {/* ✅ GTM NOSCRIPT (IMPORTANT - KEEP) */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M25MQ9BL"
@@ -156,6 +156,7 @@ export default function RootLayout({ children }) {
           />
         </noscript>
 
+        {/* ✅ UI */}
         <Toaster />
 
         <NextUIProvider>
@@ -165,10 +166,7 @@ export default function RootLayout({ children }) {
         </NextUIProvider>
 
         <Conditionalstickyicons />
-
       </body>
     </html>
   );
 }
-
-

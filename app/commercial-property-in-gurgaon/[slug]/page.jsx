@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-
+import Script from "next/script";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBuilderById } from "@/lib/firestore/builders/read_server";
 import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
@@ -25,7 +25,9 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 /* ================= METADATA ================= */
 
@@ -43,45 +45,68 @@ export async function generateMetadata({ params }) {
 
   const seo = await getSEO(slug);
 
+  console.log("SEO FULL:", seo);
+  console.log("SEO KEYWORDS:", seo?.keywords);
+  console.log("SEO METAKEYWORDS:", seo?.metaKeywords);
+  console.log("PROPERTY META:", property.metaKeywords, property.canonical);
+
   const baseUrl = "https://www.neevrealty.com";
 
-  const title =
-    seo?.title ||
-    property.metaTitle ||
-    `${property.title} in ${property.location} | Price & Details`;
+  // 🔥 SAFE HELPER
+  const getValid = (v) =>
+    typeof v === "string" && v.trim() !== "" ? v : null;
 
-  const description =
-    seo?.description ||
-    property.metaDescription ||
-    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
-
+  // 🔥 PARENT SLUG
   let parentSlug = "commercial-property-in-gurgaon";
   if (property?.isRetail) parentSlug = "retail-shops-in-gurgaon";
   if (property?.isSCO) parentSlug = "sco-plots-in-gurgaon";
 
-  const keywords =
-  seo?.keywords !== undefined
-    ? Array.isArray(seo.keywords)
-      ? seo.keywords.join(", ")
-      : seo.keywords
-    : seo?.metaKeywords !== undefined
-    ? seo.metaKeywords
-    : property.metaKeywords || "";
+  // ✅ TITLE
+  const title =
+    getValid(seo?.title) ||
+    getValid(property.metaTitle) ||
+    `${property.title} in ${property.location} | Price & Details`;
 
+  // ✅ DESCRIPTION
+  const description =
+    getValid(seo?.description) ||
+    getValid(property.metaDescription) ||
+    `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and payment plans.`;
+
+  // ✅ KEYWORDS
+  const keywordsRaw =
+
+    getValid(seo?.metaKeywords) ||
+    getValid(property.metaKeywords) ||
+    "";
+
+  const keywords = keywordsRaw
+    ? keywords.split(",").map((k) => k.trim()).filter(Boolean)
+    : [];
+
+  // ✅ CANONICAL (🔥 FIXED)
   const canonicalURL =
-    seo?.canonical ||
+    getValid(seo?.canonical) ||
+    getValid(property.canonical) || // 🔥 THIS WAS MISSING
     `${baseUrl}/${parentSlug}/${property.slug}`;
+
+  console.log("FINAL CANONICAL:", canonicalURL);
 
   return {
     title,
     description,
 
-    // ✅ FIX KEYWORDS
-    keywords: keywords
-      ? keywords.split(",").map((k) => k.trim())
-      : [],
+    metadataBase: new URL("https://www.neevrealty.com"),
 
-    // ✅ IMPORTANT: FULL URL USE KAR
+    alternates: {
+      canonical: canonicalURL,
+    },
+
+    // 🔥 FORCE KEYWORDS (THIS IS FINAL FIX)
+    other: {
+      keywords: keywords.join(", "),
+    },
+
     openGraph: {
       title,
       description,
@@ -93,14 +118,8 @@ export async function generateMetadata({ params }) {
       title,
       description,
     },
-
-    // ✅ MOST IMPORTANT (THIS FIXES CANONICAL)
-    alternates: {
-      canonical: canonicalURL,
-    },
   };
 }
-
 /* ================= PAGE ================= */
 
 export default async function PropertyPage({ params }) {
@@ -276,13 +295,13 @@ export default async function PropertyPage({ params }) {
 
           ...(parentSlug !== "commercial-property-in-gurgaon"
             ? [
-                {
-                  "@type": "ListItem",
-                  position: 3,
-                  name: parentLabel,
-                  item: `${baseUrl}${currentBaseRoute}`,
-                },
-              ]
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: parentLabel,
+                item: `${baseUrl}${currentBaseRoute}`,
+              },
+            ]
             : []),
 
           {
@@ -297,9 +316,13 @@ export default async function PropertyPage({ params }) {
 
   return (
     <>
-      <script
+      <Script
+        id="property-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema),
+        }}
       />
 
       <ApartmentClient>

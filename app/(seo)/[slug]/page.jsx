@@ -21,6 +21,9 @@ export async function generateMetadata({ params }) {
   const property = await getPropertyBySlugOrId(slug);
 
   if (property) {
+    const canonicalUrl =
+  property.canonical ||
+  `https://www.neevrealty.com/${property.slug || slug}`;
     return {
       title:
         property.metaTitle ||
@@ -28,6 +31,12 @@ export async function generateMetadata({ params }) {
       description:
         property.metaDescription ||
         `Explore ${property.title} located in ${property.location}.`,
+      keywords:
+        property.metaKeywords ||
+        `${property.title}, property in ${property.location}, real estate ${property.location}`,
+      alternates: {
+      canonical: canonicalUrl,  
+      },
     };
   }
 
@@ -52,6 +61,11 @@ export async function generateMetadata({ params }) {
         `Explore the best ${COMMERCIAL_TYPE_MAP[
           slug
         ].toLowerCase()} available for sale in Gurgaon.`,
+
+      keywords:
+        seo?.keywords ||
+        seo?.metaKeywords ||
+        `${COMMERCIAL_TYPE_MAP[slug]}, commercial property in gurgaon, real estate gurgaon`,
 
       alternates: {
         canonical:
@@ -80,6 +94,11 @@ export async function generateMetadata({ params }) {
         `Explore the best ${RESIDENTIAL_TYPE_META_MAP[
           slug
         ].toLowerCase()} available for sale in Gurgaon.`,
+
+      keywords:
+        seo?.keywords ||
+        seo?.metaKeywords ||
+        `${RESIDENTIAL_TYPE_META_MAP[slug]}, property in gurgaon, real estate gurgaon`,
 
       alternates: {
         canonical:

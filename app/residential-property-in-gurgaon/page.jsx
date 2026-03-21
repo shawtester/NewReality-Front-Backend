@@ -25,6 +25,11 @@ export async function generateMetadata() {
       seo?.description ||
       "Explore the best residential projects in Gurgaon.",
 
+    keywords:
+      seo?.keywords ||
+      seo?.metaKeywords ||
+      "residential property in gurgaon, flats in gurgaon, apartments in gurgaon",
+
     alternates: {
       canonical: seo?.canonical || baseUrl,
     },
@@ -35,7 +40,7 @@ export async function generateMetadata() {
    ✅ PAGE LOGIC
 ========================= */
 export default async function ResidentialPage({ searchParams }) {
-  
+
 
   const allProperties = await getAllProperties();
 

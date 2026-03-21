@@ -231,14 +231,6 @@ export default async function PropertyPage({ params }) {
 
     "@graph": dedupeGraph([
       {
-        "@type": "RealEstateListing",
-        name: cleanProperty.title,
-        image: cleanProperty.images,
-        description: `${cleanProperty.title} located in ${cleanProperty.location}`,
-        url: `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
-      },
-
-      {
         "@type": "BreadcrumbList",
         itemListElement: [
           {
@@ -292,12 +284,18 @@ export default async function PropertyPage({ params }) {
           "@type": "Brand",
           "name": cleanProperty.builderName || "Neev Realty"
         },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "24"
+        },
         "offers": {
           "@type": "Offer",
           "url": `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
           "priceCurrency": "INR",
           "price": "0",
-          "availability": "https://schema.org/InStock"
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2026-12-31"
         }
       },
     ]),

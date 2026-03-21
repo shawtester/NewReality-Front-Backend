@@ -49,6 +49,7 @@ export default function FavoriteButton({ productId }) {
       color="danger"
       className="rounded-full"
       isIconOnly
+      aria-label="Toggle Favorite"
       size="sm"
     >
       {!isLiked && <FavoriteBorderOutlinedIcon fontSize="small" />}

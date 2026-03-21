@@ -117,6 +117,7 @@ export default function ContactListView() {
                   >
                     <Button
                       isIconOnly
+                      aria-label="Delete Contact"
                       size="sm"
                       className="bg-red-500 text-white"
                       onClick={() => handleDelete(item.id)}

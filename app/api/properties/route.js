@@ -11,10 +11,8 @@ export async function GET(req) {
       slug: p.slug || "",
     }));
 
-    // Optional: log if no residential or commercial found
+    // No longer logging missing residential/commercial types to keep build clean
     const types = properties.map(p => p.type.toLowerCase());
-    if (!types.includes("residential")) console.warn("No residential properties found");
-    if (!types.includes("commercial")) console.warn("No commercial properties found");
 
     return new Response(JSON.stringify(properties), {
       status: 200,

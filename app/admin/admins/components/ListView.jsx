@@ -97,6 +97,7 @@ function Row({ item, index }) {
             onClick={handleUpdate}
             isDisabled={isDeleting}
             isIconOnly
+            aria-label="Edit Admin"
             size="sm"
           >
             <Edit2 size={13} />
@@ -106,6 +107,7 @@ function Row({ item, index }) {
             isLoading={isDeleting}
             isDisabled={isDeleting}
             isIconOnly
+            aria-label="Delete Admin"
             size="sm"
             color="danger"
           >

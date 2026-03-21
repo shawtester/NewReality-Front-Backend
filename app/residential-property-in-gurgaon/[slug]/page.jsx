@@ -233,23 +233,13 @@ export default async function PropertyPage({ params }) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@graph": dedupeGraph([
-              // ✅ PRODUCT SCHEMA
+              // ✅ REAL ESTATE SCHEMA
               {
-                "@type": "Product",
+                "@type": "RealEstateListing",
                 name: cleanProperty.title,
                 image: cleanProperty.images,
                 description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-                brand: {
-                  "@type": "Brand",
-                  name: "Neev Realty",
-                },
-                offers: {
-                  "@type": "Offer",
-                  priceCurrency: "INR",
-                  price: cleanProperty.price || "",
-                  availability: "https://schema.org/InStock",
-                  url: `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
-                },
+                url: `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
               },
 
               // ✅ BREADCRUMB SCHEMA

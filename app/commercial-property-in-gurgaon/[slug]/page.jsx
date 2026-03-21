@@ -231,21 +231,11 @@ export default async function PropertyPage({ params }) {
 
     "@graph": dedupeGraph([
       {
-        "@type": "Product",
+        "@type": "RealEstateListing",
         name: cleanProperty.title,
         image: cleanProperty.images,
         description: `${cleanProperty.title} located in ${cleanProperty.location}`,
-        brand: {
-          "@type": "Brand",
-          name: "Neev Realty",
-        },
-        offers: {
-          "@type": "Offer",
-          priceCurrency: "INR",
-          price: cleanProperty.price || "",
-          availability: "https://schema.org/InStock",
-          url: `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
-        },
+        url: `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
       },
 
       {

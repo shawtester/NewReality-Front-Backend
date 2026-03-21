@@ -54,7 +54,6 @@ export default function RootLayout({ children }) {
                   "logo": "https://www.neevrealty.com/logo.png",
                   "image": "https://www.neevrealty.com/logo.png",
                   "telephone": "+91-9999999999",
-                  "priceRange": "₹₹ - ₹₹₹",
                   "contactPoint": [
                     {
                       "@type": "ContactPoint",

@@ -231,17 +231,6 @@ export default async function PropertyPage({ params }) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@graph": dedupeGraph([
-              // ✅ ORGANIZATION SCHEMA
-              {
-                "@type": "Organization",
-                "name": "Neev Realty",
-                "url": "https://www.neevrealty.com",
-                "logo": "https://www.neevrealty.com/logo.png",
-                "image": "https://www.neevrealty.com/logo.png",
-                "telephone": "+91-9999999999",
-                "priceRange": "₹₹ - ₹₹₹"
-              },
-
               // ✅ PRODUCT SCHEMA
               {
                 "@type": "Product",

@@ -52,12 +52,6 @@ export default async function ResidentialPage({ searchParams }) {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
-        "name": "Neev Realty",
-        "url": baseUrl,
-        "logo": `${baseUrl}/logo.png`
-      },
-      {
         "@type": "BreadcrumbList",
         "itemListElement": [
           {

@@ -229,15 +229,6 @@ export default async function PropertyPage({ params }) {
 
     "@graph": dedupeGraph([
       {
-        "@type": "Organization",
-        "name": "Neev Realty",
-        "url": "https://www.neevrealty.com",
-        "logo": "https://www.neevrealty.com/logo.png",
-        "image": "https://www.neevrealty.com/logo.png",
-        "telephone": "+91-9999999999",
-        "priceRange": "₹₹ - ₹₹₹"
-      },
-      {
         "@type": "Product",
         name: cleanProperty.title,
         image: cleanProperty.images,

@@ -5,10 +5,11 @@ import TestimonialsSection from "@/app/about-us/components/Testimonial";
 import { getTestimonials } from "@/lib/firestore/testimonials/read";
 import Footer from "@/app/components/Footer";
 import { getSEO } from "@/lib/firestore/seo/read";
+import Script from "next/script";
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {
-  const slug = "contact-us"; // 🔥 Must match Firestore document ID
+  const slug = "contact-us";
 
   try {
     const seo = await getSEO(slug);
@@ -64,37 +65,40 @@ export async function generateMetadata() {
 export default async function ContactPage() {
   const testimonials = await getTestimonials();
 
-  const baseUrl = "https://www.neevrealty.com";
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "LocalBusiness",
-        "name": "Neev Realty",
-        "image": `${baseUrl}/logo.png`,
-        "telephone": "+91-9999999999",
-        "email": "info@neevrealty.com",
-        "priceRange": "₹₹ - ₹₹₹",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Gurgaon",
-          "addressLocality": "Gurgaon",
-          "addressRegion": "Haryana",
-          "postalCode": "122001",
-          "addressCountry": "IN"
-        },
-        "url": `${baseUrl}/contact`
-      }
-    ]
+        "@type": "Organization",
+        "@id": "https://www.neevrealty.com/#organization",
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            telephone: "+91-9999999999",
+            contactType: "customer support",
+            areaServed: "IN",
+            availableLanguage: ["en", "hi"],
+            email: "info@neevrealty.com",
+          },
+        ],
+      },
+    ],
   };
 
   return (
     <div>
       <Navbar />
-      <script
+
+      {/* ✅ ONLY CONTACTPOINT EXTENSION (NO DUPLICATE) */}
+      <Script
+        id="contact-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema),
+        }}
       />
+
       <ContactSection />
       <Faq />
       <TestimonialsSection testimonials={testimonials} />

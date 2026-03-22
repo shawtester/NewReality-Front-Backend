@@ -12,10 +12,13 @@ export default function SchemaScript() {
   const isPropertySlug =
     pathname.split("/").filter(Boolean).length === 1;
 
+  const isContactPage = pathname === "/contact" || pathname === "/contact-us";
+
   // 🔥 FULL SCHEMA
   const fullGraph = [
     {
       "@type": "Organization",
+      "@id": "https://www.neevrealty.com/#organization",
       name: "Neev Realty",
       url: "https://www.neevrealty.com",
       logo: "https://www.neevrealty.com/logo.png",
@@ -39,6 +42,7 @@ export default function SchemaScript() {
     },
     {
       "@type": "WebSite",
+      "@id": "https://www.neevrealty.com/#website",
       url: "https://www.neevrealty.com/",
       name: "Neev Realty",
       potentialAction: {
@@ -50,6 +54,7 @@ export default function SchemaScript() {
     },
     {
       "@type": "RealEstateAgent",
+      "@id": "https://www.neevrealty.com/#organization",
       name: "Neev Realty",
       url: "https://www.neevrealty.com",
       image: "https://www.neevrealty.com/logo.png",
@@ -65,6 +70,7 @@ export default function SchemaScript() {
     },
     {
       "@type": "LocalBusiness",
+      "@id": "https://www.neevrealty.com/#organization",
       name: "Neev Realty",
       image: "https://www.neevrealty.com/logo.png",
       url: "https://www.neevrealty.com",
@@ -84,7 +90,6 @@ export default function SchemaScript() {
   let finalGraph = fullGraph;
 
   if (isBlog) {
-    // blog page → kuch bhi global schema nahi
     return null;
   }
 
@@ -92,6 +97,15 @@ export default function SchemaScript() {
     // property page → ONLY organization
     finalGraph = fullGraph.filter(
       (item) => item["@type"] === "Organization"
+    );
+  }
+
+  if (isContactPage) {
+    // contact page → ONLY Organization + LocalBusiness
+    finalGraph = fullGraph.filter(
+      (item) =>
+        item["@type"] === "Organization" ||
+        item["@type"] === "LocalBusiness"
     );
   }
 

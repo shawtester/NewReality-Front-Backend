@@ -253,7 +253,7 @@ export default function Footer() {
             <Link href="/blog">Blog</Link>
             <Link href={BASE_ROUTE}>Residential</Link>
             <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/commercial-property-in-gurgaon">Commercial</Link>  
+            <Link href="/commercial-property-in-gurgaon">Commercial</Link>
             <Link href="/terms-condition">Terms & Condition</Link>
             <Link href="/about-us">About</Link>
             <Link href="/disclaimer">Disclaimer</Link>
@@ -267,10 +267,22 @@ export default function Footer() {
         {/* CONTACT */}
         <div>
           <h4 className="text-white font-semibold mb-4">Connect with us</h4>
-          <p className="text-sm text-gray-400">sales@neevrealty.com</p>
-          <p className="text-sm text-gray-400 mt-2">info@neevrealty.com</p>
 
-          {/* ✅ UPDATED: Clickable social media icons */}
+          <a
+            href="mailto:sales@neevrealty.com"
+            className="block text-sm text-gray-400 hover:text-white"
+          >
+            sales@neevrealty.com
+          </a>
+
+          <a
+            href="mailto:info@neevrealty.com?subject=Property Inquiry&body=Hi, I am interested in your properties."
+            className="block text-sm text-gray-400 mt-2 hover:text-white"
+          >
+            info@neevrealty.com
+          </a>
+
+          {/* Social icons */}
           <div className="mt-4 flex gap-2">
             {socialLinks.map(({ Icon, href }, i) => (
               <Link

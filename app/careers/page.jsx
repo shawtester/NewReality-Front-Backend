@@ -1,7 +1,5 @@
 import Navbar from "../components/Header";
-import Career from "./components/section1";
-import LifeAtNeev from "./components/section2";
-import WhatWeOffer from "./components/section3";
+import CareerWrapper from "./CareerWrapper";
 import Footer from "../components/Footer";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -66,9 +64,7 @@ export default function CareerPage() {
   return (
     <div>
       <Navbar />
-      <Career />
-      <LifeAtNeev />
-      <WhatWeOffer />
+      <CareerWrapper />
       <Footer />
     </div>
   );

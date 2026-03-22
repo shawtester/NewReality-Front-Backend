@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -19,8 +19,16 @@ const benefitsRight = [
   "Diversity & Inclusion Initiatives",
 ];
 
-const WhatWeOffer = () => {
-  const [showResumePopup, setShowResumePopup] = useState(false);
+// ✅ FIX: props added
+const WhatWeOffer = ({
+  showResumePopup,
+  setShowResumePopup,
+  selectedPosition,
+  jobs,
+}) => {
+
+  // ❌ FIX: removed local popup state
+
   const [loading, setLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
 
@@ -33,6 +41,16 @@ const WhatWeOffer = () => {
     resumeFile: null,
     description: "",
   });
+
+  // ✅ FIX: auto-fill position
+  useEffect(() => {
+    if (selectedPosition) {
+      setFormData((p) => ({
+        ...p,
+        position: selectedPosition,
+      }));
+    }
+  }, [selectedPosition]);
 
   const CLOUDINARY_CLOUD_NAME = "dzcocqhut";
   const CLOUDINARY_UPLOAD_PRESET = "resume_upload";
@@ -66,10 +84,6 @@ const WhatWeOffer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    console.log("🔥 FORM SUBMIT STARTED");
-    console.log("📋 Form data:", formData);
-    console.log("🔥 Firebase db:", db);
 
     if (!formData.fullName || !formData.email || !formData.mobile || !formData.position || !formData.resumeFile) {
       setSubmitStatus("Please fill all required fields*");
@@ -80,12 +94,8 @@ const WhatWeOffer = () => {
     setSubmitStatus("");
 
     try {
-      // 1. Cloudinary
-      console.log("📤 1. Cloudinary...");
       const resumeURL = await uploadToCloudinary(formData.resumeFile);
-      console.log("✅ 1. Cloudinary URL:", resumeURL);
 
-      // 2. 🔥 FIXED FIREBASE DATA - ALL FIELDS ADMIN NEEDS
       const firebaseData = {
         fullName: formData.fullName,
         email: formData.email,
@@ -96,42 +106,32 @@ const WhatWeOffer = () => {
         resumeURL,
         source: "careers-page",
         status: "pending",
-        submittedAt: serverTimestamp(),  // ✅ CRITICAL: Admin query needs this!
+        submittedAt: serverTimestamp(),
       };
-      console.log("📝 2. Firebase data:", firebaseData);
 
-      // 3. Collection access
-      console.log("🔍 3. Testing collection...");
       const contactsCollection = collection(db, "send_resume");
-      console.log("✅ 3. Collection object:", contactsCollection);
-
-      // 4. Save to Firebase
-      console.log("💾 4. Saving document...");
-      const docRef = await addDoc(contactsCollection, firebaseData);
-      console.log("🎉 5. ✅ FIREBASE SUCCESS! Document ID:", docRef.id);
+      await addDoc(contactsCollection, firebaseData);
 
       setSubmitStatus("✅ Resume submitted successfully!");
       setShowResumePopup(false);
+
       setFormData({
-        fullName: "", 
-        email: "", 
-        mobile: "", 
-        position: "", 
-        experience: "", 
-        resumeFile: null, 
+        fullName: "",
+        email: "",
+        mobile: "",
+        position: "",
+        experience: "",
+        resumeFile: null,
         description: ""
       });
 
     } catch (error) {
-      console.error("💥 6. ❌ COMPLETE ERROR:", error);
-      console.error("Code:", error.code);
-      console.error("Message:", error.message);
+      console.error(error);
       setSubmitStatus(`❌ ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <>
       <section className="w-full bg-[#F6FAFF] ">
@@ -185,52 +185,54 @@ const WhatWeOffer = () => {
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 lg:gap-4">
-                <input 
-                  name="fullName" 
-                  type="text" 
-                  placeholder="Full Name*" 
-                  value={formData.fullName} 
-                  onChange={handleInputChange} 
-                  required 
-                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none" 
+                <input
+                  name="fullName"
+                  type="text"
+                  placeholder="Full Name*"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none"
                 />
-                <input 
-                  name="email" 
-                  type="email" 
-                  placeholder="Email Address*" 
-                  value={formData.email} 
-                  onChange={handleInputChange} 
-                  required 
-                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none" 
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email Address*"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none"
                 />
-                <input 
-                  name="mobile" 
-                  type="tel" 
-                  placeholder="Mobile Number*" 
-                  value={formData.mobile} 
-                  onChange={handleInputChange} 
-                  required 
-                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none" 
+                <input
+                  name="mobile"
+                  type="tel"
+                  placeholder="Mobile Number*"
+                  value={formData.mobile}
+                  onChange={handleInputChange}
+                  required
+                  className="border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none"
                 />
-                
-                <select 
-                  name="position" 
-                  value={formData.position} 
-                  onChange={handleInputChange} 
-                  required 
+
+                <select
+                  name="position"
+                  value={formData.position}
+                  onChange={handleInputChange}
+                  required
                   className="border rounded-md px-3 md:px-4 py-2.5 text-sm text-gray-600 focus:border-[#DBA40D] outline-none"
                 >
                   <option value="">Applying For Position*</option>
-                  <option value="Sales Executive">Sales Executive</option>
-                  <option value="Marketing Manager">Marketing Manager</option>
-                  <option value="Channel Partner">Channel Partner</option>
-                  <option value="Operations">Operations</option>
+
+                  {jobs.map((job) => (
+                    <option key={job.id} value={job.title}>
+                      {job.title}
+                    </option>
+                  ))}
                 </select>
-                
-                <select 
-                  name="experience" 
-                  value={formData.experience} 
-                  onChange={handleInputChange} 
+
+                <select
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleInputChange}
                   className="border rounded-md px-3 md:px-4 py-2.5 text-sm text-gray-600 focus:border-[#DBA40D] outline-none"
                 >
                   <option value="">Total Work Experience</option>
@@ -239,15 +241,15 @@ const WhatWeOffer = () => {
                   <option value="3–5 Years">3–5 Years</option>
                   <option value="5+ Years">5+ Years</option>
                 </select>
-                
+
                 <div className="md:col-span-2">
-                  <input 
-                    type="file" 
-                    name="resumeFile" 
-                    accept=".pdf,.doc,.docx" 
-                    onChange={handleFileChange} 
+                  <input
+                    type="file"
+                    name="resumeFile"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileChange}
                     required
-                    className="w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#DBA40D] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#c8950a]" 
+                    className="w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#DBA40D] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#c8950a]"
                   />
                   {formData.resumeFile && (
                     <p className="text-xs text-gray-500 mt-1">
@@ -260,28 +262,27 @@ const WhatWeOffer = () => {
                 </div>
               </div>
 
-              <textarea 
-                name="description" 
-                rows={2} 
-                placeholder="Briefly describe your experience (optional)" 
-                value={formData.description} 
-                onChange={handleInputChange} 
-                className="w-full border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none" 
+              <textarea
+                name="description"
+                rows={2}
+                placeholder="Briefly describe your experience (optional)"
+                value={formData.description}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 md:px-4 py-2.5 text-sm focus:border-[#DBA40D] outline-none"
               />
 
               {submitStatus && (
-                <div className={`text-sm p-2 rounded-md text-center ${
-                  submitStatus.includes("✅") || submitStatus.includes("success")
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "bg-red-50 text-red-700 border border-red-200"
-                }`}>
+                <div className={`text-sm p-2 rounded-md text-center ${submitStatus.includes("✅") || submitStatus.includes("success")
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+                  }`}>
                   {submitStatus}
                 </div>
               )}
 
-              <button 
-                type="submit" 
-                disabled={loading} 
+              <button
+                type="submit"
+                disabled={loading}
                 className={`w-full rounded-lg py-2.5 md:py-3 text-sm font-semibold text-white transition-all ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#DBA40D] hover:bg-[#c8950a]"}`}
               >
                 {loading ? "Submitting..." : "Submit Resume"}

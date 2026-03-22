@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getJobs } from "@/lib/firestore/jobs/read";
 
-export default function Career() {
+export default function Career({ openResume }) {
   const [jobs, setJobs] = useState([]);
   const [openId, setOpenId] = useState(null); // ⭐ track open card
 
@@ -76,6 +76,17 @@ export default function Career() {
                 <p className="text-sm mt-2">
                   Experience: {job.experience}
                 </p>
+
+                {/* ⭐ APPLY BUTTON */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // 🔥 prevent card toggle
+                    openResume(job.title); // 🔥 pass job title
+                  }}
+                  className="mt-4 bg-[#DBA40D] text-white px-4 py-2 rounded-md text-sm hover:bg-[#c8950a] transition"
+                >
+                  Apply Now
+                </button>
 
                 {/* ⭐ DESCRIPTION EXPAND */}
                 {isOpen && (

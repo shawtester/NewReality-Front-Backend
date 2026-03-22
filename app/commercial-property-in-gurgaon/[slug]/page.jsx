@@ -246,103 +246,71 @@ export default async function PropertyPage({ params }) {
   };
 
   const schema = {
-    "@context": "https://schema.org",
+  "@context": "https://schema.org",
+  "@graph": [
 
-    "@graph": dedupeGraph([
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: baseUrl,
-          },
+    // ✅ PRODUCT
+    {
+      "@type": "Product",
+      name: cleanProperty.title,
+      image: cleanProperty.images,
+      description: `${cleanProperty.title} located in ${cleanProperty.location}.`,
 
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Commercial",
-            item: `${baseUrl}/commercial-property-in-gurgaon`,
-          },
+      brand: {
+        "@type": "Brand",
+        name: cleanProperty.builderName || "Neev Realty"
+      },
 
-          ...(parentSlug !== "commercial-property-in-gurgaon"
-            ? [
+      offers: {
+        "@type": "Offer",
+        url: `${baseUrl}/${parentSlug}/${cleanProperty.slug}`,
+        priceCurrency: "INR",
+        price: cleanProperty.price?.replace(/[^\d]/g, "") || "",
+        availability: "https://schema.org/InStock"
+      }
+    },
+
+    // ✅ BREADCRUMB
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: baseUrl
+        },
+
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Commercial",
+          item: `${baseUrl}/commercial-property-in-gurgaon`
+        },
+
+        ...(parentSlug !== "commercial-property-in-gurgaon"
+          ? [
               {
                 "@type": "ListItem",
                 position: 3,
                 name: parentLabel,
-                item: `${baseUrl}${currentBaseRoute}`,
-              },
-            ]
-            : []),
-
-          {
-            "@type": "ListItem",
-            position: parentSlug !== "commercial-property-in-gurgaon" ? 4 : 3,
-            name: cleanProperty.title,
-          },
-        ],
-      },
-
-      // ✅ PRODUCT SCHEMA
-      {
-        "@type": "Product",
-        "name": cleanProperty.title,
-        "image": cleanProperty.images,
-        "description": `${cleanProperty.title} located in ${cleanProperty.location}. Check price, floor plans, amenities and payment plans.`,
-        "brand": {
-          "@type": "Brand",
-          "name": cleanProperty.builderName || "Neev Realty"
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "24"
-        },
-        "offers": {
-          "@type": "Offer",
-          "url": `${baseUrl}${currentBaseRoute}/${cleanProperty.slug}`,
-          "priceCurrency": "INR",
-          "price": "0",
-          "availability": "https://schema.org/InStock",
-          "priceValidUntil": "2026-12-31",
-          "hasMerchantReturnPolicy": {
-            "@type": "MerchantReturnPolicy",
-            "applicableCountry": "IN",
-            "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
-          },
-          "shippingDetails": {
-            "@type": "OfferShippingDetails",
-            "shippingRate": {
-              "@type": "MonetaryAmount",
-              "value": "0",
-              "currency": "INR"
-            },
-            "deliveryTime": {
-              "@type": "ShippingDeliveryTime",
-              "handlingTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 0,
-                "maxValue": 0,
-                "unitCode": "DAY"
-              },
-              "transitTime": {
-                "@type": "QuantitativeValue",
-                "minValue": 0,
-                "maxValue": 0,
-                "unitCode": "DAY"
+                item: `${baseUrl}/${parentSlug}`
               }
-            },
-            "shippingDestination": {
-              "@type": "DefinedRegion",
-              "addressCountry": "IN"
-            }
-          }
+            ]
+          : []),
+
+        {
+          "@type": "ListItem",
+          position:
+            parentSlug !== "commercial-property-in-gurgaon" ? 4 : 3,
+          name: cleanProperty.title
         }
-      },
-    ]),
-  };
+      ]
+    }
+
+  ]
+};
 
   return (
     <>

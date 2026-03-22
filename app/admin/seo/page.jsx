@@ -16,7 +16,7 @@ const defaultPages = [
   { label: "Careers", slug: "careers", path: "/careers" },
   { label: "Services", slug: "our-services", path: "/our-services" },
   { label: "FAQ", slug: "faqs", path: "/faqs" },
-  { label: "Terms & Conditions", slug: "terms-condition", path: "/terms-condition" },
+  { label: "Terms & Conditions", slug: "terms-and-conditions", path: "/terms-and-conditions" },
 
   // Commercial
   { label: "Commercial Main", slug: "commercial-property-in-gurgaon", path: "/commercial-property-in-gurgaon" },

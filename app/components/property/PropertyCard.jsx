@@ -79,6 +79,11 @@ export default function PropertyCard({ property = {} }) {
       console.error("Contact submit error:", error);
     }
   };
+  const optimizedImg = img?.includes("res.cloudinary.com")
+    ? img.replace("/upload/", "/upload/f_auto,q_auto/")
+    : img;
+
+
 
   return (
     <>
@@ -96,7 +101,13 @@ export default function PropertyCard({ property = {} }) {
         >
           {/* IMAGE */}
           <div className="relative h-32 md:h-40 lg:h-44 xl:h-48 w-full">
-            <Image src={img} alt={title} fill className="object-cover" loading="lazy" />
+            <Image
+              src={optimizedImg}
+              alt={title}
+              fill
+              className="object-cover"
+              loading="lazy"
+            />
           </div>
 
           {/* CONTENT */}

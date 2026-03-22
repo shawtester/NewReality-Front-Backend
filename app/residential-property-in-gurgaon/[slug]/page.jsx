@@ -41,9 +41,9 @@ export async function generateMetadata({ params }) {
 
     // ✅ Fetch Data
     const propertyRaw = await getPropertyBySlugOrId(slug);
-        const property = JSON.parse(JSON.stringify(propertyRaw));
-        const seoRaw = await getSEO(slug);
-        const seo = JSON.parse(JSON.stringify(seoRaw));
+    const property = JSON.parse(JSON.stringify(propertyRaw));
+    const seoRaw = await getSEO(slug);
+    const seo = JSON.parse(JSON.stringify(seoRaw));
 
     if (!property) {
       return {
@@ -260,38 +260,30 @@ export default async function PropertyPage({ params }) {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@graph": dedupeGraph([
-              // ✅ ORGANIZATION SCHEMA
-              {
-                "@type": "Organization",
-                name: "Neev Realty",
-                url: "https://www.neevrealty.com",
-                logo: "https://www.neevrealty.com/logo.png",
-                image: "https://www.neevrealty.com/logo.png",
-                telephone: "+91-9999999999",
-                priceRange: "₹₹ - ₹₹₹",
-              },
+            "@graph": [
 
-              // ✅ PRODUCT SCHEMA
+              // ✅ PRODUCT (MAIN)
               {
                 "@type": "Product",
                 name: cleanProperty.title,
                 image: cleanProperty.images,
                 description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
+
                 brand: {
                   "@type": "Brand",
-                  name: "Neev Realty",
+                  name: cleanProperty.builderName || "Neev Realty"
                 },
+
                 offers: {
                   "@type": "Offer",
+                  url: `https://www.neevrealty.com/residential-property-in-gurgaon/${cleanProperty.slug}`,
                   priceCurrency: "INR",
                   price: cleanProperty.price || "",
-                  availability: "https://schema.org/InStock",
-                  url: `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
-                },
+                  availability: "https://schema.org/InStock"
+                }
               },
 
-              // ✅ BREADCRUMB SCHEMA
+              // ✅ BREADCRUMB
               {
                 "@type": "BreadcrumbList",
                 itemListElement: [
@@ -299,92 +291,23 @@ export default async function PropertyPage({ params }) {
                     "@type": "ListItem",
                     position: 1,
                     name: "Home",
-                    item: "https://www.neevrealty.com",
+                    item: "https://www.neevrealty.com"
                   },
                   {
                     "@type": "ListItem",
                     position: 2,
                     name: "Residential",
-                    item: "https://www.neevrealty.com/residential-property-in-gurgaon",
+                    item: "https://www.neevrealty.com/residential-property-in-gurgaon"
                   },
-
-                  ...(parentSlug !== "residential-property-in-gurgaon"
-                    ? [
-                      {
-                        "@type": "ListItem",
-                        position: 3,
-                        name: parentLabel,
-                        item: `https://www.neevrealty.com${currentBaseRoute}`,
-                      },
-                    ]
-                    : []),
-
                   {
                     "@type": "ListItem",
-                    position:
-                      parentSlug !== "residential-property-in-gurgaon" ? 4 : 3,
-                    name: cleanProperty.title,
-                  },
-                ],
-              },
-
-              // ✅ PRODUCT SCHEMA
-              {
-                "@type": "Product",
-                "name": cleanProperty.title,
-                "image": cleanProperty.images,
-                "description": `${cleanProperty.title} located in ${cleanProperty.location}. Check price, floor plans, amenities and payment plans.`,
-                "brand": {
-                  "@type": "Brand",
-                  "name": cleanProperty.builderName || "Neev Realty"
-                },
-                "aggregateRating": {
-                  "@type": "AggregateRating",
-                  "ratingValue": "4.8",
-                  "reviewCount": "24"
-                },
-                "offers": {
-                  "@type": "Offer",
-                  "url": `https://www.neevrealty.com/residential/${cleanProperty.slug}`,
-                  "priceCurrency": "INR",
-                  "price": "0",
-                  "availability": "https://schema.org/InStock",
-                  "priceValidUntil": "2026-12-31",
-                  "hasMerchantReturnPolicy": {
-                    "@type": "MerchantReturnPolicy",
-                    "applicableCountry": "IN",
-                    "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
-                  },
-                  "shippingDetails": {
-                    "@type": "OfferShippingDetails",
-                    "shippingRate": {
-                      "@type": "MonetaryAmount",
-                      "value": "0",
-                      "currency": "INR"
-                    },
-                    "deliveryTime": {
-                      "@type": "ShippingDeliveryTime",
-                      "handlingTime": {
-                        "@type": "QuantitativeValue",
-                        "minValue": 0,
-                        "maxValue": 0,
-                        "unitCode": "DAY"
-                      },
-                      "transitTime": {
-                        "@type": "QuantitativeValue",
-                        "minValue": 0,
-                        "maxValue": 0,
-                        "unitCode": "DAY"
-                      }
-                    },
-                    "shippingDestination": {
-                      "@type": "DefinedRegion",
-                      "addressCountry": "IN"
-                    }
+                    position: 3,
+                    name: cleanProperty.title
                   }
-                }
-              },
-            ]),
+                ]
+              }
+
+            ]
           }),
         }}
       />

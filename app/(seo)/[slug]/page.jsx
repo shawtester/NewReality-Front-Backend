@@ -10,6 +10,7 @@ import ResidentialPropertyPage from "@/app/residential-property-in-gurgaon/[slug
 import CommercialPropertyPage from "@/app/commercial-property-in-gurgaon/[slug]/page";
 import CommercialClient from "@/app/commercial-property-in-gurgaon/CommercialClient";
 import ResidentialClient from "@/app/residential-property-in-gurgaon/ResidentialClient";
+import Script from "next/script";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +23,8 @@ export async function generateMetadata({ params }) {
 
   if (property) {
     const canonicalUrl =
-  property.canonical ||
-  `https://www.neevrealty.com/${property.slug || slug}`;
+      property.canonical ||
+      `https://www.neevrealty.com/${property.slug || slug}`;
     return {
       title:
         property.metaTitle ||
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }) {
         property.metaKeywords ||
         `${property.title}, property in ${property.location}, real estate ${property.location}`,
       alternates: {
-      canonical: canonicalUrl,  
+        canonical: canonicalUrl,
       },
     };
   }
@@ -157,12 +158,80 @@ export default async function Page({ params }) {
       .filter((p) => p.propertyType === "commercial")
       .filter((p) => p[field] === true);
 
+    const baseUrl = "https://www.neevrealty.com";
+
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: baseUrl,
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name:
+                slug === "sco-plots-in-gurgaon"
+                  ? "SCO Plots in Gurgaon"
+                  : slug === "retail-shops-in-gurgaon"
+                    ? "Retail Shops in Gurgaon"
+                    : "Commercial Property in Gurgaon",
+              item: `${baseUrl}/${slug}`,
+            },
+          ],
+        },
+        {
+          "@type": "ItemList",
+          name:
+            slug === "sco-plots-in-gurgaon"
+              ? "SCO Plots in Gurgaon"
+              : slug === "retail-shops-in-gurgaon"
+                ? "Retail Shops in Gurgaon"
+                : "Commercial Properties in Gurgaon",
+          description: "Explore top commercial investment opportunities in Gurgaon.",
+          url: `${baseUrl}/${slug}`,
+          itemListElement: filtered.slice(0, 12).map((p, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${baseUrl}/commercial-property-in-gurgaon/${p.slug}`,
+            name: p.title,
+          })),
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: `What are the best ${slug.replaceAll("-", " ")}?`,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Neev Realty offers top commercial properties for investment in Gurgaon.",
+              },
+            },
+          ],
+        },
+      ],
+    };
+
     return (
-      <CommercialClient
-        apartments={filtered}
-        forcedTypeSlug={slug}
-      />
+      <>
+        <Script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+
+        <CommercialClient
+          apartments={filtered}
+          forcedTypeSlug={slug}
+        />
+      </>
     );
+
   }
 
   /* ================= RESIDENTIAL TYPE ================= */
@@ -178,11 +247,77 @@ export default async function Page({ params }) {
       .filter((p) => p.propertyType === "residential")
       .filter((p) => p[field] === true);
 
+    const baseUrl = "https://www.neevrealty.com";
+
+    const pageTitle =
+      slug === "luxury-apartments-in-gurgaon"
+        ? "Luxury Apartments in Gurgaon"
+        : slug === "builder-floor-in-gurgaon"
+          ? "Builder Floors in Gurgaon"
+          : "Residential Properties in Gurgaon";
+
+    const pageUrl = `${baseUrl}/${slug}`;
+
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: baseUrl,
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: pageTitle,
+              item: pageUrl,
+            },
+          ],
+        },
+        {
+          "@type": "ItemList",
+          name: pageTitle,
+          description: `Explore the best ${pageTitle.toLowerCase()} available in Gurgaon.`,
+          url: pageUrl,
+          itemListElement: filtered.slice(0, 12).map((p, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${baseUrl}/residential-property-in-gurgaon/${p.slug}`,
+            name: p.title,
+          })),
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: `What are the best ${pageTitle.toLowerCase()}?`,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: `Neev Realty offers top ${pageTitle.toLowerCase()} for living and investment in Gurgaon.`,
+              },
+            },
+          ],
+        },
+      ],
+    };
+
     return (
-      <ResidentialClient
-        apartments={filtered}
-        forcedTypeSlug={slug}
-      />
+      <>
+        <Script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+
+        <ResidentialClient
+          apartments={filtered}
+          forcedTypeSlug={slug}
+        />
+      </>
     );
   }
 

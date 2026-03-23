@@ -3,18 +3,35 @@
 import { useState } from "react";
 import { uploadPropertyImage } from "@/lib/cloudinary/uploadPropertyImage";
 
-
-export default function Image({ data, handleData }) {
+export default function Image({ data, handleData, slug }) {
   const [uploading, setUploading] = useState(false);
 
   /* 🔹 Upload Handler */
   const uploadImages = async (files, type = "gallery") => {
+    if (!slug) {
+      alert("Please enter project title first");
+      return;
+    }
+
     setUploading(true);
     try {
       const uploaded = [];
 
-      for (const file of files) {
-        const res = await uploadPropertyImage(file);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        // 🔥 UNIQUE SUFFIX LOGIC
+        let suffix = "";
+
+        if (type === "main") {
+          suffix = "cover";
+        } else {
+          const startIndex = data.gallery?.length || 0;
+          suffix = `gallery-${startIndex + i + 1}`;
+        }
+
+        const res = await uploadPropertyImage(file, slug, suffix);
+
         console.log("🔥 CLOUDINARY RESPONSE:", res);
 
         uploaded.push({
@@ -23,7 +40,7 @@ export default function Image({ data, handleData }) {
         });
       }
 
-      console.log("✅ FINAL UPLOADED IMAGE OBJ:", uploaded); // 👈 ADD THIS
+      console.log("✅ FINAL UPLOADED IMAGE OBJ:", uploaded);
 
       if (type === "main") {
         handleData("mainImage", uploaded[0] || null);
@@ -53,7 +70,9 @@ export default function Image({ data, handleData }) {
 
       {/* 🔹 MAIN IMAGE */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">Main Image (Primary Banner  Dimension:1640 × 772 px)</p>
+        <p className="text-sm font-medium">
+          Main Image (Primary Banner Dimension:1640 × 772 px)
+        </p>
         <input
           type="file"
           accept="image/*"
@@ -75,7 +94,7 @@ export default function Image({ data, handleData }) {
         )}
       </div>
 
-      {/* 🔹 CHILD / GALLERY IMAGES */}
+      {/* 🔹 GALLERY */}
       <div className="space-y-2">
         <p className="text-sm font-medium">Child Images (Gallery / Slider)</p>
         <input
@@ -89,7 +108,10 @@ export default function Image({ data, handleData }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
           {data.gallery?.map((img) => (
             <div key={img.publicId} className="relative">
-              <img src={img.url} className="h-24 w-full object-cover rounded" />
+              <img
+                src={img.url}
+                className="h-24 w-full object-cover rounded"
+              />
               <button
                 type="button"
                 onClick={() => removeImage(img.publicId)}

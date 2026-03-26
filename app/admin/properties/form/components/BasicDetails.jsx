@@ -121,8 +121,8 @@ export default function BasicDetails({ data, handleData }) {
               "slug",
               e.target.value
                 .toLowerCase()
-                .replace(/[^a-z0-9-]/g, "")
                 .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "")
             )
           }
           placeholder="prestige-city-sarjapur"

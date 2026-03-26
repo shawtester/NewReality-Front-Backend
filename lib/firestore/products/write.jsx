@@ -65,7 +65,7 @@ export const createNewProperty = async ({ data }) => {
   if (!data?.location) throw new Error("Location is required");
 
   const newId = doc(collection(db, "ids")).id;
-  const slug = data.slug || generateSlug(data);
+  const slug = generateSlug({ title: data.title });
 
   const safeMainImage = {
     url: data.mainImage?.url || "",
@@ -113,7 +113,7 @@ export const createNewProperty = async ({ data }) => {
 export const updateProperty = async ({ data }) => {
   if (!data?.id) throw new Error("Property ID is required");
 
-  const slug = data.slug || generateSlug(data);
+  const slug = generateSlug({ title: data.title });
 
   const safeMainImage = {
     url: data.mainImage?.url || "",

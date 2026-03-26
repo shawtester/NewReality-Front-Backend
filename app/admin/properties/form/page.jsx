@@ -19,37 +19,29 @@ import { defaultProperty } from "@/constants/propertyDefaults";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+
+
 export default function Page() {
   const [data, setData] = useState(defaultProperty);
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-
+  
   useEffect(() => {
     if (!id) return;
-
+  
     const fetchProperty = async () => {
       const snap = await getDoc(doc(db, "properties", id));
       if (snap.exists()) {
         console.log("🔥 FETCHED PROPERTY:", snap.data());
-        setData(snap.data());
+        setData(snap.data()); // ✅ YAHI MISSING THA
       }
     };
-
+  
     fetchProperty();
   }, [id]);
-
-  // ✅ ADD: SLUG GENERATOR
-  const generateSlug = (title) => {
-  return title
-    ?.toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9- ]/g, "") // ✅ hyphen allow
-    .replace(/\s+/g, "-");
-};
-
   const sanitizePropertyData = (data) => ({
     ...data,
     mainImage: {
@@ -57,6 +49,7 @@ export default function Page() {
       publicId: data.mainImage?.publicId || "",
     },
   });
+
 
   /* Nested state updater */
   const handleData = (key, value) => {
@@ -85,13 +78,7 @@ export default function Page() {
       if (!data?.title) throw new Error("Project name is required");
       if (!data?.location) throw new Error("Location is required");
 
-      // ✅ ADD: GENERATE SLUG
-      const slug = generateSlug(data.title);
-
-      const safeData = {
-        ...sanitizePropertyData(data),
-        slug: slug, // ✅ ADD SLUG IN FIRESTORE
-      };
+      const safeData = sanitizePropertyData(data);
 
       console.log("✅ AFTER SANITIZE — safeData.mainImage:", safeData.mainImage);
 
@@ -110,6 +97,8 @@ export default function Page() {
 
     setIsLoading(false);
   };
+
+
 
   return (
     <form
@@ -135,14 +124,7 @@ export default function Page() {
       </div>
 
       <BasicDetails data={data} handleData={handleData} />
-
-      {/* ✅ PASS SLUG TO IMAGE COMPONENT */}
-      <Image
-        data={data}
-        handleData={handleData}
-        slug={generateSlug(data.title)}
-      />
-
+      <Image data={data} handleData={handleData} />
       <Overview data={data} handleData={handleData} />
       <FloorPlans data={data} handleData={handleData} />
       <Amenities data={data} handleData={handleData} />
@@ -151,3 +133,4 @@ export default function Page() {
     </form>
   );
 }
+

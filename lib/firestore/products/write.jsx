@@ -173,3 +173,4 @@ export const deleteProperty = async ({ id }) => {
     });
   }
 };
+

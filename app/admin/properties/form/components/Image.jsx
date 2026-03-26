@@ -1,65 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { uploadPropertyImage } from "@/lib/cloudinary/uploadPropertyImage";
 
-export default function Image({ data, handleData, slug }) {
+export default function PropertyImageUpload({ data, handleData }) {
   const [uploading, setUploading] = useState(false);
+
+  const mainInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
   /* 🔹 Upload Handler */
   const uploadImages = async (files, type = "gallery") => {
-    if (!slug) {
-      alert("Please enter project title first");
-      return;
-    }
+    if (!files || files.length === 0) return;
 
     setUploading(true);
+
     try {
-      const uploaded = [];
+      // 🚀 Parallel upload (FAST)
+      const uploadPromises = files.map((file) =>
+        uploadPropertyImage(file)
+      );
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      const results = await Promise.all(uploadPromises);
 
-        // 🔥 UNIQUE SUFFIX LOGIC
-        let suffix = "";
-
-        if (type === "main") {
-          suffix = "cover";
-        } else {
-          const startIndex = data.gallery?.length || 0;
-          suffix = `gallery-${startIndex + i + 1}`;
-        }
-
-        const res = await uploadPropertyImage(file, slug, suffix);
-
-        console.log("🔥 CLOUDINARY RESPONSE:", res);
-
-        uploaded.push({
+      const uploaded = results
+        .filter((res) => res?.url)
+        .map((res) => ({
           url: res.url,
           publicId: res.publicId,
-        });
-      }
+        }));
 
-      console.log("✅ FINAL UPLOADED IMAGE OBJ:", uploaded);
+      console.log("✅ FINAL UPLOADED:", uploaded);
 
       if (type === "main") {
         handleData("mainImage", uploaded[0] || null);
       } else {
-        handleData("gallery", [...(data.gallery || []), ...uploaded]);
+        handleData("gallery", [
+          ...(data.gallery || []),
+          ...uploaded,
+        ]);
       }
+
+      // 🔁 Reset input (important)
+      if (type === "main" && mainInputRef.current) {
+        mainInputRef.current.value = "";
+      }
+      if (type === "gallery" && galleryInputRef.current) {
+        galleryInputRef.current.value = "";
+      }
+
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
+  /* 🔹 Remove Image */
   const removeImage = (publicId, type = "gallery") => {
     if (type === "main") {
-      handleData("mainImage", { url: "", publicId: "" });
+      handleData("mainImage", null); // ✅ FIX
     } else {
       handleData(
         "gallery",
-        (data.gallery || []).filter((img) => img.publicId !== publicId)
+        (data.gallery || []).filter(
+          (img) => img.publicId !== publicId
+        )
       );
     }
   };
@@ -71,18 +78,26 @@ export default function Image({ data, handleData, slug }) {
       {/* 🔹 MAIN IMAGE */}
       <div className="space-y-2">
         <p className="text-sm font-medium">
-          Main Image (Primary Banner Dimension:1640 × 772 px)
+          Main Image (1640 × 772 px)
         </p>
+
         <input
+          ref={mainInputRef}
           type="file"
           accept="image/*"
           disabled={uploading}
-          onChange={(e) => uploadImages(Array.from(e.target.files), "main")}
+          onChange={(e) =>
+            uploadImages(Array.from(e.target.files), "main")
+          }
         />
 
         {data.mainImage?.url && (
           <div className="relative w-40 mt-2">
-            <img src={data.mainImage.url} className="rounded-lg" />
+            <img
+              src={data.mainImage.url}
+              className="rounded-lg"
+              alt="Main"
+            />
             <button
               type="button"
               onClick={() => removeImage(null, "main")}
@@ -96,13 +111,19 @@ export default function Image({ data, handleData, slug }) {
 
       {/* 🔹 GALLERY */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">Child Images (Gallery / Slider)</p>
+        <p className="text-sm font-medium">
+          Gallery Images
+        </p>
+
         <input
+          ref={galleryInputRef}
           type="file"
           accept="image/*"
           multiple
           disabled={uploading}
-          onChange={(e) => uploadImages(Array.from(e.target.files), "gallery")}
+          onChange={(e) =>
+            uploadImages(Array.from(e.target.files), "gallery")
+          }
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
@@ -111,6 +132,7 @@ export default function Image({ data, handleData, slug }) {
               <img
                 src={img.url}
                 className="h-24 w-full object-cover rounded"
+                alt="Gallery"
               />
               <button
                 type="button"
@@ -125,7 +147,9 @@ export default function Image({ data, handleData, slug }) {
       </div>
 
       {uploading && (
-        <p className="text-sm text-gray-500">Uploading images...</p>
+        <p className="text-sm text-gray-500">
+          Uploading images...
+        </p>
       )}
     </div>
   );

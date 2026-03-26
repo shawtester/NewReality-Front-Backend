@@ -43,11 +43,12 @@ export default function Page() {
 
   // ✅ ADD: SLUG GENERATOR
   const generateSlug = (title) => {
-    return title
-      ?.toLowerCase()
-      .replace(/[^a-z0-9 ]/g, "")
-      .replace(/\s+/g, "-");
-  };
+  return title
+    ?.toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9- ]/g, "") // ✅ hyphen allow
+    .replace(/\s+/g, "-");
+};
 
   const sanitizePropertyData = (data) => ({
     ...data,

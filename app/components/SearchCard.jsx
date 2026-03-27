@@ -241,6 +241,7 @@ export default function SearchCard({ initialHeroData }) {
               alt={`Hero ${index + 1}`}
               fill
               sizes="100vw"
+              unoptimized
               className="object-cover object-center"
               priority={index === 0}
             />

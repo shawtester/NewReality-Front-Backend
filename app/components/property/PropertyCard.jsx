@@ -101,13 +101,16 @@ export default function PropertyCard({ property = {} }) {
         >
           {/* IMAGE */}
           <div className="relative h-32 md:h-40 lg:h-44 xl:h-48 w-full">
+           
+              
             <Image
               src={optimizedImg}
               alt={title}
               fill
               className="object-cover"
               loading="lazy"
-            />
+              />
+              
           </div>
 
           {/* CONTENT */}

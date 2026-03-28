@@ -96,7 +96,7 @@ export default function Page() {
   };
 
   return (
-    <main className="flex flex-col gap-0 p-5">
+    <main className="flex flex-col gap-0 px-5">
       <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
 
       <p className="text-gray-500">

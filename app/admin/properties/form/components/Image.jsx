@@ -33,7 +33,11 @@ export default function PropertyImageUpload({ data, handleData }) {
       console.log("✅ FINAL UPLOADED:", uploaded);
 
       if (type === "main") {
-        handleData("mainImage", uploaded[0] || null);
+        if (uploaded.length > 0) {
+          handleData("mainImage", uploaded[0]);
+        } else {
+          alert("Image upload failed");
+        }
       } else {
         handleData("gallery", [
           ...(data.gallery || []),

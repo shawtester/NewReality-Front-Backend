@@ -107,6 +107,7 @@ export default function PropertyCard({ property = {} }) {
               src={optimizedImg}
               alt={title}
               fill
+              unoptimized
               className="object-cover"
               loading="lazy"
               />

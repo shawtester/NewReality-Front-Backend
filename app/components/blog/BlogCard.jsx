@@ -48,6 +48,7 @@ export default function BlogCard({ blog }) {
             alt={blog?.title || "Blog"}
             fill
             sizes="(max-width:768px) 100vw, 33vw"
+            unoptimized
             className="object-cover"
           />
         ) : (

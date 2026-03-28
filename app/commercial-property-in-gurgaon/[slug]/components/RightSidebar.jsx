@@ -132,6 +132,7 @@ export default function RightSidebar({ property }) {
                     src={galleryImages[0]}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
@@ -149,6 +150,7 @@ export default function RightSidebar({ property }) {
                     src={galleryImages[1]}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                   />
 
@@ -183,6 +185,7 @@ export default function RightSidebar({ property }) {
                     src={galleryImages[3] || mainImage}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 )
@@ -269,6 +272,7 @@ export default function RightSidebar({ property }) {
               src={galleryImages[index]}
               alt=""
               fill
+              unoptimized
               className="object-contain"
             />
           </div>

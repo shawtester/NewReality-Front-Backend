@@ -33,6 +33,7 @@ export default function MobileGallery({ images = [], title = "" }) {
           alt={title}
           fill
           priority
+          unoptimized
           className="object-cover"
         />
       </div>
@@ -61,6 +62,7 @@ export default function MobileGallery({ images = [], title = "" }) {
                 alt=""
                 width={56}
                 height={42}
+                unoptimized
                 className="w-full h-full object-cover"
               />
             </button>
@@ -98,6 +100,7 @@ export default function MobileGallery({ images = [], title = "" }) {
               src={images[index]}
               alt=""
               fill
+              unoptimized
               className="object-contain"
             />
           </div>

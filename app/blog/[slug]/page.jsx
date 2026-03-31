@@ -12,6 +12,8 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  const url = `https://www.neevrealty.com/blog/${blog.slug}`;
+
   return {
     title: blog.metaTitle || blog.title,
     description: blog.metaDescription || blog.excerpt,

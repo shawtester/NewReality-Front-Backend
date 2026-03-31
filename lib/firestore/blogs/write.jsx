@@ -86,6 +86,7 @@ export const createBlog = async ({ data }) => {
 
     metaTitle: data.metaTitle || "",
     metaDescription: data.metaDescription || "",
+    metaKeywords: data.metaKeywords || "",
 
     sections: data.sections || [],
     faqs: data.faqs || [],
@@ -151,6 +152,7 @@ export const updateBlog = async ({ id, data }) => {
 
     metaTitle: data.metaTitle || "",
     metaDescription: data.metaDescription || "",
+    metaKeywords: data.metaKeywords || "",
 
     sections: data.sections || [],
     faqs: data.faqs || [],

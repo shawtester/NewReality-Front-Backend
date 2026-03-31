@@ -80,7 +80,7 @@ export default function RootLayout({ children }) {
         <Toaster />
 
         <NextUIProvider>
-          <main className="pt-[60px] min-[800px]:pt-[50px] min-h-screen">
+          <main className="pt-[70px] min-[800px]:pt-[102px] min-h-screen">
             {children}
           </main>
         </NextUIProvider>

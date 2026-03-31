@@ -335,6 +335,7 @@ export default function BlogContent({ blog, onHeadingsReady }) {
   [&_ol]:list-decimal
   [&_ul]:pl-5
   [&_ol]:pl-5
+  [&_li]:ml-4 
   [&_p]:my-3
   prose-headings:scroll-mt-32
   prose-img:rounded-xl

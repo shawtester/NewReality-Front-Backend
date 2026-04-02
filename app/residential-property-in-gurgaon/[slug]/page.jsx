@@ -24,14 +24,9 @@ import DisclaimerSection from "./components/DisclaimerSection";
 import RightSidebar from "./components/RightSidebar";
 import Footer from "@/app/components/Footer";
 
-// 🔥 Firebase SEO import
 import { getSEO } from "@/lib/firestore/seo/read";
 
-
-// ✅ IMPORTANT
 export const dynamic = "force-dynamic";
-// OR use this instead of above
-// export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   console.log("🔥 METADATA FUNCTION CALLED");
@@ -39,7 +34,6 @@ export async function generateMetadata({ params }) {
     const slug = params.slug;
     const parentSlug = "residential-property-in-gurgaon";
 
-    // ✅ Fetch Data
     const propertyRaw = await getPropertyBySlugOrId(slug);
     const property = JSON.parse(JSON.stringify(propertyRaw));
     const seoRaw = await getSEO(slug);
@@ -52,29 +46,19 @@ export async function generateMetadata({ params }) {
       };
     }
 
-    // ✅ Helper
     const getValid = (v) =>
       typeof v === "string" && v.trim() !== "" ? v : null;
 
-    // =========================
-    // 🔥 TITLE
-    // =========================
     const title =
       getValid(seo?.title) ||
       getValid(property.metaTitle) ||
       `${property.title} in ${property.location} | Price & Details`;
 
-    // =========================
-    // 🔥 DESCRIPTION
-    // =========================
     const description =
       getValid(seo?.description) ||
       getValid(property.metaDescription) ||
       `Explore ${property.title} located in ${property.location}. Check price, floor plans, amenities and more.`;
 
-    // =========================
-    // 🔥 KEYWORDS (FIXED)
-    // =========================
     const keywordsRaw =
       getValid(seo?.metaKeywords) ||
       getValid(property.metaKeywords) ||
@@ -84,38 +68,24 @@ export async function generateMetadata({ params }) {
       ? keywordsRaw.split(",").map((k) => k.trim()).filter(Boolean)
       : [];
 
-    // =========================
-    // 🔥 CANONICAL (FIXED)
-    // =========================
     const canonicalURL =
       getValid(seo?.canonical) ||
       getValid(property.canonical) ||
       `https://www.neevrealty.com/${parentSlug}/${property.slug}`;
 
-    // =========================
-    // 🔥 DEBUG (REMOVE AFTER TEST)
-    // =========================
     console.log("SEO:", seo);
     console.log("PROPERTY:", property);
     console.log("FINAL KEYWORDS:", keywords);
     console.log("FINAL CANONICAL:", canonicalURL);
 
-    // =========================
-    // 🔥 RETURN METADATA
-    // =========================
     return {
       metadataBase: new URL("https://www.neevrealty.com"),
-
       title,
       description,
-
-      // ✅ THIS IS THE REAL FIX
-      keywords: keywords,
-
+      keywords,
       alternates: {
         canonical: canonicalURL,
       },
-
       openGraph: {
         title,
         description,
@@ -123,7 +93,6 @@ export async function generateMetadata({ params }) {
         siteName: "Neev Realty",
         type: "website",
       },
-
       twitter: {
         card: "summary_large_image",
         title,
@@ -140,19 +109,13 @@ export async function generateMetadata({ params }) {
   }
 }
 
-// ================== PAGE COMPONENT ==================
 export default async function PropertyPage({ params }) {
   console.log("🔥 RESIDENTIAL PAGE HIT");
   const slug = params.slug;
 
-  // 🔥 Detect Parent Category from URL
-  const pathnameParts = params?.slug ? [] : [];
-
-  // 1️⃣ Fetch property
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
 
-  // 🔥 NOW detect parent (after property exists)
   let parentSlug = "residential-property-in-gurgaon";
   let parentLabel = "Residential";
 
@@ -167,26 +130,20 @@ export default async function PropertyPage({ params }) {
   }
 
   const currentBaseRoute = `/${parentSlug}`;
-
-  // 2️⃣ Fetch all properties for "Similar Projects"
   const allProjects = await getAllProperties();
 
-  // 3️⃣ Fetch builder safely
   let builder = null;
   if (property.builderId) {
     builder = await getBuilderById(property.builderId);
   }
 
-  // 4️⃣ Fetch amenities
   const amenitiesData = await getAmenitiesByIds(property.amenities || []);
 
-  // 5️⃣ Format location string
   const locationString =
     [property.sector, property.locationName].filter(Boolean).join(", ") ||
     property.location ||
     "";
 
-  // 6️⃣ Clean property object
   const cleanProperty = {
     id: property.id,
     slug: property.slug,
@@ -202,9 +159,7 @@ export default async function PropertyPage({ params }) {
     size: property.areaRange,
     rera: property.reraNumber,
     updatedAt: property.lastUpdated,
-
     brochure: property.brochure || null,
-
     mainImage: property.mainImage || null,
     gallery: property.gallery || [],
     images: Array.from(
@@ -213,42 +168,25 @@ export default async function PropertyPage({ params }) {
         ...(property.gallery?.map((g) => g.url) || []),
       ]),
     ),
-
     video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],
     paymentPlan: property.paymentPlan || [],
     amenities: amenitiesData,
-
     locationImage: property.locationImage?.url || "",
     mapQuery: property.mapQuery || property.location || "",
     locationPoints: property.locationPoints || [],
-
     faq: (property.faq || []).map((f) => ({
       q: f.question,
       a: f.answer,
     })),
-
     builder: builder && typeof builder === "object" ? builder : null,
-
     disclaimer: property.disclaimer || "",
-
     projectArea: property.projectArea || "",
     projectType: property.projectType || "",
     projectStatus: property.projectStatus || "",
     projectElevation: property.projectElevation || "",
     possession: property.possession || "",
-  };
-
-  // ================== RENDER ==================
-  const dedupeGraph = (graph) => {
-    const seen = new Set();
-    return graph.filter((item) => {
-      const key = `${item["@type"]}-${item.name || item.item || JSON.stringify(item)}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
   };
 
   return (
@@ -261,29 +199,16 @@ export default async function PropertyPage({ params }) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@graph": [
-
-              // ✅ PRODUCT (MAIN)
               {
                 "@type": "Product",
                 name: cleanProperty.title,
                 image: cleanProperty.images,
                 description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-
                 brand: {
                   "@type": "Brand",
-                  name: cleanProperty.builderName || "Neev Realty"
+                  name: cleanProperty.builderName || "Neev Realty",
                 },
-
-                offers: {
-                  "@type": "Offer",
-                  url: `https://www.neevrealty.com/residential-property-in-gurgaon/${cleanProperty.slug}`,
-                  priceCurrency: "INR",
-                  price: cleanProperty.price || "",
-                  availability: "https://schema.org/InStock"
-                }
               },
-
-              // ✅ BREADCRUMB
               {
                 "@type": "BreadcrumbList",
                 itemListElement: [
@@ -291,23 +216,22 @@ export default async function PropertyPage({ params }) {
                     "@type": "ListItem",
                     position: 1,
                     name: "Home",
-                    item: "https://www.neevrealty.com"
+                    item: "https://www.neevrealty.com",
                   },
                   {
                     "@type": "ListItem",
                     position: 2,
                     name: "Residential",
-                    item: "https://www.neevrealty.com/residential-property-in-gurgaon"
+                    item: "https://www.neevrealty.com/residential-property-in-gurgaon",
                   },
                   {
                     "@type": "ListItem",
                     position: 3,
-                    name: cleanProperty.title
-                  }
-                ]
-              }
-
-            ]
+                    name: cleanProperty.title,
+                  },
+                ],
+              },
+            ],
           }),
         }}
       />
@@ -315,7 +239,6 @@ export default async function PropertyPage({ params }) {
       <ApartmentClient>
         <AutoPopup propertyTitle={cleanProperty.title} />
 
-        {/* ✅ BREADCRUMB */}
         <section className="bg-white">
           <div className="max-w-[1240px] mx-auto px-4 py-3 text-sm text-gray-600">
             <nav className="flex flex-wrap items-center gap-2">
@@ -325,7 +248,6 @@ export default async function PropertyPage({ params }) {
 
               <span className="text-gray-400">/</span>
 
-              {/* Residential Always */}
               <Link
                 href="/residential-property-in-gurgaon"
                 className="hover:text-[#F5A300]"
@@ -333,7 +255,6 @@ export default async function PropertyPage({ params }) {
                 Residential
               </Link>
 
-              {/* Sub Category (Only if not base residential) */}
               {parentSlug !== "residential-property-in-gurgaon" && (
                 <>
                   <span className="text-gray-400">/</span>
@@ -350,7 +271,9 @@ export default async function PropertyPage({ params }) {
                 <>
                   <span className="text-gray-400">/</span>
                   <Link
-                    href={`/residential-property-in-gurgaon?locality=${cleanProperty.locationName.toLowerCase().replace(/\s+/g, "-")}`}
+                    href={`/residential-property-in-gurgaon?locality=${cleanProperty.locationName
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
                     className="hover:text-[#F5A300]"
                   >
                     {cleanProperty.locationName}
@@ -368,7 +291,6 @@ export default async function PropertyPage({ params }) {
         </section>
 
         <section className="max-w-[1240px] mx-auto px-4 md:px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-3 gap-1">
-          {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
             <MobileGallery
               images={cleanProperty.images}
@@ -387,9 +309,7 @@ export default async function PropertyPage({ params }) {
             />
 
             <FloorPlanSection floorPlans={cleanProperty.floorPlans} />
-
             <PaymentPlanSection paymentPlan={cleanProperty.paymentPlan} />
-
             <AmenitiesSection amenities={cleanProperty.amenities} />
 
             <LocationSection
@@ -399,7 +319,6 @@ export default async function PropertyPage({ params }) {
             />
 
             <EmiCalculatorSection />
-
             <FAQSection faq={cleanProperty.faq} />
 
             {cleanProperty.builder && (
@@ -415,7 +334,6 @@ export default async function PropertyPage({ params }) {
             <DisclaimerSection text={cleanProperty.disclaimer} />
           </div>
 
-          {/* RIGHT */}
           <RightSidebar property={cleanProperty} />
         </section>
 

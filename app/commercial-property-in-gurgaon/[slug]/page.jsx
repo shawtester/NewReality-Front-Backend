@@ -189,21 +189,30 @@ export default async function PropertyPage({ params }) {
     possession: property.possession || "",
   };
 
+  const schemaImages = (cleanProperty.images || []).filter(
+    (img) => typeof img === "string" && /^https?:\/\//.test(img)
+  );
+
+  const productSchema = {
+    "@type": "Product",
+    name: cleanProperty.title,
+    description: `${cleanProperty.title} located in ${cleanProperty.location}.`,
+    brand: {
+      "@type": "Brand",
+      name: cleanProperty.builderName || "Neev Realty",
+    },
+  };
+
+  if (schemaImages.length > 0) {
+    productSchema.image = schemaImages;
+  }
+
   const baseUrl = "https://www.neevrealty.com";
 
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Product",
-        name: cleanProperty.title,
-        image: cleanProperty.images,
-        description: `${cleanProperty.title} located in ${cleanProperty.location}.`,
-        brand: {
-          "@type": "Brand",
-          name: cleanProperty.builderName || "Neev Realty",
-        },
-      },
+      productSchema,
       {
         "@type": "BreadcrumbList",
         itemListElement: [

@@ -189,6 +189,24 @@ export default async function PropertyPage({ params }) {
     possession: property.possession || "",
   };
 
+  const schemaImages = (cleanProperty.images || []).filter(
+    (img) => typeof img === "string" && /^https?:\/\//.test(img)
+  );
+
+  const productSchema = {
+    "@type": "Product",
+    name: cleanProperty.title,
+    description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
+    brand: {
+      "@type": "Brand",
+      name: cleanProperty.builderName || "Neev Realty",
+    },
+  };
+
+  if (schemaImages.length > 0) {
+    productSchema.image = schemaImages;
+  }
+
   return (
     <>
       <Script
@@ -197,21 +215,12 @@ export default async function PropertyPage({ params }) {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@graph": [
-              {
-                "@type": "Product",
-                name: cleanProperty.title,
-                image: cleanProperty.images,
-                description: `${cleanProperty.title} located in ${cleanProperty.location}. Explore price, floor plans, amenities and more.`,
-                brand: {
-                  "@type": "Brand",
-                  name: cleanProperty.builderName || "Neev Realty",
-                },
-              },
-              {
-                "@type": "BreadcrumbList",
-                itemListElement: [
+              "@context": "https://schema.org",
+              "@graph": [
+                productSchema,
+                {
+                  "@type": "BreadcrumbList",
+                  itemListElement: [
                   {
                     "@type": "ListItem",
                     position: 1,

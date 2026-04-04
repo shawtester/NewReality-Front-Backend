@@ -29,17 +29,21 @@ export default function RightSidebar({ property }) {
 
   const galleryImages = useMemo(() => {
     if (property.gallery?.length > 0) {
-      return property.gallery.map((img) =>
-        typeof img === "string" ? img : img.url
-      );
+      return property.gallery
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
     }
 
     if (property.imageList?.length > 0) {
-      return property.imageList;
+      return property.imageList.filter(Boolean);
     }
 
     return [];
   }, [property]);
+
+  const primaryThumb = galleryImages[0] || mainImage;
+  const secondaryThumb = galleryImages[1] || galleryImages[0] || mainImage;
+  const previewImage = galleryImages[3] || galleryImages[2] || galleryImages[0] || mainImage;
 
   /* ================= VIDEO ================= */
   const getVideoUrl = (video) => {
@@ -120,7 +124,7 @@ export default function RightSidebar({ property }) {
 
             {/* TOP IMAGES */}
             <div className="grid grid-cols-2 gap-2 px-2">
-              {mainImage && (
+              {primaryThumb && (
                 <div
                   onClick={() => {
                     setIndex(0);
@@ -129,7 +133,7 @@ export default function RightSidebar({ property }) {
                   className="relative h-[120px] rounded-lg overflow-hidden cursor-pointer"
                 >
                   <Image
-                    src={galleryImages[0]}
+                    src={primaryThumb}
                     alt=""
                     fill
                     unoptimized
@@ -138,16 +142,16 @@ export default function RightSidebar({ property }) {
                 </div>
               )}
 
-              {galleryImages.length > 0 && (
+              {secondaryThumb && (
                 <div
                   onClick={() => {
-                    setIndex(1);
+                    setIndex(galleryImages[1] ? 1 : 0);
                     setOpen(true);
                   }}
                   className="relative h-[120px] rounded-lg overflow-hidden cursor-pointer group"
                 >
                   <Image
-                    src={galleryImages[1]}
+                    src={secondaryThumb}
                     alt=""
                     fill
                     unoptimized
@@ -180,9 +184,9 @@ export default function RightSidebar({ property }) {
                   />
                 )
               ) : (
-                mainImage && (
+                previewImage && (
                   <Image
-                    src={galleryImages[3] || mainImage}
+                    src={previewImage}
                     alt=""
                     fill
                     unoptimized
@@ -244,7 +248,7 @@ export default function RightSidebar({ property }) {
       </div>
 
       {/* ================= FULLSCREEN GALLERY ================= */}
-      {open && (
+      {open && galleryImages.length > 0 && (
         <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
 
           {/* CLOSE */}

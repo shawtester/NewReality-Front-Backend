@@ -73,7 +73,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed  top-0 z-50 bg-white w-full">
-      <nav className="mx-auto flex min-h-[60px] items-center justify-between px-4 py-3 sm:px-6 min-[800px]:h-[102px] max-w-[1212px]">
+      <nav className="mx-auto flex min-h-[54px] items-center justify-between px-4 py-2 sm:px-6 min-[800px]:h-[102px] max-w-[1212px]">
        
         {/* LOGO */}
         <Link href="/" className="flex items-center">
@@ -182,7 +182,7 @@ export default function Navbar() {
             onClick={() => setMenuOpen(false)}
           />
 
-          <div className="fixed left-0 right-0 top-[60px] z-50 bg-white shadow-md min-[800px]:top-[102px] min-[800px]:hidden">
+          <div className="fixed left-0 right-0 top-[54px] z-50 bg-white shadow-md min-[800px]:top-[102px] min-[800px]:hidden">
             <ul className="flex flex-col px-6 py-4 gap-4 text-sm">
               {navLinks.map((item) => (
                 <li key={item.label}>

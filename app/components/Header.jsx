@@ -80,8 +80,8 @@ export default function Navbar() {
           <Image
             src="/images/neevlogo.png"
             alt="Neev Realty"
-            width={64}
-            height={64}
+            width={80}
+            height={80}
             priority
             className="h-auto w-[64px] min-[800px]:w-[80px]"
           />
@@ -166,11 +166,11 @@ export default function Navbar() {
         {/* ================= MOBILE ================= */}
         <div className="flex items-center gap-4 min-[800px]:hidden">
           <a href="tel:+918824966966">
-            <Phone size={18} />
+            <Phone size={20} />
           </a>
 
           <button aria-label="Open Menu" onClick={() => setMenuOpen(true)}>
-            <Menu size={22} />
+            <Menu size={26} />
           </button>
         </div>
       </nav>

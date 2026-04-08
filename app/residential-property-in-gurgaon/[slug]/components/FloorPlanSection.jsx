@@ -52,8 +52,8 @@ export default function FloorPlanSection({ floorPlans = [] }) {
               key={t}
               onClick={() => setActiveType(t)}
               className={`px-4 py-1 rounded-full text-sm border transition ${activeType === t
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-600"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-600"
                 }`}
             >
               {t}
@@ -145,12 +145,14 @@ export default function FloorPlanSection({ floorPlans = [] }) {
           >
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+              className="absolute top-2 right-2 z-50 p-2 rounded-full 
+             bg-white/80 hover:bg-white shadow-md 
+             text-gray-700 hover:text-black"
             >
               <FaTimes size={18} />
             </button>
 
-            <div className="relative w-full h-[70vh]">
+            <div className="relative w-full h-[70vh] z-0">
               <Image
                 src={previewImage}
                 alt="Floor Plan Preview"

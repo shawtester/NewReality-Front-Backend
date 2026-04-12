@@ -3,10 +3,20 @@
 import Image from "next/image";
 import { useState } from "react";
 
+const sanitizeSchemaHtml = (input = "") =>
+  input
+    .replace(
+      /<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi,
+      "",
+    )
+    .replace(/\sitemtype=["']https?:\/\/schema\.org\/\w+["']/gi, "")
+    .replace(/\sitemscope\b/gi, "");
+
 export default function DeveloperSection({ builder }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!builder) return null;
+  const safeDescription = sanitizeSchemaHtml(builder.description || "");
 
   return (
     <section
@@ -50,7 +60,7 @@ export default function DeveloperSection({ builder }) {
         </div>
 
         {/* DESCRIPTION */}
-        {builder.description && (
+        {safeDescription && (
           <div className="mt-6">
             <div
               className={`
@@ -61,7 +71,7 @@ export default function DeveloperSection({ builder }) {
                 ${expanded ? "" : "line-clamp-2"}
               `}
               dangerouslySetInnerHTML={{
-                __html: builder.description,
+                __html: safeDescription,
               }}
             />
 

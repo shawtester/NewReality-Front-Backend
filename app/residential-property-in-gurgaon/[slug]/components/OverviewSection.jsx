@@ -3,11 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import BrandEnquiryPopup from "./BrandEnquiryPopup";
 
+const sanitizeSchemaHtml = (input = "") =>
+  input
+    .replace(
+      /<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi,
+      "",
+    )
+    .replace(/\sitemtype=["']https?:\/\/schema\.org\/\w+["']/gi, "")
+    .replace(/\sitemscope\b/gi, "");
+
 /* ================= EXPANDABLE HTML TEXT ================= */
 const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef(null);
+  const safeHtml = sanitizeSchemaHtml(html || "");
 
   useEffect(() => {
     if (textRef.current) {
@@ -16,9 +26,9 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
       const maxHeight = lineHeight * maxLines;
       setIsOverflowing(el.scrollHeight > maxHeight);
     }
-  }, [html, maxLines]);
+  }, [safeHtml, maxLines]);
 
-  if (!html) return null;
+  if (!safeHtml) return null;
 
   return (
     <div className={`space-y-3 ${className}`}>
@@ -35,7 +45,7 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
           [&_a]:underline
           [&_a:hover]:text-yellow-600
         `}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: safeHtml }}
       />
 
       {isOverflowing && (

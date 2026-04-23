@@ -17,7 +17,8 @@ export async function GET(req) {
       .map(doc => ({ id: doc.id, ...doc.data() }))
       .filter(item =>
         item.title?.toLowerCase().includes(q) ||
-        item.location?.toLowerCase().includes(q)
+        item.location?.toLowerCase().includes(q) ||
+        item.developer?.toLowerCase().includes(q)
       )
       .slice(0, 5);
 

@@ -2,10 +2,24 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
+import { uploadToCloudinary } from "@/lib/cloudinary/uploadBlogImage";
 
-export default function TinyEditor({ value, onChange }) {
+export default function TinyEditor({
+  value,
+  onChange,
+  imageUploadFolder = "blogs/content",
+}) {
   const editorRef = useRef(null);
   const [localValue, setLocalValue] = useState(value || "");
+
+  const uploadEditorImage = async (file) => {
+    const result = await uploadToCloudinary(file, imageUploadFolder);
+    if (!result?.url) {
+      throw new Error("Image upload failed");
+    }
+
+    return result.url;
+  };
 
   // Sync only when external value changes (not on every keystroke)
   useEffect(() => {
@@ -42,6 +56,37 @@ export default function TinyEditor({ value, onChange }) {
           "link image media | table | code | removeformat | ltr rtl",
 
         toolbar_mode: "wrap",
+        automatic_uploads: true,
+        image_title: true,
+        image_advtab: true,
+        file_picker_types: "image",
+
+        images_upload_handler: async (blobInfo) => {
+          return uploadEditorImage(blobInfo.blob());
+        },
+
+        file_picker_callback: (callback, value, meta) => {
+          if (meta.filetype !== "image") return;
+
+          const input = document.createElement("input");
+          input.setAttribute("type", "file");
+          input.setAttribute("accept", "image/*");
+
+          input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file) return;
+
+            try {
+              const url = await uploadEditorImage(file);
+              callback(url, { title: file.name });
+            } catch (error) {
+              console.error("TinyMCE image upload failed:", error);
+              alert("Image upload failed");
+            }
+          };
+
+          input.click();
+        },
 
         content_style: `
           body {

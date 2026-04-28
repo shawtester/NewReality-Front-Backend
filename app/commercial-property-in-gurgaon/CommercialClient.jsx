@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Header from "../components/Header";
 import { getBanner } from "@/lib/firestore/banners/read";
+import { getActiveLocations } from "@/lib/firestore/locations/read";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
@@ -62,6 +63,17 @@ const COMMERCIAL_TYPE_MAP = {
   "retail-shops": "isRetail",
   "sco-plots": "isSCO",
 };
+
+const DEFAULT_LOCALITY_OPTIONS = [
+  { name: "Dwarka Expressway", slug: "dwarka-expressway" },
+  { name: "Golf Course Road", slug: "golf-course-road" },
+  { name: "Golf Course Extension Road", slug: "golf-course-extension-road" },
+  { name: "Sohna Road", slug: "sohna-road" },
+  { name: "New Gurgaon", slug: "new-gurgaon" },
+  { name: "Old Gurgaon", slug: "old-gurgaon" },
+  { name: "SPR", slug: "spr" },
+  { name: "NH8", slug: "nh8" },
+];
 
 const filterForCommercial = (list = []) =>
   list.filter(
@@ -154,10 +166,11 @@ const applyCommercialFilters = ({
 
   // 📍 LOCALITY
   if (locality) {
+    const normalizedLocality = locality.replace(/-/g, " ").toLowerCase();
     filtered = filtered.filter((item) =>
-      item.location?.toLowerCase().includes(
-        locality.replace(/-/g, " ").toLowerCase()
-      )
+      item.location?.toLowerCase().includes(normalizedLocality) ||
+      item.locationName?.toLowerCase().includes(normalizedLocality) ||
+      item.sector?.toLowerCase().includes(normalizedLocality)
     );
   }
 
@@ -217,6 +230,9 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
   const [locality, setLocality] = useState("");
   const [budget, setBudget] = useState("");
   const [bhk, setBhk] = useState("");
+  const [locationOptions, setLocationOptions] = useState(
+    DEFAULT_LOCALITY_OPTIONS
+  );
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [filteredApartments, setFilteredApartments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -299,6 +315,22 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
 
   /* ================= URL FILTER LOGIC ================= */
+  useEffect(() => {
+    const loadLocations = async () => {
+      const locations = await getActiveLocations();
+      if (locations.length > 0) {
+        setLocationOptions(
+          locations.map((item) => ({
+            name: item.name,
+            slug: item.slug,
+          }))
+        );
+      }
+    };
+
+    loadLocations();
+  }, []);
+
   useEffect(() => {
     const urlKeyword = searchParams.get("q") || "";
     const urlType = searchParams.get("type") || "";
@@ -674,14 +706,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                 className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0"
               >
                 <option value="" disabled hidden>Localities</option>
-                <option value="dwarka-expressway">Dwarka Expressway</option>
-                <option value="golf-course-road">Golf Course Road</option>
-                <option value="golf-course-extension-road">Golf Course Extension Road</option>
-                <option value="sohna-road">Sohna Road</option>
-                <option value="new-gurgaon">New Gurgaon</option>
-                <option value="old-gurgaon">Old Gurgaon</option>
-                <option value="spr">SPR</option>
-                <option value="nh8">NH8</option>
+                {locationOptions.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.name}
+                  </option>
+                ))}
               </select>
               <select
                 value={budget}
@@ -782,14 +811,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
                   className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
                 >
                   <option value="" disabled hidden>Localities</option>
-                  <option value="dwarka-expressway">Dwarka Expressway</option>
-                  <option value="golf-course-road">Golf Course Road</option>
-                  <option value="golf-course-extension-road">Golf Course Extension Road</option>
-                  <option value="sohna-road">Sohna Road</option>
-                  <option value="new-gurgaon">New Gurgaon</option>
-                  <option value="old-gurgaon">Old Gurgaon</option>
-                  <option value="spr">SPR</option>
-                  <option value="nh8">NH8</option>
+                  {locationOptions.map((item) => (
+                    <option key={item.slug} value={item.slug}>
+                      {item.name}
+                    </option>
+                  ))}
                 </select>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
               </div>

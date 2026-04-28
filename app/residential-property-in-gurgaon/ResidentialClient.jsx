@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Header from "../components/Header";
 import { getBanner } from "@/lib/firestore/banners/read";
+import { getActiveLocations } from "@/lib/firestore/locations/read";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
@@ -71,6 +72,17 @@ const STATUS_FLAG_MAP = {
     "pre-launch": "isPreLaunch",
     "new-launch": "isNewLaunch",
 };
+
+const DEFAULT_LOCALITY_OPTIONS = [
+    { name: "Dwarka Expressway", slug: "dwarka-expressway" },
+    { name: "Golf Course Road", slug: "golf-course-road" },
+    { name: "Golf Course Extension Road", slug: "golf-course-extension-road" },
+    { name: "Sohna Road", slug: "sohna-road" },
+    { name: "New Gurgaon", slug: "new-gurgaon" },
+    { name: "Old Gurgaon", slug: "old-gurgaon" },
+    { name: "SPR", slug: "spr" },
+    { name: "NH8", slug: "nh8" },
+];
 
 const filterByPropertyType = (list = [], type) => {
     const field = PROPERTY_TYPE_MAP[type];
@@ -156,10 +168,13 @@ const applyAllFilters = ({
 
     // 📍 LOCALITY
     if (locality) {
+        const normalizedLocality = locality.replace(/-/g, " ").toLowerCase();
         filtered = filtered.filter((item) =>
             item.location?.toLowerCase().includes(
-                locality.replace(/-/g, " ").toLowerCase()
-            )
+                normalizedLocality
+            ) ||
+            item.locationName?.toLowerCase().includes(normalizedLocality) ||
+            item.sector?.toLowerCase().includes(normalizedLocality)
         );
     }
 
@@ -237,6 +252,7 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
     const [locality, setLocality] = useState("");
     const [budget, setBudget] = useState("");
     const [bhk, setBhk] = useState("");
+    const [locationOptions, setLocationOptions] = useState(DEFAULT_LOCALITY_OPTIONS);
     const [page, setPage] = useState(1);
     const [filteredApartments, setFilteredApartments] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -321,6 +337,22 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
         router.push(BASE_ROUTE, { scroll: false });
     }, [router, BASE_ROUTE]);
 
+
+    useEffect(() => {
+        const loadLocations = async () => {
+            const locations = await getActiveLocations();
+            if (locations.length > 0) {
+                setLocationOptions(
+                    locations.map((item) => ({
+                        name: item.name,
+                        slug: item.slug,
+                    }))
+                );
+            }
+        };
+
+        loadLocations();
+    }, []);
 
     // ✅ URL FILTER LOGIC
     useEffect(() => {
@@ -681,7 +713,10 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
                                 <option value="" disabled hidden>Status</option><option value="new-launch">New Launch</option><option value="ready-to-move">Ready to Move</option><option value="under-construction">Under Construction</option><option value="pre-launch">Pre Launch</option>
                             </select>
                             <select value={locality} onChange={(e) => handleFilterChange('locality', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
-                                <option value="" disabled hidden>Localities</option><option value="dwarka-expressway">Dwarka Expressway</option><option value="golf-course-road">Golf Course Road</option><option value="golf-course-extension-road">Golf Course Extension Road</option><option value="sohna-road">Sohna Road</option><option value="new-gurgaon">New Gurgaon</option><option value="old-gurgaon">Old Gurgaon</option><option value="spr">SPR</option><option value="nh8">NH8</option>
+                                <option value="" disabled hidden>Localities</option>
+                                {locationOptions.map((item) => (
+                                    <option key={item.slug} value={item.slug}>{item.name}</option>
+                                ))}
                             </select>
                             <select value={budget} onChange={(e) => handleFilterChange('budget', e.target.value)} className="w-full px-3 py-2.5 rounded-full bg-gray-50 text-sm md:w-28 flex-shrink-0">
                                 <option value="" disabled hidden>Budget</option><option value="1-2-cr">1 – 2 Cr</option><option value="2-3-cr">2 – 3 Cr</option><option value="3-4-cr">3 – 4 Cr</option><option value="4-5-cr">4 – 5 Cr</option><option value="5-6-cr">5 – 6 Cr</option><option value="6-7-cr">6 – 7 Cr</option><option value="7-8-cr">7 – 8 Cr</option><option value="above-8-cr">Above 8 Cr</option>
@@ -766,14 +801,11 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
                                     className="w-full px-3 py-3 rounded-full bg-gray-50 text-sm appearance-none pr-6"
                                 >
                                     <option value="" disabled hidden>Localities</option>
-                                    <option value="dwarka-expressway">Dwarka Expressway</option>
-                                    <option value="golf-course-road">Golf Course Road</option>
-                                    <option value="golf-course-extension-road">Golf Course Extension Road</option>
-                                    <option value="sohna-road">Sohna Road</option>
-                                    <option value="new-gurgaon">New Gurgaon</option>
-                                    <option value="old-gurgaon">Old Gurgaon</option>
-                                    <option value="spr">SPR</option>
-                                    <option value="nh8">NH8</option>
+                                    {locationOptions.map((item) => (
+                                        <option key={item.slug} value={item.slug}>
+                                            {item.name}
+                                        </option>
+                                    ))}
                                 </select>
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">▾</span>
                             </div>

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "@/lib/dashboardStats";
-import { getMonthlyEnquiries } from "@/lib/getMonthlyEnquiries"; // 🔥 ADD
-import { Home, FileText, HelpCircle, Mail } from "lucide-react";
+import { getMonthlyEnquiries } from "@/lib/getMonthlyEnquiries";
+import { Home, FileText, Mail } from "lucide-react";
 
 import {
   Chart as ChartJS,
@@ -32,7 +32,6 @@ export default function Page() {
   const [stats, setStats] = useState({
     properties: 0,
     blogs: 0,
-    faqs: 0,
     enquiries: 0,
   });
 
@@ -46,41 +45,28 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       const statsData = await getDashboardStats();
-      const monthlyData = await getMonthlyEnquiries(); // 🔥 REAL DATA
+      const monthlyData = await getMonthlyEnquiries();
 
       setStats(statsData);
       setGrowthData(monthlyData);
-
       setLoading(false);
     };
 
     fetchData();
   }, []);
 
-  /* 🔥 BAR CHART DATA */
   const barData = {
-    labels: ["Properties", "Blogs", "FAQs", "Enquiries"],
+    labels: ["Properties", "Blogs", "Enquiries"],
     datasets: [
       {
         label: "Data Overview",
-        data: [
-          stats.properties,
-          stats.blogs,
-          stats.faqs,
-          stats.enquiries,
-        ],
-        backgroundColor: [
-          "#3B82F6",
-          "#22C55E",
-          "#A855F7",
-          "#DBA40D",
-        ],
+        data: [stats.properties, stats.blogs, stats.enquiries],
+        backgroundColor: ["#3B82F6", "#22C55E", "#DBA40D"],
         borderRadius: 8,
       },
     ],
   };
 
-  /* 🔥 REAL LINE CHART DATA */
   const lineData = {
     labels: growthData.labels,
     datasets: [
@@ -99,39 +85,47 @@ export default function Page() {
     <main className="flex flex-col gap-0 p-5">
       <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
 
-      <p className="text-gray-500">
-        Welcome to the admin panel.
-      </p>
+      <p className="text-gray-500">Welcome to the admin panel.</p>
 
-      {/* 🔥 STATS CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        <Card title="Total Properties" value={stats.properties} loading={loading} icon={Home} color="bg-blue-500" />
-        <Card title="Total Blogs" value={stats.blogs} loading={loading} icon={FileText} color="bg-green-500" />
-        <Card title="Total FAQs" value={stats.faqs} loading={loading} icon={HelpCircle} color="bg-purple-500" />
-        <Card title="Enquiries" value={stats.enquiries} loading={loading} icon={Mail} color="bg-[#DBA40D]" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+        <Card
+          title="Total Properties"
+          value={stats.properties}
+          loading={loading}
+          icon={Home}
+          color="bg-blue-500"
+        />
+        <Card
+          title="Total Blogs"
+          value={stats.blogs}
+          loading={loading}
+          icon={FileText}
+          color="bg-green-500"
+        />
+        <Card
+          title="Enquiries"
+          value={stats.enquiries}
+          loading={loading}
+          icon={Mail}
+          color="bg-[#DBA40D]"
+        />
       </div>
 
-      {/* 🔥 CHARTS SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        
-        {/* BAR CHART */}
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-semibold mb-4">Overview</h2>
           <Bar data={barData} />
         </div>
 
-        {/* LINE CHART */}
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-semibold mb-4">Enquiries Growth</h2>
           <Line data={lineData} />
         </div>
-
       </div>
     </main>
   );
 }
 
-/* 🔥 CARD COMPONENT */
 function Card({ title, value, loading, icon: Icon, color }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between hover:shadow-md transition">

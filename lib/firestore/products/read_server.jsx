@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+import { toWebpUrl } from "@/lib/cloudinary/toWebpUrl";
 
 import {
   collection,
@@ -16,11 +17,25 @@ import {
 ===================================================== */
 const serializeProperty = (d) => {
   const data = d.data();
+  const withWebpUrl = (image) =>
+    image?.url ? { ...image, url: toWebpUrl(image.url) } : image;
 
   return {
     id: d.id,
 
     ...data,
+
+    mainImage: withWebpUrl(data?.mainImage),
+    gallery: Array.isArray(data?.gallery)
+      ? data.gallery.map((image) => withWebpUrl(image))
+      : data?.gallery || [],
+    locationImage: withWebpUrl(data?.locationImage),
+    floorPlans: Array.isArray(data?.floorPlans)
+      ? data.floorPlans.map((plan) => ({
+          ...plan,
+          image: toWebpUrl(plan?.image),
+        }))
+      : data?.floorPlans || [],
 
     // ✅ FORCE brochure pass (Next.js nested object fix)
     brochure: data?.brochure

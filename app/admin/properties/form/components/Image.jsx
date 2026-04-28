@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { uploadPropertyImage } from "@/lib/cloudinary/uploadPropertyImage";
 
 export default function PropertyImageUpload({ data, handleData }) {
@@ -9,16 +9,31 @@ export default function PropertyImageUpload({ data, handleData }) {
   const mainInputRef = useRef(null);
   const galleryInputRef = useRef(null);
 
-  /* 🔹 Upload Handler */
+  const getProjectImageName = () =>
+    (data?.title || data?.slug || "property-image")
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "property-image";
+
   const uploadImages = async (files, type = "gallery") => {
     if (!files || files.length === 0) return;
 
     setUploading(true);
 
     try {
-      // 🚀 Parallel upload (FAST)
-      const uploadPromises = files.map((file) =>
-        uploadPropertyImage(file)
+      const projectImageName = getProjectImageName();
+      const existingGalleryCount = data.gallery?.length || 0;
+
+      const uploadPromises = files.map((file, index) =>
+        uploadPropertyImage(file, {
+          folder: "properties",
+          publicId:
+            type === "main"
+              ? projectImageName
+              : `${projectImageName}-${existingGalleryCount + index + 1}`,
+        })
       );
 
       const results = await Promise.all(uploadPromises);
@@ -30,7 +45,7 @@ export default function PropertyImageUpload({ data, handleData }) {
           publicId: res.publicId,
         }));
 
-      console.log("✅ FINAL UPLOADED:", uploaded);
+      console.log("FINAL UPLOADED:", uploaded);
 
       if (type === "main") {
         if (uploaded.length > 0) {
@@ -39,20 +54,15 @@ export default function PropertyImageUpload({ data, handleData }) {
           alert("Image upload failed");
         }
       } else {
-        handleData("gallery", [
-          ...(data.gallery || []),
-          ...uploaded,
-        ]);
+        handleData("gallery", [...(data.gallery || []), ...uploaded]);
       }
 
-      // 🔁 Reset input (important)
       if (type === "main" && mainInputRef.current) {
         mainInputRef.current.value = "";
       }
       if (type === "gallery" && galleryInputRef.current) {
         galleryInputRef.current.value = "";
       }
-
     } catch (err) {
       console.error(err);
       alert("Upload failed");
@@ -61,16 +71,13 @@ export default function PropertyImageUpload({ data, handleData }) {
     }
   };
 
-  /* 🔹 Remove Image */
   const removeImage = (publicId, type = "gallery") => {
     if (type === "main") {
-      handleData("mainImage", null); // ✅ FIX
+      handleData("mainImage", null);
     } else {
       handleData(
         "gallery",
-        (data.gallery || []).filter(
-          (img) => img.publicId !== publicId
-        )
+        (data.gallery || []).filter((img) => img.publicId !== publicId)
       );
     }
   };
@@ -79,45 +86,33 @@ export default function PropertyImageUpload({ data, handleData }) {
     <div className="bg-white rounded-xl p-6 space-y-8 shadow-sm">
       <h2 className="text-lg font-semibold">Project Images</h2>
 
-      {/* 🔹 MAIN IMAGE */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">
-          Main Image (1640 × 772 px)
-        </p>
+        <p className="text-sm font-medium">Main Image (1640 x 772 px)</p>
 
         <input
           ref={mainInputRef}
           type="file"
           accept="image/*"
           disabled={uploading}
-          onChange={(e) =>
-            uploadImages(Array.from(e.target.files), "main")
-          }
+          onChange={(e) => uploadImages(Array.from(e.target.files), "main")}
         />
 
         {data.mainImage?.url && (
           <div className="relative w-40 mt-2">
-            <img
-              src={data.mainImage.url}
-              className="rounded-lg"
-              alt="Main"
-            />
+            <img src={data.mainImage.url} className="rounded-lg" alt="Main" />
             <button
               type="button"
               onClick={() => removeImage(null, "main")}
               className="absolute top-1 right-1 bg-black text-white px-2 text-xs rounded"
             >
-              ✕
+              X
             </button>
           </div>
         )}
       </div>
 
-      {/* 🔹 GALLERY */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">
-          Gallery Images
-        </p>
+        <p className="text-sm font-medium">Gallery Images</p>
 
         <input
           ref={galleryInputRef}
@@ -125,9 +120,7 @@ export default function PropertyImageUpload({ data, handleData }) {
           accept="image/*"
           multiple
           disabled={uploading}
-          onChange={(e) =>
-            uploadImages(Array.from(e.target.files), "gallery")
-          }
+          onChange={(e) => uploadImages(Array.from(e.target.files), "gallery")}
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
@@ -143,18 +136,14 @@ export default function PropertyImageUpload({ data, handleData }) {
                 onClick={() => removeImage(img.publicId)}
                 className="absolute top-1 right-1 bg-black text-white text-xs px-2 rounded"
               >
-                ✕
+                X
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {uploading && (
-        <p className="text-sm text-gray-500">
-          Uploading images...
-        </p>
-      )}
+      {uploading && <p className="text-sm text-gray-500">Uploading images...</p>}
     </div>
   );
 }

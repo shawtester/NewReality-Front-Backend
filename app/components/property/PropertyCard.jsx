@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { toWebpUrl } from "@/lib/cloudinary/toWebpUrl";
 
 /* ================= COUNTRY CODES ================= */
 const countries = [
@@ -79,9 +80,7 @@ export default function PropertyCard({ property = {} }) {
       console.error("Contact submit error:", error);
     }
   };
-  const optimizedImg = img?.includes("res.cloudinary.com")
-    ? img.replace("/upload/", "/upload/f_auto,q_auto/")
-    : img;
+  const optimizedImg = toWebpUrl(img);
 
 
 

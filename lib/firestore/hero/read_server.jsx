@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+import { toWebpUrl } from "@/lib/cloudinary/toWebpUrl";
 import { doc, getDoc } from "firebase/firestore";
 
 /* =====================================================
@@ -12,10 +13,15 @@ export const getHeroServer = async () => {
     if (!snap.exists()) return null;
 
     const data = snap.data();
+    const normalizeImages = (images = []) =>
+      images.map((image) => ({
+        ...image,
+        url: toWebpUrl(image?.url),
+      }));
 
     return {
-      mobileImages: data.mobileImages || [],
-      desktopImages: data.desktopImages || [],
+      mobileImages: normalizeImages(data.mobileImages || []),
+      desktopImages: normalizeImages(data.desktopImages || []),
       videoUrl: data.videoUrl || "",
       mediaType: data.mediaType || "youtube",
     };

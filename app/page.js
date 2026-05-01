@@ -65,9 +65,11 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-  const properties = await getAllProperties();
-  const blogs = await getBlogsForHome();
-  const hero = await getHeroServer();
+  const [properties, blogs, hero] = await Promise.all([
+    getAllProperties(),
+    getBlogsForHome(),
+    getHeroServer(),
+  ]);
 
   return (
     <main className="w-full overflow-x-hidden">

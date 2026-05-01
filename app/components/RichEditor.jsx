@@ -61,9 +61,15 @@ export default function TinyEditor({
         image_advtab: true,
         file_picker_types: "image",
 
-        images_upload_handler: async (blobInfo) => {
-          return uploadEditorImage(blobInfo.blob());
-        },
+        images_upload_handler: (blobInfo) =>
+          new Promise((resolve, reject) => {
+            uploadEditorImage(blobInfo.blob())
+              .then(resolve)
+              .catch((error) => {
+                console.error("TinyMCE image upload failed:", error);
+                reject(error.message || "Image upload failed");
+              });
+          }),
 
         file_picker_callback: (callback, value, meta) => {
           if (meta.filetype !== "image") return;

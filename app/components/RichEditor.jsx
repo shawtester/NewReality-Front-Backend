@@ -41,7 +41,40 @@ export default function TinyEditor({
 
         // ✅ ADD THIS
         block_formats:
-          "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3",
+          "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre",
+
+        font_family_formats:
+          "Arial=arial,helvetica,sans-serif;" +
+          "Arial Black=arial black,avant garde;" +
+          "Calibri=calibri,sans-serif;" +
+          "Cambria=cambria,serif;" +
+          "Candara=candara,sans-serif;" +
+          "Comic Sans MS=comic sans ms,sans-serif;" +
+          "Consolas=consolas,monaco,monospace;" +
+          "Courier New=courier new,courier,monospace;" +
+          "Georgia=georgia,palatino,serif;" +
+          "Helvetica=helvetica,arial,sans-serif;" +
+          "Impact=impact,chicago;" +
+          "Lucida Console=lucida console,monaco,monospace;" +
+          "Palatino=palatino linotype,book antiqua,palatino,serif;" +
+          "Tahoma=tahoma,arial,helvetica,sans-serif;" +
+          "Times New Roman=times new roman,times,serif;" +
+          "Trebuchet MS=trebuchet ms,geneva,sans-serif;" +
+          "Verdana=verdana,geneva,sans-serif",
+
+        font_size_formats:
+          "8px 9px 10px 11px 12px 13px 14px 16px 18px 20px 22px 24px 26px 28px 30px 32px 36px 40px 44px 48px 54px 60px 66px 72px",
+
+        line_height_formats: "1 1.15 1.25 1.5 1.75 2 2.5 3",
+
+        style_formats: [
+          { title: "Title", block: "h1" },
+          { title: "Subtitle", block: "h2" },
+          { title: "Section Heading", block: "h3" },
+          { title: "Normal Text", block: "p" },
+          { title: "Quote", block: "blockquote" },
+          { title: "Code", block: "pre" },
+        ],
 
         plugins:
           "advlist autolink lists link image charmap preview anchor " +
@@ -49,8 +82,8 @@ export default function TinyEditor({
           "insertdatetime media table paste help wordcount directionality",
 
         toolbar:
-          "undo redo | formatselect | " +
-          "bold italic underline strikethrough | fontselect fontsizeselect | " +
+          "undo redo | styleselect formatselect | " +
+          "bold italic underline strikethrough superscript subscript | fontselect fontfamily fontsizeselect fontsize lineheight | " +
           "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
           "bullist numlist outdent indent | blockquote | " +
           "link image media | table | code | removeformat | ltr rtl",

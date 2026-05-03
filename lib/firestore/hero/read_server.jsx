@@ -17,7 +17,7 @@ export const getHeroServer = async () => {
     const normalizeImages = (images = [], width = 1920, isHero = false) =>
       images.map((image) => ({
         ...image,
-        url: isHero ? toHighQualityUrl(image?.url) : toOptimizedUrl(image?.url, width),
+        url: isHero ? toHighQualityUrl(image?.url, width) : toOptimizedUrl(image?.url, width),
       }));
 
     return {

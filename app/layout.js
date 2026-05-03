@@ -23,6 +23,7 @@ const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
+  display: "swap",
 });
 
 const geistMono = localFont({
@@ -54,7 +55,7 @@ export default function RootLayout({ children }) {
         {/* ✅ GTM */}
         <Script
           id="gtm-head"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];
             w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});

@@ -19,7 +19,7 @@ import { getSEOServer } from "@/lib/firestore/seo/read_server";
 import { getHeroServer } from "@/lib/firestore/hero/read_server";
 
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // ✅ ISR: Cache page for 1 hour, background update
 
 /* ✅ PROFESSIONAL DYNAMIC SEO */
 export async function generateMetadata() {

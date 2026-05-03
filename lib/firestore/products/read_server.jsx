@@ -57,7 +57,8 @@ export async function getAllProperties() {
   const q = query(
     collection(db, "properties"),
     where("isActive", "==", true),
-    orderBy("timestampCreate", "desc")
+    orderBy("timestampCreate", "desc"),
+    limit(40)
   );
 
   const snap = await getDocs(q);

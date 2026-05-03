@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { toWebpUrl } from "@/lib/cloudinary/toWebpUrl";
+import { toOptimizedUrl } from "@/lib/cloudinary/toWebpUrl";
 
 /* ================= COUNTRY CODES ================= */
 const countries = [
@@ -80,7 +80,7 @@ export default function PropertyCard({ property = {} }) {
       console.error("Contact submit error:", error);
     }
   };
-  const optimizedImg = toWebpUrl(img);
+  const optimizedImg = toOptimizedUrl(img, 640);
 
 
 
@@ -106,7 +106,7 @@ export default function PropertyCard({ property = {} }) {
               src={optimizedImg}
               alt={title}
               fill
-              unoptimized
+              sizes="(max-width: 768px) 100vw, 340px"
               className="object-cover"
               loading="lazy"
               />

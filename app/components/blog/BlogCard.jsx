@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { toOptimizedUrl } from "@/lib/cloudinary/toWebpUrl";
 
 export default function BlogCard({ blog }) {
 
   /* SAFE IMAGE SOURCE */
-  const imageSrc =
+  const rawImageSrc =
     blog?.image?.url ||
     blog?.image?.secure_url ||
     (typeof blog?.image === "string" ? blog?.image : null);
+  const imageSrc = rawImageSrc ? toOptimizedUrl(rawImageSrc, 400) : null;
 
   /* DATE FORMAT */
   const formatBlogDate = (timestamp) => {
@@ -48,7 +50,6 @@ export default function BlogCard({ blog }) {
             alt={blog?.title || "Blog"}
             fill
             sizes="(max-width:768px) 100vw, 33vw"
-            unoptimized
             className="object-cover"
           />
         ) : (

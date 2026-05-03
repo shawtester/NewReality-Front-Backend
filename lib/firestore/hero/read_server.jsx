@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { toWebpUrl } from "@/lib/cloudinary/toWebpUrl";
+import { toOptimizedUrl, toHighQualityUrl } from "@/lib/cloudinary/toWebpUrl";
 import { doc, getDoc } from "firebase/firestore";
 
 /* =====================================================
@@ -13,17 +13,16 @@ export const getHeroServer = async () => {
     if (!snap.exists()) return null;
 
     const data = snap.data();
-    const toSharpWebpUrl = (url) =>
-      toWebpUrl(url).replace("/upload/f_webp,q_auto/", "/upload/f_webp,q_auto:best/");
-    const normalizeImages = (images = []) =>
+
+    const normalizeImages = (images = [], width = 1920, isHero = false) =>
       images.map((image) => ({
         ...image,
-        url: toSharpWebpUrl(image?.url),
+        url: isHero ? toHighQualityUrl(image?.url) : toOptimizedUrl(image?.url, width),
       }));
 
     return {
-      mobileImages: normalizeImages(data.mobileImages || []),
-      desktopImages: normalizeImages(data.desktopImages || []),
+      mobileImages: normalizeImages(data.mobileImages || [], 828, true),
+      desktopImages: normalizeImages(data.desktopImages || [], 1920, true),
       videoUrl: data.videoUrl || "",
       mediaType: data.mediaType || "youtube",
     };

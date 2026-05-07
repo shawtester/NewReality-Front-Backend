@@ -8,6 +8,8 @@ export default function TinyEditor({
   value,
   onChange,
   imageUploadFolder = "blogs/content",
+  inlineOnlyFormatting = false,
+  ariaLabel = "Rich text editor",
 }) {
   const editorRef = useRef(null);
   const [localValue, setLocalValue] = useState(value || "");
@@ -40,8 +42,9 @@ export default function TinyEditor({
         directionality: "ltr",
 
         // ✅ ADD THIS
-        block_formats:
-          "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre",
+        block_formats: inlineOnlyFormatting
+          ? "Paragraph=p"
+          : "Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre",
 
         font_family_formats:
           "Arial=arial,helvetica,sans-serif;" +
@@ -67,26 +70,42 @@ export default function TinyEditor({
 
         line_height_formats: "1 1.15 1.25 1.5 1.75 2 2.5 3",
 
-        style_formats: [
-          { title: "Title", block: "h1" },
-          { title: "Subtitle", block: "h2" },
-          { title: "Section Heading", block: "h3" },
-          { title: "Normal Text", block: "p" },
-          { title: "Quote", block: "blockquote" },
-          { title: "Code", block: "pre" },
-        ],
+        style_formats: inlineOnlyFormatting
+          ? [
+              { title: "Bold Text", inline: "strong" },
+              { title: "Italic Text", inline: "em" },
+              {
+                title: "Accent Text",
+                inline: "span",
+                styles: { color: "#F5A300" },
+              },
+              {
+                title: "Highlighted Text",
+                inline: "span",
+                styles: { backgroundColor: "#fff3cd" },
+              },
+            ]
+          : [
+              { title: "Title", block: "h1" },
+              { title: "Subtitle", block: "h2" },
+              { title: "Section Heading", block: "h3" },
+              { title: "Normal Text", block: "p" },
+              { title: "Quote", block: "blockquote" },
+              { title: "Code", block: "pre" },
+            ],
 
         plugins:
           "advlist autolink lists link image charmap preview anchor " +
           "searchreplace visualblocks code fullscreen " +
           "insertdatetime media table paste help wordcount directionality",
 
-        toolbar:
-          "undo redo | styleselect formatselect | " +
-          "bold italic underline strikethrough superscript subscript | fontselect fontfamily fontsizeselect fontsize lineheight | " +
-          "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
-          "bullist numlist outdent indent | blockquote | " +
-          "link image media | table | code | removeformat | ltr rtl",
+        toolbar: inlineOnlyFormatting
+          ? "undo redo | styleselect | bold italic underline strikethrough superscript subscript | fontselect fontfamily fontsizeselect fontsize | forecolor backcolor | bullist numlist | link image media | code | removeformat | ltr rtl"
+          : "undo redo | styleselect formatselect | " +
+            "bold italic underline strikethrough superscript subscript | fontselect fontfamily fontsizeselect fontsize lineheight | " +
+            "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
+            "bullist numlist outdent indent | blockquote | " +
+            "link image media | table | code | removeformat | ltr rtl",
 
         toolbar_mode: "wrap",
         automatic_uploads: true,
@@ -133,6 +152,12 @@ export default function TinyEditor({
             text-align: left;
           }
         `,
+
+        setup: (editor) => {
+          editor.on("init", () => {
+            editor.getContainer()?.setAttribute("aria-label", ariaLabel);
+          });
+        },
       }}
 
       // 🔥 Local update only (no parent re-render per letter)

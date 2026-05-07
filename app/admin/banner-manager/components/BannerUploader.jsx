@@ -408,6 +408,8 @@ export default function BannerUploader({ category }) {
                         value={editedIntroText}
                         onChange={setEditedIntroText}
                         placeholder="Write full formatted page intro..."
+                        inlineOnlyFormatting
+                        ariaLabel="Page manager description"
                     />
 
                 </div>

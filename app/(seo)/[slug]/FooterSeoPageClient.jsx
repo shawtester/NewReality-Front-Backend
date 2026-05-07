@@ -12,16 +12,14 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef(null);
+  const collapsedHeight = `${maxLines * 1.625}em`;
 
   useEffect(() => {
     if (textRef.current) {
       const element = textRef.current;
-      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
-      const maxHeight = lineHeight * maxLines;
-
-      setIsOverflowing(element.scrollHeight > maxHeight);
+      setIsOverflowing(element.scrollHeight > element.clientHeight + 1);
     }
-  }, [html, maxLines]);
+  }, [html, collapsedHeight]);
 
   return (
     <div className={className}>
@@ -36,9 +34,8 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
         [&>ul]:pl-5
         [&>ul]:list-disc"
         style={{
-          display: "-webkit-box",
-          WebkitLineClamp: isExpanded ? "unset" : maxLines,
-          WebkitBoxOrient: "vertical",
+          lineHeight: 1.625,
+          maxHeight: isExpanded ? "none" : collapsedHeight,
           overflow: isExpanded ? "visible" : "hidden",
         }}
         dangerouslySetInnerHTML={{ __html: html }}

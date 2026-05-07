@@ -14,16 +14,29 @@ import Pagination from "../components/property/Pagination";
 const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
+    const [collapsedHeight, setCollapsedHeight] = useState(null);
     const textRef = useRef(null);
 
     useEffect(() => {
-        if (textRef.current) {
-            const element = textRef.current;
+        const element = textRef.current;
+        if (!element) return;
+
+        const updateOverflow = () => {
             const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
             const maxHeight = lineHeight * maxLines;
-            setIsOverflowing(element.scrollHeight > maxHeight);
-        }
+
+            setCollapsedHeight(maxHeight);
+            setIsOverflowing(element.scrollHeight > maxHeight + 1);
+        };
+
+        updateOverflow();
+
+        const resizeObserver = new ResizeObserver(updateOverflow);
+        resizeObserver.observe(element);
+
+        return () => resizeObserver.disconnect();
     }, [html, maxLines]);
+
     return (
         <div className={className}>
             <div
@@ -37,9 +50,11 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
         [&>ul]:pl-5
         [&>ul]:list-disc"
                 style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: isExpanded ? "unset" : maxLines,
-                    WebkitBoxOrient: "vertical",
+                    lineHeight: 1.625,
+                    maxHeight:
+                        isExpanded || !collapsedHeight
+                            ? "none"
+                            : `${collapsedHeight}px`,
                     overflow: isExpanded ? "visible" : "hidden",
                 }}
                 dangerouslySetInnerHTML={{ __html: html }}

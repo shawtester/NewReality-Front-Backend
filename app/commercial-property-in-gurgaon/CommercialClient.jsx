@@ -11,7 +11,12 @@ import PropertyCard from "../components/property/PropertyCard";
 import Pagination from "../components/property/Pagination";
 
 /* ================= EXPANDABLE TEXT ================= */
-const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
+const ExpandableText = ({
+  children: html,
+  maxLines = 2,
+  className = "",
+  forceHeightClamp = false,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef(null);
@@ -36,12 +41,20 @@ const ExpandableText = ({ children: html, maxLines = 2, className = "" }) => {
     [&>strong]:font-semibold
     [&>ul]:pl-5
     [&>ul]:list-disc"
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: isExpanded ? "unset" : maxLines,
-          WebkitBoxOrient: "vertical",
-          overflow: isExpanded ? "visible" : "hidden",
-        }}
+        style={
+          forceHeightClamp
+            ? {
+              lineHeight: 1.625,
+              maxHeight: isExpanded ? "none" : `${maxLines * 1.625}em`,
+              overflow: isExpanded ? "visible" : "hidden",
+            }
+            : {
+              display: "-webkit-box",
+              WebkitLineClamp: isExpanded ? "unset" : maxLines,
+              WebkitBoxOrient: "vertical",
+              overflow: isExpanded ? "visible" : "hidden",
+            }
+        }
         dangerouslySetInnerHTML={{ __html: html }}
       />
 
@@ -537,6 +550,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
           <ExpandableText
             maxLines={2}
             className="mt-3 text-sm sm:text-[15px] text-gray-600"
+            forceHeightClamp={forcedTypeSlug === "retail-shops-in-gurgaon"}
           >
             {introText || "Loading..."}
           </ExpandableText>

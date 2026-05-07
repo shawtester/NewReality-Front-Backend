@@ -45,7 +45,7 @@ const ExpandableText = ({
           forceHeightClamp
             ? {
               lineHeight: 1.625,
-              maxHeight: isExpanded ? "none" : `${maxLines * 1.625}em`,
+              maxHeight: isExpanded ? "none" : `${maxLines * 1.75}em`,
               overflow: isExpanded ? "visible" : "hidden",
             }
             : {

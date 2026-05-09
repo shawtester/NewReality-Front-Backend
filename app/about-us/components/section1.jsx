@@ -228,7 +228,7 @@ export default function Home() {
       </section>
 
       {/* ================= 5 STEPS ================= */}
-      <section className="max-w-7xl mx-auto relative px-6 py-8 pb-10">
+      <section className="max-w-7xl mx-auto relative px-6 py-8 pb-15">
         <h2 className="text-center text-3xl sm:text-4xl lg:text-5xl mb-6 ">
           <span className="text-[#DBA40D] font-semibold">5 Steps</span> to Your Dream Home
         </h2>

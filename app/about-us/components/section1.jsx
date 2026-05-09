@@ -256,7 +256,7 @@ export default function Home() {
         </div>
 
         {/* DESKTOP GRID */}
-        <div className="hidden lg:grid grid-cols-5 gap-6 place-items-center">
+        <div className="hidden lg:grid grid-cols-5 gap-6 place-items-center pb-8">
           {steps.map((step) => (
             <div
               key={step.title}

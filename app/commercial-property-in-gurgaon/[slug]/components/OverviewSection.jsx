@@ -30,13 +30,24 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
 
   if (!safeHtml) return null;
 
+  const collapsedStyle = isExpanded
+    ? undefined
+    : {
+        display: "-webkit-box",
+        WebkitBoxOrient: "vertical",
+        WebkitLineClamp: maxLines,
+        maxHeight: `${maxLines * 1.6}rem`,
+        overflow: "hidden",
+      };
+
   return (
     <div className={`space-y-3 ${className}`}>
       <div
         ref={textRef}
+        style={collapsedStyle}
         className={`
           transition-all duration-300 ease-in-out
-          ${isExpanded ? "max-h-none" : `line-clamp-${maxLines}`}
+          ${isExpanded ? "max-h-none" : ""}
           prose prose-sm max-w-none
           leading-[1.6rem] text-left
 
@@ -58,7 +69,7 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
             <span
               className={`w-3 h-3 border-b-2 border-r-2 transition-transform duration-200 ${
                 isExpanded
-                  ? "rotate-225 -translate-y-[1px]"
+                  ? "rotate-[225deg] -translate-y-[1px]"
                   : "rotate-45 translate-y-[1px]"
               }`}
             />

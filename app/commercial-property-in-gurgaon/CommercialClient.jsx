@@ -35,9 +35,22 @@ const ExpandableText = ({
         ref={textRef}
         className="leading-relaxed
     [&_p]:my-2
-    [&>h1]:text-2xl
-    [&>h2]:text-xl
-    [&>h3]:text-lg
+    [&_h1]:my-3
+    [&_h1]:text-2xl
+    [&_h1]:font-bold
+    [&_h1]:leading-snug
+    [&_h2]:my-3
+    [&_h2]:text-xl
+    [&_h2]:font-bold
+    [&_h2]:leading-snug
+    [&_h3]:my-2
+    [&_h3]:text-lg
+    [&_h3]:font-semibold
+    [&_h3]:leading-snug
+    [&_h4]:my-2
+    [&_h4]:text-base
+    [&_h4]:font-semibold
+    [&_h4]:leading-snug
     [&>strong]:font-semibold
     [&>ul]:pl-5
     [&>ul]:list-disc"

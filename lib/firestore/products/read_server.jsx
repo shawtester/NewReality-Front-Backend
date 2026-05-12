@@ -53,13 +53,17 @@ const serializeProperty = (d) => {
 /* =====================================================
    🔹 ALL ACTIVE PROPERTIES (HOME PAGE)
 ===================================================== */
-export async function getAllProperties() {
-  const q = query(
-    collection(db, "properties"),
+export async function getAllProperties({ pageLimit } = {}) {
+  const constraints = [
     where("isActive", "==", true),
     orderBy("timestampCreate", "desc"),
-    limit(40)
-  );
+  ];
+
+  if (Number.isFinite(pageLimit) && pageLimit > 0) {
+    constraints.push(limit(pageLimit));
+  }
+
+  const q = query(collection(db, "properties"), ...constraints);
 
   const snap = await getDocs(q);
 

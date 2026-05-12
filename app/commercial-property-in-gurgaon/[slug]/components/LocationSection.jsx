@@ -104,23 +104,33 @@ export default function LocationSection({
 
       {/* ================= FULLSCREEN IMAGE ================= */}
       {open && locationImage && (
-        <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
+        <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center p-4">
 
           {/* CLOSE */}
           <button
+            type="button"
+            aria-label="Close location image"
             onClick={() => setOpen(false)}
-            className="absolute top-6 right-6 text-white text-3xl"
+            style={{ top: "calc(env(safe-area-inset-top, 0px) + 16px)" }}
+            className="
+              fixed right-4 sm:right-6
+              z-[1001]
+              flex h-11 w-11 items-center justify-center
+              rounded-full border border-white/30 bg-black/70
+              text-2xl leading-none text-white shadow-lg
+              backdrop-blur-sm
+            "
           >
             ✕
           </button>
 
           {/* IMAGE */}
-          <div className="relative w-[90vw] h-[80vh]">
+          <div className="relative mt-12 h-[78dvh] w-[92vw] sm:mt-0 sm:h-[80vh] sm:w-[90vw]">
             <Image
               src={locationImage}
               alt="Location"
               fill
-              className="object-contain"
+              className="object-contain pointer-events-none"
             />
           </div>
         </div>

@@ -103,10 +103,15 @@ export default function HeroAdminPage() {
 
       await updateHero(payload);
 
+      try {
+        await fetch("/api/revalidate/hero", { method: "POST" });
+      } catch (error) {
+        console.warn("Home page revalidation failed:", error);
+      }
+
       toast.success("Hero updated successfully");
 
       // ✅ REFRESH AFTER SAVE
-      await fetchHeroData();
 
     } catch (err) {
       console.error(err);

@@ -3,13 +3,13 @@ import "./globals.css";
 import Script from "next/script";
 import dynamic from "next/dynamic";
 import { NextUIProvider } from "@nextui-org/react";
-import SchemaScript from "@/app/components/SchemaScript"; // ✅ NEW
+import SchemaScript from "@/app/components/SchemaScript";
 
-/* ✅ DYNAMIC IMPORTS */
 const Toaster = dynamic(() =>
   import("react-hot-toast").then((mod) => mod.Toaster),
   { ssr: false }
 );
+
 const Conditionalstickyicons = dynamic(
   () => import("@/app/components/Conditionalstickyicons"),
   { ssr: false }
@@ -46,27 +46,26 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* ✅ GTM HEAD */}
-        <Script
-          id="gtm-head"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];
-            w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        {/* ✅ GOOGLE TAG MANAGER */}
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];
+            w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});
             var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
             j.async=true;
             j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
             f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-M25MQ9BL');`,
-          }}
-        />
+            })(window,document,'script','dataLayer','GTM-M25MQ9BL');
+          `}
+        </Script>
       </head>
 
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* ✅ GTM NOSCRIPT BODY */}
+        {/* ✅ GTM NOSCRIPT */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M25MQ9BL"
@@ -76,7 +75,7 @@ export default function RootLayout({ children }) {
           />
         </noscript>
 
-        {/* ✅ GLOBAL SCHEMA (CONTROLLED VIA CLIENT COMPONENT) */}
+        {/* ✅ GLOBAL SCHEMA */}
         <SchemaScript />
 
         {/* ✅ UI */}

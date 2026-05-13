@@ -20,12 +20,30 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
   const safeHtml = sanitizeSchemaHtml(html || "");
 
   useEffect(() => {
-    if (textRef.current) {
-      const el = textRef.current;
+    const el = textRef.current;
+    if (!el) return;
+
+    const updateOverflow = () => {
       const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+      if (!lineHeight) return;
       const maxHeight = lineHeight * maxLines;
-      setIsOverflowing(el.scrollHeight > maxHeight);
-    }
+      setIsOverflowing(el.scrollHeight > maxHeight + 1);
+    };
+
+    const frame = requestAnimationFrame(updateOverflow);
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateOverflow)
+        : null;
+
+    resizeObserver?.observe(el);
+    window.addEventListener("resize", updateOverflow);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateOverflow);
+    };
   }, [safeHtml, maxLines]);
 
   if (!safeHtml) return null;
@@ -62,6 +80,7 @@ const ExpandableText = ({ html, maxLines = 1, className = "" }) => {
       {isOverflowing && (
         <div className="flex justify-center">
           <button
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-sm text-[#F5A300] font-medium hover:text-yellow-600 transition-all duration-200 flex items-center gap-1 px-4 py-1 cursor-pointer bg-gray-50/70 rounded-full hover:bg-yellow-50 border border-yellow-100 hover:border-yellow-200"
           >

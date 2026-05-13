@@ -203,6 +203,7 @@ export default function TitleBlockWithBrochure({ property }) {
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
           <div className="relative w-full max-w-md bg-white rounded-xl p-6">
             <button
+              type="button"
               onClick={() => setShowBrochurePopup(false)}
               className="absolute top-3 right-3 text-gray-400 hover:text-black text-xl"
             >
@@ -287,6 +288,7 @@ export default function TitleBlockWithBrochure({ property }) {
             </div>
 
             <button
+              type="button"
               onClick={handleSubmit}
               className="mt-5 w-full bg-[#F5A300] hover:bg-[#e49a00] text-white py-2.5 rounded-md text-sm font-semibold transition"
             >
@@ -298,7 +300,7 @@ export default function TitleBlockWithBrochure({ property }) {
 
       {/* ✅ THANK YOU POPUP */}
       {showThankYou && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
           <div className="bg-white rounded-xl p-20 text-center shadow-xl">
             <h3 className="text-lg font-semibold text-[#c8950a]">
               Thank You 🙌

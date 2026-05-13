@@ -76,14 +76,16 @@ export default function MobileGallery({ images = [], title = "" }) {
 
           {/* CLOSE */}
           <button
+            type="button"
             onClick={() => setOpen(false)}
-            className="absolute top-6 right-6 text-white text-3xl"
+            className="absolute top-6 right-6 z-[1001] text-white text-3xl"
           >
             ✕
           </button>
 
           {/* LEFT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) =>
                 prev === 0 ? images.length - 1 : prev - 1
@@ -101,12 +103,13 @@ export default function MobileGallery({ images = [], title = "" }) {
               alt=""
               fill
               unoptimized
-              className="object-contain"
+              className="object-contain pointer-events-none"
             />
           </div>
 
           {/* RIGHT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) => (prev + 1) % images.length)
             }

@@ -7,6 +7,7 @@ import Portal from "./Portal";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import toast from "react-hot-toast";
+import logger from "@/lib/logger";
 
 export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
   const [formData, setFormData] = useState({
@@ -14,19 +15,25 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     phone: "",
     email: "",
     message: "",
+    countryCode: "+91",
   });
 
   const [loading, setLoading] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [errors, setErrors] = useState({});
 
-  /* Disable scroll only when form open */
+  /* Disable scroll when modal or thank you is open */
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "auto";
+    const shouldLock = open || showThankYou;
+    if (shouldLock) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [open]);
+  }, [open, showThankYou]);
 
   /* 👉 Important */
   if (!open && !showThankYou) return null;
@@ -42,8 +49,18 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!/^[6-9]\d{9}$/.test(formData.phone))
-      newErrors.phone = "Enter valid 10 digit phone";
+    
+    // Improved validation: strict for India, flexible for others
+    if (formData.countryCode === "+91") {
+      if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+        newErrors.phone = "Enter valid 10 digit phone";
+      }
+    } else {
+      if (!/^\d{7,15}$/.test(formData.phone)) {
+        newErrors.phone = "Enter valid phone number";
+      }
+    }
+
     if (!/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter valid email";
 
@@ -59,30 +76,43 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
     try {
       await addDoc(collection(db, "contacts"), {
-        ...formData,
+        name: formData.name,
+        phone: `${formData.countryCode}${formData.phone}`,
+        email: formData.email,
+        message: formData.message,
         propertyTitle,
-        source: "property",
+        source: "property-detail",
         status: "new",
         createdAt: serverTimestamp(),
       });
 
       toast.success("Enquiry submitted successfully ✅");
 
-      setFormData({ name: "", phone: "", email: "", message: "" });
+      setFormData({ name: "", phone: "", email: "", message: "", countryCode: "+91" });
 
       // 👉 form close first
       onClose();
 
       // 👉 show thank you after close
-      setTimeout(() => setShowThankYou(true), 150);
+      setShowThankYou(true);
       setTimeout(() => setShowThankYou(false), 2200);
     } catch (err) {
-      console.error(err);
+      logger.error("BrandEnquiryPopup submit error", err, { propertyTitle });
       toast.error("Failed to submit enquiry ❌");
     } finally {
       setLoading(false);
     }
   };
+
+  const countries = [
+    { label: "India (+91)", value: "+91" },
+    { label: "USA (+1)", value: "+1" },
+    { label: "UK (+44)", value: "+44" },
+    { label: "Australia (+61)", value: "+61" },
+    { label: "Canada (+1)", value: "+1" },
+    { label: "Germany (+49)", value: "+49" },
+    { label: "UAE (+971)", value: "+971" },
+  ];
 
   return (
     <Portal>
@@ -133,24 +163,17 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
               <div>
                 <div className="flex border border-gray-300 rounded-md overflow-hidden">
-                  <select className="px-3 text-sm bg-gray-50 outline-none border-r">
-                    <option>+91 India</option>
-                    <option value="+1">United States (+1)</option>
-<option value="+1">Canada (+1)</option>
-<option value="+44">United Kingdom (+44)</option>
-<option value="+91">India (+91)</option>
-<option value="+61">Australia (+61)</option>
-<option value="+49">Germany (+49)</option>
-<option value="+33">France (+33)</option>
-<option value="+81">Japan (+81)</option>
-<option value="+55">Brazil (+55)</option>
-<option value="+86">China (+86)</option>
-<option value="+39">Italy (+39)</option>
-<option value="+52">Mexico (+52)</option>
-<option value="+7">Russia (+7)</option>
-<option value="+82">South Korea (+82)</option>
-<option value="+34">Spain (+34)</option>
-
+                  <select 
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleChange}
+                    className="px-3 text-sm bg-gray-50 outline-none border-r max-w-[100px]"
+                  >
+                    {countries.map((c, i) => (
+                      <option key={`${c.value}-${i}`} value={c.value}>
+                        {c.label}
+                      </option>
+                    ))}
                   </select>
                   <input
                     type="tel"
@@ -203,8 +226,14 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
       {/* ================= THANK YOU POPUP ================= */}
       {showThankYou && (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
-          <div className="bg-white rounded-xl p-20 text-center shadow-xl animate-fadeIn">
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-auto bg-black/20">
+          <div className="bg-white rounded-xl p-10 md:p-20 text-center shadow-xl animate-fadeIn relative">
+            <button
+                onClick={() => setShowThankYou(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black pointer-events-auto"
+              >
+                <FaTimes size={14} />
+            </button>
             <h3 className="text-lg font-semibold text-[#c8950a]">
               Thank You 🙌
             </h3>

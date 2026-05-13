@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { getDashboardStats } from "@/lib/dashboardStats";
 import { getMonthlyEnquiries } from "@/lib/getMonthlyEnquiries";
 import { Home, FileText, Mail } from "lucide-react";
+import logger from "@/lib/logger";
+import toast from "react-hot-toast";
 
 import {
   Chart as ChartJS,
@@ -44,12 +46,18 @@ export default function Page() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const statsData = await getDashboardStats();
-      const monthlyData = await getMonthlyEnquiries();
+      try {
+        const statsData = await getDashboardStats();
+        const monthlyData = await getMonthlyEnquiries();
 
-      setStats(statsData);
-      setGrowthData(monthlyData);
-      setLoading(false);
+        setStats(statsData);
+        setGrowthData(monthlyData);
+      } catch (err) {
+        logger.error("Admin dashboard fetchData error", err);
+        toast.error("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();

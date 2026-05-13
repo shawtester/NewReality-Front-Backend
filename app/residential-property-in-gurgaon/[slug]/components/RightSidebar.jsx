@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaInstagram,
   FaLinkedinIn,
@@ -14,27 +14,37 @@ import {
 import BrandCTA from "./BrandCTA";
 
 export default function RightSidebar({ property }) {
-  if (!property) return null;
-
   const [open, setOpen] = useState(false);
-  const [index, setIndex] = useState(0); // ✅ NEW
+  const [index, setIndex] = useState(0);
+
+  /* BODY SCROLL LOCK */
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
 
   /* ================= IMAGE RESOLUTION ================= */
 
   const mainImage =
-    property.mainImage?.url ||
-    property.featureImageURL ||
-    property.featuredImage ||
+    property?.mainImage?.url ||
+    property?.featureImageURL ||
+    property?.featuredImage ||
     null;
 
   const galleryImages = useMemo(() => {
-    if (property.gallery?.length > 0) {
+    if (property?.gallery?.length > 0) {
       return property.gallery
         .map((img) => (typeof img === "string" ? img : img?.url))
         .filter(Boolean);
     }
 
-    if (property.imageList?.length > 0) {
+    if (property?.imageList?.length > 0) {
       return property.imageList.filter(Boolean);
     }
 
@@ -61,7 +71,7 @@ export default function RightSidebar({ property }) {
     return "";
   };
 
-  const videoUrl = getVideoUrl(property.video);
+  const videoUrl = getVideoUrl(property?.video);
 
   const socialLinks = [
     { Icon: FaInstagram, href: "https://www.instagram.com/neevrealty" },
@@ -70,6 +80,8 @@ export default function RightSidebar({ property }) {
     { Icon: FaFacebookF, href: "https://www.facebook.com/p/NeevRealty-61558971842531" },
     { Icon: FaTwitter, href: "https://x.com/NeevRealty" },
   ];
+
+  if (!property) return null;
 
   const copyPropertyLink = async () => {
     try {
@@ -253,14 +265,16 @@ export default function RightSidebar({ property }) {
 
           {/* CLOSE */}
           <button
+            type="button"
             onClick={() => setOpen(false)}
-            className="absolute top-6 right-6 text-white text-3xl"
+            className="absolute top-6 right-6 z-[1001] text-white text-3xl"
           >
             ✕
           </button>
 
           {/* LEFT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) =>
                 prev === 0 ? galleryImages.length - 1 : prev - 1
@@ -278,12 +292,13 @@ export default function RightSidebar({ property }) {
               alt=""
               fill
               unoptimized
-              className="object-contain"
+              className="object-contain pointer-events-none"
             />
           </div>
 
           {/* RIGHT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) => (prev + 1) % galleryImages.length)
             }

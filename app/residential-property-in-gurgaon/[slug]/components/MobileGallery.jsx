@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function MobileGallery({ images = [], title = "" }) {
@@ -9,6 +9,18 @@ export default function MobileGallery({ images = [], title = "" }) {
   /* ✅ NEW — FULLSCREEN STATE */
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+
+  /* BODY SCROLL LOCK */
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
 
   if (!images || images.length === 0) return null;
 
@@ -76,14 +88,16 @@ export default function MobileGallery({ images = [], title = "" }) {
 
           {/* CLOSE */}
           <button
+            type="button"
             onClick={() => setOpen(false)}
-            className="absolute top-6 right-6 text-white text-3xl"
+            className="absolute top-6 right-6 z-[1001] text-white text-3xl"
           >
             ✕
           </button>
 
           {/* LEFT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) =>
                 prev === 0 ? images.length - 1 : prev - 1
@@ -101,12 +115,13 @@ export default function MobileGallery({ images = [], title = "" }) {
               alt=""
               fill
               unoptimized
-              className="object-contain"
+              className="object-contain pointer-events-none"
             />
           </div>
 
           {/* RIGHT */}
           <button
+            type="button"
             onClick={() =>
               setIndex((prev) => (prev + 1) % images.length)
             }

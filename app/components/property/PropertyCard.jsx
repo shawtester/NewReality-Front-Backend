@@ -87,17 +87,20 @@ export default function PropertyCard({ property = {} }) {
   return (
     <>
       {/* ================= CARD ================= */}
-      <Link href={slug ? `/${slug}` : "#"}>
-
-
-        <div
-          className="
+      <div
+        className="
             group flex h-full w-full flex-col overflow-hidden rounded-xl
             bg-white shadow-sm hover:shadow-md transition-all duration-300
             hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg cursor-pointer
-            md:h-72 lg:h-80 xl:h-96 border-1
+            md:h-72 lg:h-80 xl:h-96 border-1 relative
           "
-        >
+      >
+        <Link
+          href={slug ? `/${slug}` : "#"}
+          aria-label={title || "View property details"}
+          className="absolute inset-0 z-10"
+        />
+
           {/* IMAGE */}
           <div className="relative h-32 md:h-40 lg:h-44 xl:h-48 w-full">
            
@@ -162,6 +165,7 @@ export default function PropertyCard({ property = {} }) {
               </p>
 
               <button
+                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -174,20 +178,21 @@ export default function PropertyCard({ property = {} }) {
                   transition-all duration-300
                   group-hover:bg-[#F5A300]
                   group-hover:text-white
+                  relative z-20
                 "
               >
                 Contact
               </button>
             </div>
           </div>
-        </div>
-      </Link>
+      </div>
 
       {/* ================= CONTACT POPUP ================= */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40">
           <div className="bg-white w-[95%] max-w-lg rounded-2xl shadow-xl p-6 relative">
             <button
+              type="button"
               onClick={() => setOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-black"
             >

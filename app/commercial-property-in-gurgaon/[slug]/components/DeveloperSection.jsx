@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const sanitizeSchemaHtml = (input = "") =>
   input
@@ -14,9 +14,38 @@ const sanitizeSchemaHtml = (input = "") =>
 
 export default function DeveloperSection({ builder }) {
   const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const descriptionRef = useRef(null);
+
+  const safeDescription = sanitizeSchemaHtml(builder?.description || "");
+
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el) return;
+
+    const updateOverflow = () => {
+      const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+      if (!lineHeight) return;
+      setIsOverflowing(el.scrollHeight > lineHeight * 2 + 1);
+    };
+
+    const frame = requestAnimationFrame(updateOverflow);
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateOverflow)
+        : null;
+
+    resizeObserver?.observe(el);
+    window.addEventListener("resize", updateOverflow);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateOverflow);
+    };
+  }, [safeDescription]);
 
   if (!builder) return null;
-  const safeDescription = sanitizeSchemaHtml(builder.description || "");
 
   return (
     <section
@@ -63,6 +92,7 @@ export default function DeveloperSection({ builder }) {
         {safeDescription && (
           <div className="mt-6">
             <div
+              ref={descriptionRef}
               className={`
                 prose prose-sm max-w-none text-gray-600
                 [&_a]:text-[#F5A300]
@@ -76,12 +106,15 @@ export default function DeveloperSection({ builder }) {
             />
 
             {/* READ MORE / LESS */}
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="mt-2 text-sm font-semibold text-[#F5A300] hover:text-yellow-600"
-            >
-              {expanded ? "Read Less" : "Read More"}
-            </button>
+            {isOverflowing && (
+              <button
+                type="button"
+                onClick={() => setExpanded(!expanded)}
+                className="mt-2 text-sm font-semibold text-[#F5A300] hover:text-yellow-600"
+              >
+                {expanded ? "Read Less" : "Read More"}
+              </button>
+            )}
           </div>
         )}
       </div>

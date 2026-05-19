@@ -4,9 +4,8 @@ import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import Portal from "./Portal";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import toast from "react-hot-toast";
+import { saveLead } from "@/lib/saveLead";
 
 export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
   const [formData, setFormData] = useState({
@@ -19,6 +18,7 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
   const [loading, setLoading] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [errors, setErrors] = useState({});
+  const [countryCode, setCountryCode] = useState("+91");
 
   /* Disable scroll only when form open */
   useEffect(() => {
@@ -58,17 +58,20 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contacts"), {
-        ...formData,
-        propertyTitle,
-        source: "property",
-        status: "new",
-        createdAt: serverTimestamp(),
+      await saveLead({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        countryCode: countryCode,
+        propertyTitle: propertyTitle,
+        source: "property-detail",
+        message: formData.message
       });
 
       toast.success("Enquiry submitted successfully ✅");
 
       setFormData({ name: "", phone: "", email: "", message: "" });
+      setCountryCode("+91");
 
       // 👉 form close first
       onClose();
@@ -133,8 +136,16 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
 
               <div>
                 <div className="flex border border-gray-300 rounded-md overflow-hidden">
-                  <select className="px-3 text-sm bg-gray-50 outline-none border-r">
-                    <option>+91 India</option>
+                  <select 
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="px-3 text-sm bg-gray-50 outline-none border-r max-w-[100px]"
+                  >
+                    <option value="+91">India (+91)</option>
+                    <option value="+1">USA (+1)</option>
+                    <option value="+44">UK (+44)</option>
+                    <option value="+61">Australia (+61)</option>
+                    <option value="+971">UAE (+971)</option>
                   </select>
                   <input
                     type="tel"

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { saveLead } from "@/lib/saveLead";
 
 // Country codes array from our previous conversation
 const countryCodes = [
@@ -115,16 +114,16 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
     try {
       setLoading(true);
 
-      await addDoc(collection(db, "contacts"), {
+      await saveLead({
         name,
-        phone: `${countryCode}${phone}`, // Combine country code + phone
         email,
+        phone,
+        countryCode: countryCode,
         propertyTitle,
         source: "EMI Calculator Popup",
         loanAmount,
         interestRate,
-        tenure,
-        createdAt: serverTimestamp(),
+        tenure
       });
 
       // Clear form

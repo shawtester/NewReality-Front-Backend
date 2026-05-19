@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import toast from "react-hot-toast";
+import { saveLead } from "@/lib/saveLead";
 
 export default function GetInTouchModal({
   open,
@@ -22,6 +21,7 @@ export default function GetInTouchModal({
   const [loading, setLoading] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [errors, setErrors] = useState({});
+  const [countryCode, setCountryCode] = useState("+91");
 
   /* Scroll lock */
   useEffect(() => {
@@ -63,12 +63,14 @@ export default function GetInTouchModal({
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contacts"), {
-        ...formData,
-        propertyTitle,
+      await saveLead({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        countryCode: countryCode,
+        propertyTitle: propertyTitle,
         source: "get-in-touch-modal",
-        status: "new",
-        createdAt: serverTimestamp(),
+        message: formData.message
       });
 
       toast.success("Enquiry submitted successfully ✅");
@@ -79,6 +81,7 @@ export default function GetInTouchModal({
         email: "",
         message: "",
       });
+      setCountryCode("+91");
 
       // 👉 Close form first
       onClose();
@@ -144,23 +147,16 @@ export default function GetInTouchModal({
               )}
 
               <div className="flex border border-gray-300 rounded-md overflow-hidden">
-                <select className="px-3 text-sm bg-gray-50 outline-none border-r">
-                  <option>+91 India</option>
-                  <option value="+1">United States (+1)</option>
-<option value="+1">Canada (+1)</option>
-<option value="+44">United Kingdom (+44)</option>
-<option value="+91">India (+91)</option>
-<option value="+61">Australia (+61)</option>
-<option value="+49">Germany (+49)</option>
-<option value="+33">France (+33)</option>
-<option value="+81">Japan (+81)</option>
-<option value="+55">Brazil (+55)</option>
-<option value="+86">China (+86)</option>
-<option value="+39">Italy (+39)</option>
-<option value="+52">Mexico (+52)</option>
-<option value="+7">Russia (+7)</option>
-<option value="+82">South Korea (+82)</option>
-<option value="+34">Spain (+34)</option>
+                <select 
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="px-3 text-sm bg-gray-50 outline-none border-r max-w-[100px]"
+                >
+                  <option value="+91">India (+91)</option>
+                  <option value="+1">USA (+1)</option>
+                  <option value="+44">UK (+44)</option>
+                  <option value="+61">Australia (+61)</option>
+                  <option value="+971">UAE (+971)</option>
 
                 </select>
                 <input

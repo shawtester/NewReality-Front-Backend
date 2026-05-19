@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { toOptimizedUrl } from "@/lib/cloudinary/toWebpUrl";
+import { saveLead } from "@/lib/saveLead";
 
 /* ================= COUNTRY CODES ================= */
 const countries = [
@@ -51,14 +50,14 @@ export default function PropertyCard({ property = {} }) {
     e.preventDefault();
 
     try {
-      await addDoc(collection(db, "contacts"), {
+      await saveLead({
         name: form.name,
         email: form.email,
-        phone: `${countryCode}${form.phone}`,
-        message: form.message,
-        source: "property-card",
+        phone: form.phone,
+        countryCode: countryCode,
         propertyTitle: title,
-        createdAt: serverTimestamp(),
+        source: "property-card",
+        message: form.message
       });
 
       setForm({ name: "", email: "", phone: "", message: "" });

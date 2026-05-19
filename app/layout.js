@@ -4,6 +4,7 @@ import Script from "next/script";
 import dynamic from "next/dynamic";
 import { NextUIProvider } from "@nextui-org/react";
 import SchemaScript from "@/app/components/SchemaScript";
+import UtmTracker from "@/app/components/UtmTracker";
 
 const Toaster = dynamic(() =>
   import("react-hot-toast").then((mod) => mod.Toaster),
@@ -77,6 +78,7 @@ export default function RootLayout({ children }) {
 
         {/* ✅ GLOBAL SCHEMA */}
         <SchemaScript />
+        <UtmTracker />
 
         {/* ✅ UI */}
         <Toaster />

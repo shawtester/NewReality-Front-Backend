@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { saveLead } from "@/lib/saveLead";
+
 
 // Country codes array (same as EMI calculator)
 const countryCodes = [
@@ -69,13 +69,17 @@ export default function TitleBlockWithBrochure({ property }) {
     if (!validate()) return;
 
     try {
-      await addDoc(collection(db, "brochureLeads"), {
+      await saveLead({
         name: lead.name,
         email: lead.email,
-        phone: `${countryCode}${lead.phone}`, // ✅ COMBINE country code + phone
-        propertySlug: property.slug,
+        phone: lead.phone,
+        countryCode: countryCode,
         propertyTitle: property.title,
-        createdAt: serverTimestamp(),
+        source: "brochure-download",
+        collectionName: "brochureLeads",
+        extraData: {
+          propertySlug: property.slug
+        }
       });
 
       // Clear form

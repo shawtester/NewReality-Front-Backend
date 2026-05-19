@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import Image from "next/image";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { saveLead } from "@/lib/saveLead";
+
 
 export default function TitleBlockWithBrochure({ property }) {
   const [lead, setLead] = useState({
@@ -51,11 +51,17 @@ export default function TitleBlockWithBrochure({ property }) {
     if (!validate()) return;
 
     try {
-      await addDoc(collection(db, "brochureLeads"), {
-        ...lead,
-        propertySlug: property.slug,
+      await saveLead({
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        countryCode: "+91",
         propertyTitle: property.title,
-        createdAt: serverTimestamp(),
+        source: "brochure-download",
+        collectionName: "brochureLeads",
+        extraData: {
+          propertySlug: property.slug
+        }
       });
 
       // Clear form

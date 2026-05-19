@@ -4,10 +4,9 @@ import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import Portal from "./Portal";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import toast from "react-hot-toast";
 import logger from "@/lib/logger";
+import { saveLead } from "@/lib/saveLead";
 
 export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
   const [formData, setFormData] = useState({
@@ -75,15 +74,14 @@ export default function BrandEnquiryPopup({ open, onClose, propertyTitle }) {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contacts"), {
+      await saveLead({
         name: formData.name,
-        phone: `${formData.countryCode}${formData.phone}`,
         email: formData.email,
-        message: formData.message,
-        propertyTitle,
+        phone: formData.phone,
+        countryCode: formData.countryCode,
+        propertyTitle: propertyTitle,
         source: "property-detail",
-        status: "new",
-        createdAt: serverTimestamp(),
+        message: formData.message
       });
 
       toast.success("Enquiry submitted successfully ✅");

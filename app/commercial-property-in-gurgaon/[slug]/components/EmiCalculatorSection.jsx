@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { saveLead } from "@/lib/saveLead";
 
 export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
 
@@ -93,16 +92,16 @@ export default function EmiCalculatorSection({ propertyTitle = "N/A" }) {
     try {
       setLoading(true);
 
-      await addDoc(collection(db, "contacts"), {
+      await saveLead({
         name,
-        phone,
         email,
+        phone,
+        countryCode: "+91",
         propertyTitle,
         source: "EMI Calculator Popup",
         loanAmount,
         interestRate,
-        tenure,
-        createdAt: serverTimestamp(),
+        tenure
       });
 
       // Clear form

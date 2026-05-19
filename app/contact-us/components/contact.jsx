@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import toast from "react-hot-toast";
+import { saveLead } from "@/lib/saveLead";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -29,14 +28,18 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "contacts"), {
-        ...formData,
-        source: "contact-page", // track page origin
-        status: "new",
-        createdAt: serverTimestamp(),
+      await saveLead({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+        countryCode: "+91",
+        propertyTitle: "General Inquiry",
+        source: "contact-page",
+        message: formData.message,
+        extraData: {
+          type: formData.type
+        }
       });
-
-      // toast.success("Contact submitted successfully ✅");
 
       setFormData({
         firstName: "",

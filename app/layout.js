@@ -41,6 +41,30 @@ export const metadata = {
   verification: {
     google: "qehkTwAMVJUDTMNaCSLYCQKMVHOcK8QByWq2Ykwv9PY",
   },
+  openGraph: {
+    title: "Neev Realty",
+    description:
+      "Neev Realty - Premium flats, apartments and commercial spaces in Gurgaon.",
+    url: "https://www.neevrealty.com",
+    siteName: "Neev Realty",
+    images: [
+      {
+        url: "/images/neevlogo.png",
+        width: 1200,
+        height: 630,
+        alt: "Neev Realty",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Neev Realty",
+    description:
+      "Neev Realty - Premium flats, apartments and commercial spaces in Gurgaon.",
+    images: ["/images/neevlogo.png"],
+  },
 };
 
 export default function RootLayout({ children }) {

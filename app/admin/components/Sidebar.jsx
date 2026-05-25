@@ -1,6 +1,7 @@
 "use client";
 
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "firebase/auth";
 import {
   Cat,
@@ -18,7 +19,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 
+const ADMIN_SECTION_EMAILS = [
+  "vivek.malik@neevrealty.com",
+  "shubhamsamchaudhary143@gmail.com",
+];
+
 export default function Sidebar() {
+  const { user } = useAuth();
+  const canViewAdminsSection = ADMIN_SECTION_EMAILS.includes(
+    user?.email?.toLowerCase()
+  );
+
   const menuList = [
     {
       name: "Dashboard",
@@ -107,8 +118,9 @@ export default function Sidebar() {
       name: "Admins",
       link: "/admin/admins",
       icon: <ShieldCheck className="h-5 w-5" />,
+      restricted: true,
     },
-  ];
+  ].filter((item) => !item.restricted || canViewAdminsSection);
 
 
   return (

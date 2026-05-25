@@ -1,86 +1,132 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { auth, db } from "@/lib/firebase_admin";
 
-const COOKIE_NAME = "admin_sensitive_access";
-const EIGHT_HOURS = 60 * 60 * 8;
+const MANAGER_EMAILS = [
+  "vivek.malik@neevrealty.com",
+  "shubhamsamchaudhary143@gmail.com",
+];
+const SETTINGS_COLLECTION = "adminSettings";
+const SETTINGS_DOC = "sensitiveAccess";
+const HASH_ITERATIONS = 120000;
+const KEY_LENGTH = 32;
+const DIGEST = "sha256";
 
-function getAccessKey() {
+function getFallbackKey() {
   return process.env.ADMIN_DATA_ACCESS_KEY || "Neev@2026";
 }
 
-function getSecret() {
-  return process.env.ADMIN_DATA_LOCK_SECRET || getAccessKey();
-}
-
-function signToken(expiresAt) {
+function hashPassword(password, salt) {
   return crypto
-    .createHmac("sha256", getSecret())
-    .update(String(expiresAt))
-    .digest("hex");
+    .pbkdf2Sync(password, salt, HASH_ITERATIONS, KEY_LENGTH, DIGEST)
+    .toString("hex");
 }
 
-function createToken() {
-  const expiresAt = Date.now() + EIGHT_HOURS * 1000;
-  const signature = signToken(expiresAt);
-  return `${expiresAt}.${signature}`;
+function timingSafeStringEqual(left, right) {
+  const leftBuffer = Buffer.from(left || "");
+  const rightBuffer = Buffer.from(right || "");
+
+  if (leftBuffer.length !== rightBuffer.length) return false;
+
+  return crypto.timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-function isValidToken(token) {
-  if (!token || !token.includes(".")) return false;
+async function getPasswordConfig() {
+  const snapshot = await db
+    .collection(SETTINGS_COLLECTION)
+    .doc(SETTINGS_DOC)
+    .get();
 
-  const [expiresAtRaw, signature] = token.split(".");
-  const expiresAt = Number(expiresAtRaw);
+  if (snapshot.exists) {
+    const data = snapshot.data() || {};
 
-  if (!Number.isFinite(expiresAt) || expiresAt < Date.now()) return false;
+    if (data.passwordHash && data.salt) {
+      return {
+        passwordHash: data.passwordHash,
+        salt: data.salt,
+      };
+    }
+  }
 
-  const expected = signToken(expiresAt);
-  const expectedBuffer = Buffer.from(expected);
-  const signatureBuffer = Buffer.from(signature || "");
+  const salt = "default-admin-sensitive-access";
 
-  if (expectedBuffer.length !== signatureBuffer.length) return false;
-
-  return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  return {
+    passwordHash: hashPassword(getFallbackKey(), salt),
+    salt,
+  };
 }
 
-function isCorrectKey(key) {
-  const expected = Buffer.from(getAccessKey());
-  const received = Buffer.from(key || "");
+async function verifyPassword(password) {
+  const { passwordHash, salt } = await getPasswordConfig();
+  const receivedHash = hashPassword(password || "", salt);
 
-  if (expected.length !== received.length) return false;
-
-  return crypto.timingSafeEqual(expected, received);
+  return timingSafeStringEqual(receivedHash, passwordHash);
 }
 
-export async function GET(request) {
-  const token = request.cookies.get(COOKIE_NAME)?.value;
+async function verifyManager(request) {
+  const authHeader = request.headers.get("authorization") || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length)
+    : "";
 
-  return NextResponse.json({
-    unlocked: isValidToken(token),
-  });
+  if (!token) return null;
+
+  try {
+    const decoded = await auth.verifyIdToken(token);
+    const email = decoded?.email?.toLowerCase();
+
+    return MANAGER_EMAILS.includes(email) ? email : null;
+  } catch (error) {
+    return null;
+  }
 }
 
 export async function POST(request) {
   const body = await request.json().catch(() => ({}));
   const key = typeof body?.key === "string" ? body.key : "";
 
-  if (!isCorrectKey(key)) {
+  if (!(await verifyPassword(key))) {
     return NextResponse.json(
       { unlocked: false, message: "Invalid access key" },
       { status: 401 }
     );
   }
 
-  const response = NextResponse.json({ unlocked: true });
+  return NextResponse.json({ unlocked: true });
+}
 
-  response.cookies.set({
-    name: COOKIE_NAME,
-    value: createToken(),
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: EIGHT_HOURS,
-    path: "/",
-  });
+export async function PATCH(request) {
+  const managerEmail = await verifyManager(request);
 
-  return response;
+  if (!managerEmail) {
+    return NextResponse.json(
+      { updated: false, message: "Only Vivek can change this password" },
+      { status: 403 }
+    );
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const newKey = typeof body?.newKey === "string" ? body.newKey.trim() : "";
+
+  if (newKey.length < 6) {
+    return NextResponse.json(
+      { updated: false, message: "Password must be at least 6 characters" },
+      { status: 400 }
+    );
+  }
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  const passwordHash = hashPassword(newKey, salt);
+
+  await db.collection(SETTINGS_COLLECTION).doc(SETTINGS_DOC).set(
+    {
+      passwordHash,
+      salt,
+      updatedBy: managerEmail,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true }
+  );
+
+  return NextResponse.json({ updated: true });
 }

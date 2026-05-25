@@ -19,6 +19,7 @@ const ExpandableText = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const [expandedHeight, setExpandedHeight] = useState(0);
   const textRef = useRef(null);
 
   useEffect(() => {
@@ -27,8 +28,17 @@ const ExpandableText = ({
       const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
       const maxHeight = lineHeight * maxLines;
       setIsOverflowing(element.scrollHeight > maxHeight);
+      setExpandedHeight(element.scrollHeight);
     }
-  }, [html, maxLines]);
+  }, [html, maxLines, isExpanded]);
+
+  const toggleExpanded = () => {
+    if (textRef.current) {
+      setExpandedHeight(textRef.current.scrollHeight);
+    }
+    setIsExpanded((prev) => !prev);
+  };
+
   return (
     <div className={className}>
       <div
@@ -58,8 +68,10 @@ const ExpandableText = ({
           forceHeightClamp
             ? {
               lineHeight: 1.625,
-              maxHeight: isExpanded ? "none" : `${maxLines * 1.75}em`,
-              overflow: isExpanded ? "visible" : "hidden",
+              maxHeight: isExpanded
+                ? `${expandedHeight}px`
+                : `${maxLines * 1.75}em`,
+              overflow: "hidden",
             }
             : {
               display: "-webkit-box",
@@ -73,7 +85,7 @@ const ExpandableText = ({
 
       {isOverflowing && (
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={toggleExpanded}
           className="text-sm text-[#F5A300] font-medium pt-1 cursor-pointer"
         >
           {isExpanded ? "Read Less" : "Read More"}
@@ -431,7 +443,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
     };
 
     fetchBanner();
-  }, [searchParams, pageTitleDynamic]);
+  }, [searchParams, pageTitleDynamic, forcedTypeSlug]);
 
   /* ================= AUTO-SCROLL ================= */
   useEffect(() => {
@@ -501,6 +513,11 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
 
   const commercialBaseRoute = "/commercial-property-in-gurgaon";
   const subCategoryRoute = `/${forcedTypeSlug}`;
+  const shouldClampIntro =
+    forcedTypeSlug === "retail-shops-in-gurgaon" ||
+    forcedTypeSlug === "sco-plots-in-gurgaon" ||
+    type === "retail-shops" ||
+    type === "sco-plots";
 
   return (
     <>
@@ -563,7 +580,7 @@ and NH-8. Perfect investment opportunities in Gurgaon's thriving commercial real
           <ExpandableText
             maxLines={2}
             className="mt-3 text-sm sm:text-[15px] text-gray-600"
-            forceHeightClamp={forcedTypeSlug === "retail-shops-in-gurgaon"}
+            forceHeightClamp={shouldClampIntro}
           >
             {introText || "Loading..."}
           </ExpandableText>

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import AdminSensitiveLock from "../components/AdminSensitiveLock";
 
-export default function BrochureLeadsPage() {
+function BrochureLeadsContent() {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -101,5 +102,16 @@ export default function BrochureLeadsPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function BrochureLeadsPage() {
+    return (
+        <AdminSensitiveLock
+            title="Brochure Leads Locked"
+            description="Enter the access key to view saved brochure lead details."
+        >
+            <BrochureLeadsContent />
+        </AdminSensitiveLock>
     );
 }

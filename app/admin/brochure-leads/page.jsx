@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import AdminSensitiveLock from "../components/AdminSensitiveLock";
+import {
+    AdminSensitiveFieldsProvider,
+    SensitiveFieldsUnlock,
+    SensitiveValue,
+} from "../components/AdminSensitiveFields";
 
-function BrochureLeadsContent() {
+export default function BrochureLeadsPage() {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -52,66 +56,64 @@ function BrochureLeadsContent() {
     if (loading) return <p className="p-6">Loading leads...</p>;
 
     return (
-        <div className="p-6">
-            <h1 className="text-xl font-semibold mb-4">
-                Brochure Leads
-            </h1>
+        <AdminSensitiveFieldsProvider>
+            <div className="p-6">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h1 className="text-xl font-semibold">
+                        Brochure Leads
+                    </h1>
+                    <SensitiveFieldsUnlock />
+                </div>
 
-            <div className="overflow-auto bg-white shadow rounded-lg">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-100 text-left">
-                        <tr>
-                            <th className="p-3">Name</th>
-                            <th className="p-3">Email</th>
-                            <th className="p-3">Phone</th>
-                            <th className="p-3">Property</th>
-                            <th className="p-3">Date</th>
-                            <th className="p-3">Action</th>
-
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {leads.map((lead) => (
-                            <tr key={lead.id} className="border-t">
-                                <td className="p-3">{lead.name}</td>
-                                <td className="p-3">{lead.email}</td>
-                                <td className="p-3">{lead.phone}</td>
-                                <td className="p-3">{lead.propertyTitle}</td>
-                                <td className="p-3">
-                                    {lead.createdAt?.toDate
-                                        ? lead.createdAt.toDate().toLocaleString()
-                                        : "-"}
-                                </td>
-                                <td className="p-3">
-                                    <button
-                                        onClick={() => handleDelete(lead.id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                <div className="overflow-auto bg-white shadow rounded-lg">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-100 text-left">
+                            <tr>
+                                <th className="p-3">Name</th>
+                                <th className="p-3">Email</th>
+                                <th className="p-3">Phone</th>
+                                <th className="p-3">Property</th>
+                                <th className="p-3">Date</th>
+                                <th className="p-3">Action</th>
 
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
 
-                {leads.length === 0 && (
-                    <p className="p-4 text-gray-500">No leads yet.</p>
-                )}
+                        <tbody>
+                            {leads.map((lead) => (
+                                <tr key={lead.id} className="border-t">
+                                    <td className="p-3">{lead.name}</td>
+                                    <td className="p-3">
+                                        <SensitiveValue value={lead.email} fallback="Email locked" />
+                                    </td>
+                                    <td className="p-3">
+                                        <SensitiveValue value={lead.phone} fallback="Phone locked" />
+                                    </td>
+                                    <td className="p-3">{lead.propertyTitle}</td>
+                                    <td className="p-3">
+                                        {lead.createdAt?.toDate
+                                            ? lead.createdAt.toDate().toLocaleString()
+                                            : "-"}
+                                    </td>
+                                    <td className="p-3">
+                                        <button
+                                            onClick={() => handleDelete(lead.id)}
+                                            className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {leads.length === 0 && (
+                        <p className="p-4 text-gray-500">No leads yet.</p>
+                    )}
+                </div>
             </div>
-        </div>
-    );
-}
-
-export default function BrochureLeadsPage() {
-    return (
-        <AdminSensitiveLock
-            title="Brochure Leads Locked"
-            description="Enter the access key to view saved brochure lead details."
-        >
-            <BrochureLeadsContent />
-        </AdminSensitiveLock>
+        </AdminSensitiveFieldsProvider>
     );
 }

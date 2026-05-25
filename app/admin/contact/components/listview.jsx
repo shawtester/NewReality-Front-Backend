@@ -5,6 +5,7 @@ import { useContacts } from "@/lib/firestore/contacts/read";
 import { deleteContact } from "@/lib/firestore/contacts/write"; // ✅ ADD THIS
 import { CircularProgress, Button } from "@nextui-org/react";
 import { Trash2 } from "lucide-react";
+import { SensitiveValue } from "../../components/AdminSensitiveFields";
 
 /* ================= DATE FORMATTER ================= */
 const formatDateTime = (timestamp) => {
@@ -85,7 +86,7 @@ export default function ContactListView() {
                   </td>
 
                   <td className="bg-white px-3 py-2">
-                    {item?.phone || "-"}
+                    <SensitiveValue value={item?.phone} fallback="Phone locked" />
                   </td>
 
                   <td className="bg-white px-3 py-2">
@@ -132,8 +133,8 @@ export default function ContactListView() {
                   <tr>
                     <td colSpan={6} className="bg-gray-50 px-6 py-4 rounded-lg">
                       <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div><b>Email:</b> {item?.email || "-"}</div>
-                        <div><b>Phone:</b> {item?.phone || "-"}</div>
+                        <div><b>Email:</b> <SensitiveValue value={item?.email} fallback="Email locked" /></div>
+                        <div><b>Phone:</b> <SensitiveValue value={item?.phone} fallback="Phone locked" /></div>
                         <div><b>Type:</b> {item?.type || "-"}</div>
                         <div>
                           <b>Date & Time:</b>{" "}

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { auth, db } from "@/lib/firebase_admin";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const MANAGER_EMAILS = [
   "vivek.malik@neevrealty.com",
   "shubhamsamchaudhary143@gmail.com",
@@ -100,7 +103,7 @@ export async function PATCH(request) {
 
   if (!managerEmail) {
     return NextResponse.json(
-      { updated: false, message: "Only Vivek can change this password" },
+      { updated: false, message: "You do not have permission to change this password" },
       { status: 403 }
     );
   }
@@ -128,5 +131,12 @@ export async function PATCH(request) {
     { merge: true }
   );
 
-  return NextResponse.json({ updated: true });
+  if (!(await verifyPassword(newKey))) {
+    return NextResponse.json(
+      { updated: false, message: "Password saved but verification failed" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ updated: true, updatedBy: managerEmail });
 }

@@ -56,6 +56,14 @@ export function AdminSensitiveFieldsProvider({ children }) {
     event.preventDefault();
     setChangeError("");
     setChangeSuccess("");
+
+    const passwordToSave = newKey.trim();
+
+    if (passwordToSave.length < 6) {
+      setChangeError("Password must be at least 6 characters.");
+      return;
+    }
+
     setChangingPassword(true);
 
     try {
@@ -72,7 +80,7 @@ export function AdminSensitiveFieldsProvider({ children }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ newKey }),
+        body: JSON.stringify({ newKey: passwordToSave }),
       });
       const data = await res.json();
 
@@ -81,9 +89,22 @@ export function AdminSensitiveFieldsProvider({ children }) {
         return;
       }
 
+      const verifyRes = await fetch("/api/admin-sensitive-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: passwordToSave }),
+      });
+      const verifyData = await verifyRes.json();
+
+      if (!verifyRes.ok || !verifyData?.unlocked) {
+        setChangeError("Password saved, but the new password could not unlock. Please try saving again.");
+        return;
+      }
+
       setNewKey("");
       setUnlocked(false);
-      setChangeSuccess("Password updated. Use the new password to unlock.");
+      setError("");
+      setChangeSuccess("Password updated and verified. Use the new password to unlock.");
     } catch (err) {
       setChangeError("Unable to change password right now.");
     } finally {
@@ -220,7 +241,7 @@ export function SensitiveFieldsUnlock({ className = "" }) {
           />
           <button
             type="submit"
-            disabled={changingPassword || newKey.trim().length < 6}
+            disabled={changingPassword || !newKey.trim()}
             className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {changingPassword ? "Saving..." : "Save"}

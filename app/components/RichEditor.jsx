@@ -10,6 +10,8 @@ export default function TinyEditor({
   imageUploadFolder = "blogs/content",
 }) {
   const editorRef = useRef(null);
+  const onChangeRef = useRef(onChange);
+  const isFirstSync = useRef(true);
   const [localValue, setLocalValue] = useState(value || "");
 
   const uploadEditorImage = async (file) => {
@@ -27,6 +29,23 @@ export default function TinyEditor({
       setLocalValue(value || "");
     }
   }, [value]);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    if (isFirstSync.current) {
+      isFirstSync.current = false;
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      onChangeRef.current(localValue);
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [localValue]);
 
   return (
     <Editor

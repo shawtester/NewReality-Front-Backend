@@ -331,12 +331,33 @@ export default function BlogContent({ blog, onHeadingsReady }) {
   id="blog-wrapper"
   className="bg-white rounded-lg p-2 md:p-4 shadow-sm 
   prose max-w-none
+  overflow-x-auto
   [&_ul]:list-disc
   [&_ol]:list-decimal
   [&_ul]:pl-5
   [&_ol]:pl-5
   [&_li]:ml-4 
   [&_p]:my-3
+  [&_table]:my-6
+  [&_table]:w-full
+  [&_table]:min-w-[640px]
+  [&_table]:border-collapse
+  [&_table]:border
+  [&_table]:border-gray-300
+  [&_table]:text-left
+  [&_thead]:bg-gray-100
+  [&_th]:border
+  [&_th]:border-gray-300
+  [&_th]:px-4
+  [&_th]:py-3
+  [&_th]:font-semibold
+  [&_th]:text-gray-900
+  [&_td]:border
+  [&_td]:border-gray-300
+  [&_td]:px-4
+  [&_td]:py-3
+  [&_td]:align-top
+  [&_td]:text-gray-700
   prose-headings:scroll-mt-32
   prose-img:rounded-xl
   prose-a:text-black hover:prose-a:underline"

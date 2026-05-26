@@ -51,5 +51,9 @@ export const updateAdmin = async ({ data }) => {
 export const deleteAdmin = async ({ id }) => {
   if (!id) throw new Error("ID is required");
 
-  await deleteDoc(doc(db, `admins/${id}`));
+  try {
+    await deleteDoc(doc(db, `admins/${id}`));
+  } catch (error) {
+    throw new Error(`Failed to delete admin: ${error.message}`);
+  }
 };

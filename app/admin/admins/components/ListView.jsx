@@ -21,6 +21,10 @@ export default function ListView() {
   if (error) {
     return <div>{error}</div>;
   }
+
+  // Filter out empty admins (those without name or email)
+  const validAdmins = admins?.filter((admin) => admin?.name && admin?.email) || [];
+
   return (
     <div className="flex-1 flex flex-col gap-3 md:pr-5 md:px-0 px-5 rounded-xl">
       <h1 className="text-xl">Admins</h1>
@@ -43,7 +47,7 @@ export default function ListView() {
           </tr>
         </thead>
         <tbody>
-          {admins?.map((item, index) => {
+          {validAdmins?.map((item, index) => {
             return <Row index={index} item={item} key={item?.id} />;
           })}
         </tbody>
@@ -57,16 +61,19 @@ function Row({ item, index }) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm("Are you sure you want to delete this admin?")) return;
 
     setIsDeleting(true);
     try {
+      console.log("Deleting admin with ID:", item?.id);
       await deleteAdmin({ id: item?.id });
       toast.success("Successfully Deleted");
     } catch (error) {
-      toast.error(error?.message);
+      console.error("Delete error:", error);
+      toast.error(error?.message || "Failed to delete admin");
+    } finally {
+      setIsDeleting(false);
     }
-    setIsDeleting(false);
   };
 
   const handleUpdate = () => {

@@ -3,15 +3,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/lib/firestore/admins/read";
 
 const SensitiveAccessContext = createContext(null);
-const PASSWORD_MANAGER_EMAILS = [
-  "vivek.malik@neevrealty.com",
-  "shubhamsamchaudhary143@gmail.com",
-];
 
 export function AdminSensitiveFieldsProvider({ children }) {
   const { user } = useAuth();
+  const { data: admin } = useAdmin({ email: user?.email });
   const [key, setKey] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -112,8 +110,7 @@ export function AdminSensitiveFieldsProvider({ children }) {
     }
   };
 
-  const canManagePassword =
-    PASSWORD_MANAGER_EMAILS.includes(user?.email?.toLowerCase());
+  const canManagePassword = admin?.role === "superadmin";
 
   return (
     <SensitiveAccessContext.Provider

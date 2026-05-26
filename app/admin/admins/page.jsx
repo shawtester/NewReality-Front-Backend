@@ -3,28 +3,24 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/lib/firestore/admins/read";
 import Form from "./components/Form";
 import ListView from "./components/ListView";
-
-const ADMIN_SECTION_EMAILS = [
-  "vivek.malik@neevrealty.com",
-  "shubhamsamchaudhary143@gmail.com",
-];
 
 export default function Page() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
-  const canViewAdminsSection = ADMIN_SECTION_EMAILS.includes(
-    user?.email?.toLowerCase()
-  );
+  const { data: adminData, isLoading: adminLoading } = useAdmin({ email: user?.email });
+
+  const isSuperAdmin = adminData?.role === "superadmin";
 
   useEffect(() => {
-    if (!isLoading && !canViewAdminsSection) {
+    if (!isLoading && !adminLoading && !isSuperAdmin) {
       router.replace("/admin");
     }
-  }, [isLoading, canViewAdminsSection, router]);
+  }, [isLoading, adminLoading, isSuperAdmin, router]);
 
-  if (isLoading || !canViewAdminsSection) {
+  if (isLoading || adminLoading || !isSuperAdmin) {
     return null;
   }
 

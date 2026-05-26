@@ -141,6 +141,24 @@ export default function Form() {
             required
           />
         </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="admin-role" className="text-gray-500 text-sm">
+            Role <span className="text-red-500">*</span>{" "}
+          </label>
+          <select
+            id="admin-role"
+            name="admin-role"
+            value={data?.role ?? "admin"}
+            onChange={(e) => {
+              handleData("role", e.target.value);
+            }}
+            className="border px-4 py-2 rounded-lg w-full focus:outline-none"
+            required
+          >
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super Admin</option>
+          </select>
+        </div>
         <Button className="bg-[#DBA40D]" isLoading={isLoading} isDisabled={isLoading} type="submit">
           {id ? "Update" : "Create"}
         </Button>

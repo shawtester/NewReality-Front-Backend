@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/lib/firestore/admins/read";
 import { signOut } from "firebase/auth";
 import {
   Cat,
@@ -19,16 +20,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 
-const ADMIN_SECTION_EMAILS = [
-  "vivek.malik@neevrealty.com",
-  "shubhamsamchaudhary143@gmail.com",
-];
-
 export default function Sidebar() {
   const { user } = useAuth();
-  const canViewAdminsSection = ADMIN_SECTION_EMAILS.includes(
-    user?.email?.toLowerCase()
-  );
+  const { data: admin } = useAdmin({ email: user?.email });
+  const isSuperAdmin = admin?.role === "superadmin";
 
   const menuList = [
     {
@@ -120,7 +115,7 @@ export default function Sidebar() {
       icon: <ShieldCheck className="h-5 w-5" />,
       restricted: true,
     },
-  ].filter((item) => !item.restricted || canViewAdminsSection);
+  ].filter((item) => !item.restricted || isSuperAdmin);
 
 
   return (

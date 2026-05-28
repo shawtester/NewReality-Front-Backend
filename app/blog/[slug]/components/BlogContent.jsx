@@ -340,7 +340,10 @@ export default function BlogContent({ blog, onHeadingsReady }) {
   [&_p]:my-3
   [&_table]:my-6
   [&_table]:w-full
-  [&_table]:min-w-[640px]
+  [&_table]:block
+  [&_table]:max-w-full
+  [&_table]:overflow-x-auto
+  md:[&_table]:table
   [&_table]:border-collapse
   [&_table]:border
   [&_table]:border-gray-300

@@ -275,12 +275,7 @@ export default function Footer() {
             sales@neevrealty.com
           </a>
 
-          <a
-            href="mailto:info@neevrealty.com?subject=Property Inquiry&body=Hi, I am interested in your properties."
-            className="block text-sm text-gray-400 mt-2 hover:text-white"
-          >
-            info@neevrealty.com
-          </a>
+          
 
           {/* Social icons */}
           <div className="mt-4 flex gap-2">

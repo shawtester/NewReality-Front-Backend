@@ -260,7 +260,7 @@ export default function Footer() {
             <Link href="/our-services">Services</Link>
             <Link href="/contact-us">Contact</Link>
             <Link href="/careers">Careers</Link>
-            <Link href="/faqs">FAQs</Link>
+            
           </div>
         </div>
 

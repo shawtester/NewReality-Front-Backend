@@ -186,7 +186,7 @@ export default function PrivacyPolicy() {
             </ul>
 
             <p className="mt-2">
-              To exercise your rights, contact us at Info@neevrealty.in
+              To exercise your rights, contact us at Info@neevrealty.com
             </p>
           </section>
 

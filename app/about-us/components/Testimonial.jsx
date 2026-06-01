@@ -28,7 +28,7 @@ export default function Testimonial({ testimonials = [] }) {
             <span className="text-[#DBA40D]">About Us</span>
           </h2>
           <p className="mt-4 text-gray-500 max-w-2xl mx-auto text-sm sm:text-base">
-            Real stories from families and investors who trusted Livora.
+            Real stories from families and investors who trusted Neev Realty.
           </p>
         </div>
 

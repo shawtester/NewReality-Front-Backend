@@ -5,18 +5,22 @@ import Pagination from "../components/property/Pagination";
 import BlogPage from "./components/section1";
 import { getBlogsForHome } from "@/lib/firestore/blogs/read";
 
-export default function BlogClient() {
-  const [blogs, setBlogs] = useState([]);
+export default function BlogClient({ initialBlogs = [] }) {
+  // ✅ Initialize with SSR data — Google sees actual blogs in HTML
+  const [blogs, setBlogs] = useState(initialBlogs);
   const [page, setPage] = useState(1);
 
   const blogsPerPage = 4;
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      const res = await getBlogsForHome();
-      setBlogs(res || []);
-    };
-    fetchBlogs();
+    // ✅ Only fetch client-side if SSR didn't provide data
+    if (initialBlogs.length === 0) {
+      const fetchBlogs = async () => {
+        const res = await getBlogsForHome();
+        setBlogs(res || []);
+      };
+      fetchBlogs();
+    }
   }, []);
 
   useEffect(() => {

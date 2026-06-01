@@ -25,18 +25,28 @@ export async function generateMetadata({ params }) {
     const canonicalUrl =
       property.canonical ||
       `https://www.neevrealty.com/${property.slug || slug}`;
+    const title = property.metaTitle || `${property.title} in ${property.location} | Price & Details`;
+    const description = property.metaDescription || `Explore ${property.title} located in ${property.location}.`;
     return {
-      title:
-        property.metaTitle ||
-        `${property.title} in ${property.location} | Price & Details`,
-      description:
-        property.metaDescription ||
-        `Explore ${property.title} located in ${property.location}.`,
+      title,
+      description,
       keywords:
         property.metaKeywords ||
         `${property.title}, property in ${property.location}, real estate ${property.location}`,
       alternates: {
         canonical: canonicalUrl,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   }
@@ -52,26 +62,31 @@ export async function generateMetadata({ params }) {
 
     const seo = await getSEO(slug);
 
+    const title = seo?.title || `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`;
+    const description = seo?.description || `Explore the best ${COMMERCIAL_TYPE_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
+    const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
+
     return {
-      title:
-        seo?.title ||
-        `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`,
-
-      description:
-        seo?.description ||
-        `Explore the best ${COMMERCIAL_TYPE_MAP[
-          slug
-        ].toLowerCase()} available for sale in Gurgaon.`,
-
+      title,
+      description,
       keywords:
         seo?.keywords ||
         seo?.metaKeywords ||
         `${COMMERCIAL_TYPE_MAP[slug]}, commercial property in gurgaon, real estate gurgaon`,
-
       alternates: {
-        canonical:
-          seo?.canonical ||
-          `https://www.neevrealty.com/${slug}`,
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   }
@@ -85,26 +100,31 @@ export async function generateMetadata({ params }) {
 
     const seo = await getSEO(slug);
 
+    const title = seo?.title || `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`;
+    const description = seo?.description || `Explore the best ${RESIDENTIAL_TYPE_META_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
+    const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
+
     return {
-      title:
-        seo?.title ||
-        `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`,
-
-      description:
-        seo?.description ||
-        `Explore the best ${RESIDENTIAL_TYPE_META_MAP[
-          slug
-        ].toLowerCase()} available for sale in Gurgaon.`,
-
+      title,
+      description,
       keywords:
         seo?.keywords ||
         seo?.metaKeywords ||
         `${RESIDENTIAL_TYPE_META_MAP[slug]}, property in gurgaon, real estate gurgaon`,
-
       alternates: {
-        canonical:
-          seo?.canonical ||
-          `https://www.neevrealty.com/${slug}`,
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   }
@@ -113,12 +133,28 @@ export async function generateMetadata({ params }) {
   const seoData = await getFooterSeoBySlug(slug);
 
   if (seoData) {
+    const title = seoData.metaTitle || seoData.heading || slug;
+    const description = seoData.metaDescription || "";
+    const canonicalUrl = seoData?.canonical || `https://www.neevrealty.com/${params.slug}`;
+    
     return {
-      title: seoData.metaTitle || seoData.heading || slug,
-      description: seoData.metaDescription || "",
+      title,
+      description,
       keywords: seoData.metaKeywords || "",
       alternates: {
-        canonical: seoData?.canonical || `https://www.neevrealty.com/${params.slug}`,
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName: "Neev Realty",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
       },
     };
   }

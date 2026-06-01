@@ -16,22 +16,37 @@ export async function generateMetadata() {
   const baseUrl =
     "https://www.neevrealty.com/residential-property-in-gurgaon";
 
+  const title =
+    seo?.title ||
+    "Best Residential Projects in Gurgaon | Residential Property";
+
+  const description =
+    seo?.description ||
+    "Explore the best residential projects in Gurgaon.";
+
+  const canonicalUrl = seo?.canonical || baseUrl;
+
   return {
-    title:
-      seo?.title ||
-      "Best Residential Projects in Gurgaon | Residential Property",
-
-    description:
-      seo?.description ||
-      "Explore the best residential projects in Gurgaon.",
-
+    title,
+    description,
     keywords:
       seo?.keywords ||
       seo?.metaKeywords ||
       "residential property in gurgaon, flats in gurgaon, apartments in gurgaon",
-
     alternates: {
-      canonical: seo?.canonical || baseUrl,
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "Neev Realty",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }

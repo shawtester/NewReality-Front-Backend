@@ -24,6 +24,15 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: blog.metaTitle || blog.title,
       description: blog.metaDescription || blog.excerpt,
+      url,
+      siteName: "Neev Realty",
+      type: "article",
+      images: blog.image?.url ? [blog.image.url] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.metaTitle || blog.title,
+      description: blog.metaDescription || blog.excerpt,
       images: blog.image?.url ? [blog.image.url] : [],
     },
   };

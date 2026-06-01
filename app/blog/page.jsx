@@ -1,7 +1,8 @@
 import BlogClient from "./BlogClient";
 import { getSEO } from "@/lib/firestore/seo/read"; // ✅ SAME as Contact
+import { getBlogsForHome } from "@/lib/firestore/blogs/read"; // ✅ SSR fetch
 
-export const dynamic = "force-dynamic"; // optional but safe
+export const dynamic = "force-dynamic";
 
 /* ✅ SAME PATTERN AS CONTACT PAGE */
 export async function generateMetadata() {
@@ -57,7 +58,10 @@ export async function generateMetadata() {
   }
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  // ✅ SSR: fetch blogs on server so Google can crawl them
+  const blogs = await getBlogsForHome();
+
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -100,7 +104,7 @@ export default function BlogPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
-      <BlogClient />
+      <BlogClient initialBlogs={blogs} />
     </>
   );
 }

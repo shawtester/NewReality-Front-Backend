@@ -92,6 +92,8 @@ export async function generateMetadata({ params }) {
         title,
         description,
         url: canonicalURL,
+        siteName: "Neev Realty",
+        type: "website",
       },
       twitter: {
         card: "summary_large_image",

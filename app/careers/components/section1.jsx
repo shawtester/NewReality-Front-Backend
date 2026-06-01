@@ -90,7 +90,7 @@ export default function Career({ openResume }) {
 
                 {/* ⭐ DESCRIPTION EXPAND */}
                 {isOpen && (
-                  <div className="mt-4 pt-4 border-t text-sm text-gray-700">
+                  <div className="mt-4 pt-4 border-t text-sm text-gray-700 whitespace-pre-wrap">
                     {job.description || "No description available"}
                   </div>
                 )}

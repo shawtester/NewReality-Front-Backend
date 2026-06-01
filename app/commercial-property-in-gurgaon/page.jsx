@@ -14,17 +14,33 @@ export async function generateMetadata() {
   const baseUrl =
     "https://www.neevrealty.com/commercial-property-in-gurgaon";
 
+  const title =
+    seo?.title ||
+    "Commercial Property in Gurgaon | Best Commercial Real Estate";
+
+  const description =
+    seo?.description ||
+    "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.";
+
+  const canonicalUrl = seo?.canonical || baseUrl;
+
   return {
-    title:
-      seo?.title ||
-      "Commercial Property in Gurgaon | Best Commercial Real Estate",
-
-    description:
-      seo?.description ||
-      "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.",
-
+    title,
+    description,
     alternates: {
-      canonical: seo?.canonical || baseUrl,
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "Neev Realty",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
     },
   };
 }

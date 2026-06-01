@@ -281,7 +281,11 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
     const [bhk, setBhk] = useState("");
     const [locationOptions, setLocationOptions] = useState(DEFAULT_LOCALITY_OPTIONS);
     const [page, setPage] = useState(1);
-    const [filteredApartments, setFilteredApartments] = useState([]);
+    const [filteredApartments, setFilteredApartments] = useState(() =>
+        [...apartments]
+            .filter((item) => item.propertyType === "residential")
+            .sort((a, b) => (b.timestampCreate || 0) - (a.timestampCreate || 0))
+    );
     const [loading, setLoading] = useState(false);
     const isFilterApplied =
         searchParams.get("type") ||

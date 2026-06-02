@@ -252,7 +252,7 @@ export default function Footer() {
             <Link href="/">Home</Link>
             <Link href="/blog">Blog</Link>
             <Link href={BASE_ROUTE}>Residential</Link>
-            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/commercial-property-in-gurgaon">Commercial</Link>
             <Link href="/terms-and-conditions">Terms & Conditions</Link>
             <Link href="/about-us">About</Link>

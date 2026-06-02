@@ -18,7 +18,7 @@ export async function generateMetadata() {
 
     const canonicalURL =
       seo?.canonical ||
-      "https://www.neevrealty.com/privacy";
+      "https://www.neevrealty.com/privacy-policy";
 
     const keywords = Array.isArray(seo?.keywords)
       ? seo.keywords

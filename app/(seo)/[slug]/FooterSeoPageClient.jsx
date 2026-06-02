@@ -224,10 +224,13 @@ export default function FooterSeoPageClient({
 
       }
 
-      const parts = normalizedSlug.replace("-cr", "").split("-");
-
-      const min = parseFloat(parts[0]);
-      const max = parseFloat(parts[1]);
+      // Extract numbers from slug like "4-5-cr" or "between-4-to-5-cr"
+      const numbers = normalizedSlug.match(/\d+(\.\d+)?/g);
+      
+      if (!numbers || numbers.length < 2) return false;
+      
+      const min = parseFloat(numbers[0]);
+      const max = parseFloat(numbers[1]);
 
       return propertyMax >= min && propertyMin <= max;
 

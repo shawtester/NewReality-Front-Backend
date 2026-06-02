@@ -97,6 +97,10 @@ export async function generateMetadata({ params }) {
         description,
         images: ["/images/neevlogo.png"],
       },
+    };
+  }
+
+  // 3️⃣ RESIDENTIAL TYPE META  🔥 (NEW FIX)
   const RESIDENTIAL_TYPE_META_MAP = {
     "luxury-apartments-in-gurgaon": "Luxury Apartments in Gurgaon",
     "builder-floor-in-gurgaon": "Builder Floors in Gurgaon",
@@ -140,6 +144,10 @@ export async function generateMetadata({ params }) {
         description,
         images: ["/images/neevlogo.png"],
       },
+    };
+  }
+
+  /* ================= FOOTER SEO PAGE ================= */
   const seoData = await getFooterSeoBySlug(slug);
 
   if (seoData) {

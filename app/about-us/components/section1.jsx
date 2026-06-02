@@ -154,7 +154,7 @@ export default function Home() {
             </p>
             <p>
               What truly makes us stand out is our ability to merge personalization
-              with expertise. With over 20 years of experience and a portfolio of 100
+              with expertise. With 50+ years of collective industry experience and a portfolio of 100
               premium projects, we deliver a world of opportunities tailored just
               for you. From immersive virtual tours and in-person visits to
               seamless transaction support and ongoing assistance, we ensure

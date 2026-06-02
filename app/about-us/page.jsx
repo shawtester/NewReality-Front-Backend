@@ -97,7 +97,7 @@ export default async function AboutPage() {
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     SF-09, Ninex City Mart, Sector <br />
-                    49, Shona Road, Gurgaon
+                    49, Sohna Road, Gurgaon
                   </p>
                 </div>
 

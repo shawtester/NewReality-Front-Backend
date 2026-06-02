@@ -285,12 +285,7 @@ export default function TermsAndConditions() {
             <h2 className="text-xl lg:text-2xl font-bold mb-2">
               14. Contact Us
             </h2>
-            <p className="mb-2">
-              Neev Realty reserves the right to modify or update these Terms at
-              any time without prior notice. Changes will be posted on this
-              page with the “Effective Date” updated. Your continued use of the
-              Site constitutes acceptance of the revised Terms.
-            </p>
+            
 
             <p>For any questions, concerns, or feedback regarding these Terms, please contact us:</p>
 
@@ -303,9 +298,7 @@ export default function TermsAndConditions() {
             </p>
 
             <p className="mt-2">
-              By using our services, you agree to the terms outlined in this
-              Privacy Policy. We are committed to ensuring your privacy and
-              building trust as your preferred real estate advisory in India.
+              By using our services, you agree to these Terms & Conditions. We are committed to maintaining transparency and professionalism in all our real estate advisory services across India.
             </p>
           </section>
 

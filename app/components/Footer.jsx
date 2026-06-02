@@ -254,7 +254,7 @@ export default function Footer() {
             <Link href={BASE_ROUTE}>Residential</Link>
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/commercial-property-in-gurgaon">Commercial</Link>
-            <Link href="/terms-and-conditions">Terms & Condition</Link>
+            <Link href="/terms-and-conditions">Terms & Conditions</Link>
             <Link href="/about-us">About</Link>
             <Link href="/disclaimer">Disclaimer</Link>
             <Link href="/our-services">Services</Link>
@@ -297,7 +297,7 @@ export default function Footer() {
 
       {/* ================= BOTTOM ================= */}
       <div className="border-t border-[#2c1b32] py-4 text-center text-xs text-gray-500">
-        © 2025 NeevRealty.com. All Rights Reserved.
+        © 2026 NeevRealty.com. All Rights Reserved.
       </div>
     </footer>
   );

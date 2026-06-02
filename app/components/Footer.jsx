@@ -212,7 +212,7 @@ export default function Footer() {
                   {projectBudgetLinks.map(item => (
                     <li key={item.id}>
                       <Link
-                        href={`/residential-property-in-gurgaon?budget=${item.value}`}
+                        href={`/${item.value}`}
                         className="block leading-6 hover:text-white"
                       >
                         {item.label}

@@ -82,16 +82,21 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
+        images: [
+          {
+            url: "/images/neevlogo.png",
+            width: 1200,
+            height: 630,
+            alt: "Neev Realty",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ["/images/neevlogo.png"],
       },
-    };
-  }
-
-  // 3️⃣ RESIDENTIAL TYPE META  🔥 (NEW FIX)
   const RESIDENTIAL_TYPE_META_MAP = {
     "luxury-apartments-in-gurgaon": "Luxury Apartments in Gurgaon",
     "builder-floor-in-gurgaon": "Builder Floors in Gurgaon",
@@ -120,16 +125,21 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
+        images: [
+          {
+            url: "/images/neevlogo.png",
+            width: 1200,
+            height: 630,
+            alt: "Neev Realty",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ["/images/neevlogo.png"],
       },
-    };
-  }
-
-  // 4️⃣ FOOTER SEO
   const seoData = await getFooterSeoBySlug(slug);
 
   if (seoData) {
@@ -150,11 +160,20 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
+        images: [
+          {
+            url: "/images/neevlogo.png",
+            width: 1200,
+            height: 630,
+            alt: "Neev Realty",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ["/images/neevlogo.png"],
       },
     };
   }

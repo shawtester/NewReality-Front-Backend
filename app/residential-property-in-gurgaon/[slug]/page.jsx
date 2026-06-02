@@ -92,11 +92,27 @@ export async function generateMetadata({ params }) {
         url: canonicalURL,
         siteName: "Neev Realty",
         type: "website",
+        images: property?.images?.length > 0 ? [
+          {
+            url: property.images[0],
+            width: 1200,
+            height: 630,
+            alt: property.title,
+          },
+        ] : [
+          {
+            url: "/images/neevlogo.png",
+            width: 1200,
+            height: 630,
+            alt: "Neev Realty",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: property?.images?.length > 0 ? [property.images[0]] : ["/images/neevlogo.png"],
       },
     };
   } catch (error) {

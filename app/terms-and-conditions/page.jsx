@@ -68,7 +68,7 @@ export default function TermsAndConditions() {
 
           {/* Title */}
           <h1 className="text-4xl font-bold text-center mb-6">
-            Terms And Condition
+            Terms And Conditions
           </h1>
 
           {/* Intro */}

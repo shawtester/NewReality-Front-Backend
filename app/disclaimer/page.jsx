@@ -232,7 +232,7 @@ export default function PrivacyPolicy() {
             </p>
             <p className="mt-2 leading-relaxed">
               By using our services, you agree to the terms outlined in this
-              Privacy Policy. We are committed to ensuring your privacy and
+              disclaimer. We are committed to ensuring your privacy and
               building trust as your preferred real estate advisory in India.
             </p>
           </section>

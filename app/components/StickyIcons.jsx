@@ -23,7 +23,7 @@ export default function StickyIcons() {
     "faqs",
     "contact-us",
     "privacy",
-    "terms-condition",
+    "terms-and-conditions",
     "residential-property-in-gurgaon",
     "commercial-property-in-gurgaon",
   ];

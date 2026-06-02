@@ -13,7 +13,7 @@ const staticRoutes = [
   { path: "/disclaimer", priority: 0.5 },
   { path: "/faqs", priority: 0.7 },
   { path: "/privacy", priority: 0.5 },
-  { path: "/terms-condition", priority: 0.5 },
+  { path: "/terms-and-conditions", priority: 0.5 },
   { path: "/our-services", priority: 0.8 },
   { path: "/commercial-property-in-gurgaon", priority: 0.9 },
   { path: "/residential-property-in-gurgaon", priority: 0.9 },

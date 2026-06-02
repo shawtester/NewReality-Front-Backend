@@ -295,7 +295,7 @@ export default function TermsAndConditions() {
             <p>For any questions, concerns, or feedback regarding these Terms, please contact us:</p>
 
             <p className="font-semibold">Neev Realty</p>
-            <p>Email: Info@neevrealty.com</p>
+            <p>Email: info@neevrealty.com</p>
             <p>Phone: +91 8824-966-966</p>
             <p>
               Address: SF 09, Ninex City Mart, Sector 49, Gurgaon, Haryana,

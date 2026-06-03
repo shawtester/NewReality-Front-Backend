@@ -34,6 +34,7 @@ export async function generateMetadata() {
         ];
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords,
@@ -46,11 +47,20 @@ export async function generateMetadata() {
         url: canonicalURL,
         siteName: "Neev Realty",
         type: "website",
+        images: [
+          {
+            url: "/images/neevlogo.png",
+            width: 1200,
+            height: 630,
+            alt: "Neev Realty",
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: ["/images/neevlogo.png"],
       },
     };
   } catch (error) {

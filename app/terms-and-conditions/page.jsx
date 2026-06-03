@@ -2,34 +2,35 @@ import Navbar from "../components/Header";
 import Footer from "../components/Footer";
 import { getSEO } from "@/lib/firestore/seo/read";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-/* ✅ PROFESSIONAL DYNAMIC SEO */
+/* Professional dynamic SEO */
 export async function generateMetadata() {
-  const slug = "terms-and-conditions"; // 🔥 Must match Firestore document ID
+  const slug = "terms-and-conditions"; // Must match Firestore document ID
 
   try {
     const seo = await getSEO(slug);
 
-    const title =
-      seo?.title || "Terms and Conditions — Neev Realty";
+    const title = seo?.title || "Terms and Conditions - Neev Realty";
 
     const description =
       seo?.description ||
       "Read the Terms and Conditions of Neev Realty governing the use of our website and real estate services.";
 
     const canonicalURL =
-      seo?.canonical ||
-      "https://www.neevrealty.com/terms-and-conditions";
+      seo?.canonical || "https://www.neevrealty.com/terms-and-conditions";
 
     const keywords = Array.isArray(seo?.keywords)
       ? seo.keywords
       : seo?.keywords?.split(",").map((k) => k.trim()) || [
-        "terms and conditions neev realty",
-        "real estate website terms india",
-        "property platform legal terms",
-      ];
+          "terms and conditions neev realty",
+          "real estate website terms india",
+          "property platform legal terms",
+        ];
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords,
@@ -60,9 +61,8 @@ export async function generateMetadata() {
     };
   } catch (error) {
     return {
-      title: "Terms and Conditions — Neev Realty",
-      description:
-        "Terms and Conditions of Neev Realty.",
+      title: "Terms and Conditions - Neev Realty",
+      description: "Terms and Conditions of Neev Realty.",
     };
   }
 }
@@ -74,7 +74,6 @@ export default function TermsAndConditions() {
 
       <section className="py-8 px-4 sm:px-6 lg:px-0">
         <div className="max-w-[1173px] mx-auto text-gray-900">
-
           {/* Title */}
           <h1 className="text-4xl font-bold text-center mb-6">
             Terms And Conditions
@@ -84,7 +83,7 @@ export default function TermsAndConditions() {
           <p className="mb-6 leading-relaxed">
             Welcome to Neev Realty! By accessing or using our website
             ("www.neevrealty.com") you agree to comply with and be bound by these
-            Terms and Conditions (“Terms”). Please read them carefully before
+            Terms and Conditions ("Terms"). Please read them carefully before
             using the Site. If you do not agree with these Terms, please refrain
             from using the Site.
           </p>
@@ -110,7 +109,9 @@ export default function TermsAndConditions() {
             <p>By using the Site, you confirm that:</p>
             <ul className="list-disc pl-6 space-y-1">
               <li className="font-semibold">You are at least 18 years of age.</li>
-              <li className="font-semibold">You have the legal authority to enter into these Terms.</li>
+              <li className="font-semibold">
+                You have the legal authority to enter into these Terms.
+              </li>
             </ul>
           </section>
 
@@ -186,8 +187,8 @@ export default function TermsAndConditions() {
               <li className="font-semibold">
                 If you submit any information through the Site, including
                 inquiries or feedback, you grant Neev Realty a non-exclusive,
-                royalty-free license to use, modify, and display the content
-                for business purposes.
+                royalty-free license to use, modify, and display the content for
+                business purposes.
               </li>
               <li className="font-semibold">
                 You are responsible for ensuring the accuracy and legality of
@@ -198,12 +199,10 @@ export default function TermsAndConditions() {
 
           {/* 7 */}
           <section className="mb-6">
-            <h2 className="text-xl lg:text-2xl font-bold mb-2">
-              7. Privacy
-            </h2>
+            <h2 className="text-xl lg:text-2xl font-bold mb-2">7. Privacy</h2>
             <p>
-              Your use of the Site is also governed by our Privacy Policy,
-              which outlines how we collect, use, and protect your personal
+              Your use of the Site is also governed by our Privacy Policy, which
+              outlines how we collect, use, and protect your personal
               information.
             </p>
           </section>
@@ -214,14 +213,16 @@ export default function TermsAndConditions() {
               8. Disclaimer of Warranties
             </h2>
             <p>
-              The Site and its content are provided on an “as-is” and
-              “as-available” basis. Neev Realty makes no representations or
+              The Site and its content are provided on an "as-is" and
+              "as-available" basis. Neev Realty makes no representations or
               warranties of any kind, express or implied, regarding the Site,
               including but not limited to:
             </p>
             <ul className="list-disc pl-6 space-y-1">
               <li className="font-semibold">The accuracy or reliability of content.</li>
-              <li className="font-semibold">The uninterrupted or error-free operation of the Site.</li>
+              <li className="font-semibold">
+                The uninterrupted or error-free operation of the Site.
+              </li>
             </ul>
           </section>
 
@@ -234,7 +235,7 @@ export default function TermsAndConditions() {
               To the fullest extent permitted by law, Neev Realty shall not be
               liable for any direct, indirect, incidental, consequential, or
               punitive damages arising out of your use of the Site or reliance
-              on its content
+              on its content.
             </p>
           </section>
 
@@ -258,9 +259,9 @@ export default function TermsAndConditions() {
             </h2>
             <p>
               Neev Realty reserves the right to modify or update these Terms at
-              any time without prior notice. Changes will be posted on this
-              page with the “Effective Date” updated. Your continued use of the
-              Site constitutes acceptance of the revised Terms.
+              any time without prior notice. Changes will be posted on this page
+              with the "Effective Date" updated. Your continued use of the Site
+              constitutes acceptance of the revised Terms.
             </p>
           </section>
 
@@ -271,21 +272,20 @@ export default function TermsAndConditions() {
             </h2>
             <p>
               These Terms are governed by the laws of India. Any disputes
-              arising from your use of the Site will be subject to the
-              exclusive jurisdiction of the courts in Gurugram, Haryana.
+              arising from your use of the Site will be subject to the exclusive
+              jurisdiction of the courts in Gurugram, Haryana.
             </p>
           </section>
 
           {/* 13 */}
           <section className="mb-6">
             <h2 className="text-xl lg:text-2xl font-bold mb-2">
-              13 Termination
+              13. Termination
             </h2>
             <p>
-              Neev Realty reserves the right to suspend or terminate your
-              access to the Site at its discretion, without notice, for any
-              violation of these Terms or for other reasons deemed
-              appropriate.
+              Neev Realty reserves the right to suspend or terminate your access
+              to the Site at its discretion, without notice, for any violation of
+              these Terms or for other reasons deemed appropriate.
             </p>
           </section>
 
@@ -294,9 +294,11 @@ export default function TermsAndConditions() {
             <h2 className="text-xl lg:text-2xl font-bold mb-2">
               14. Contact Us
             </h2>
-            
 
-            <p>For any questions, concerns, or feedback regarding these Terms, please contact us:</p>
+            <p>
+              For any questions, concerns, or feedback regarding these Terms,
+              please contact us:
+            </p>
 
             <p className="font-semibold">Neev Realty</p>
             <p>Email: info@neevrealty.com</p>
@@ -307,10 +309,11 @@ export default function TermsAndConditions() {
             </p>
 
             <p className="mt-2">
-              By using our services, you agree to these Terms & Conditions. We are committed to maintaining transparency and professionalism in all our real estate advisory services across India.
+              By using our services, you agree to these Terms and Conditions. We
+              are committed to maintaining transparency and professionalism in
+              all our real estate advisory services across India.
             </p>
           </section>
-
         </div>
       </section>
 
@@ -318,4 +321,3 @@ export default function TermsAndConditions() {
     </>
   );
 }
-

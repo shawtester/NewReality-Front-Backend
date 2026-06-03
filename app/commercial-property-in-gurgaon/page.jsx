@@ -25,6 +25,7 @@ export async function generateMetadata() {
   const canonicalUrl = seo?.canonical || baseUrl;
 
   return {
+    metadataBase: new URL("https://www.neevrealty.com"),
     title,
     description,
     alternates: {

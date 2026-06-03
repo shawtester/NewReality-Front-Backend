@@ -31,6 +31,7 @@ export async function generateMetadata() {
         ];
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords,
@@ -56,6 +57,8 @@ export async function generateMetadata() {
         card: "summary_large_image",
         title,
         description,
+        images: ["/images/neevlogo.png"],
+      },
         images: ["/images/neevlogo.png"],
       },
     };

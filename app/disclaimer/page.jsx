@@ -29,6 +29,7 @@ export async function generateMetadata() {
       ];
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords,

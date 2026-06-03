@@ -62,9 +62,6 @@ export async function generateMetadata() {
         images: ["/images/neevlogo.png"],
       },
     };
-        images: ["/images/neevlogo.png"],
-      },
-    };
   } catch (error) {
     return {
       title: "About Us — Neev Realty",

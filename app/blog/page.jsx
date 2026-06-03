@@ -59,8 +59,6 @@ export async function generateMetadata() {
         description,
         images: ["/images/neevlogo.png"],
       },
-        images: ["/images/neevlogo.png"],
-      },
     };
   } catch (error) {
     return {

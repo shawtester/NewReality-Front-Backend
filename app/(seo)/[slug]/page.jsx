@@ -11,6 +11,7 @@ import CommercialPropertyPage from "@/app/commercial-property-in-gurgaon/[slug]/
 import CommercialClient from "@/app/commercial-property-in-gurgaon/CommercialClient";
 import ResidentialClient from "@/app/residential-property-in-gurgaon/ResidentialClient";
 import Script from "next/script";
+import { getPropertyOgImage } from "@/lib/seo/propertyMetadata";
 
 export const dynamic = "force-dynamic";
 
@@ -22,16 +23,29 @@ export async function generateMetadata({ params }) {
   const property = await getPropertyBySlugOrId(slug);
 
   if (property) {
+    const seo = await getSEO(slug);
+    const getValid = (v) =>
+      typeof v === "string" && v.trim() !== "" ? v.trim() : null;
     const canonicalUrl =
-      property.canonical ||
+      getValid(seo?.canonical) ||
+      getValid(property.canonical) ||
       `https://www.neevrealty.com/${property.slug || slug}`;
-    const title = property.metaTitle || `${property.title} in ${property.location} | Price & Details`;
-    const description = property.metaDescription || `Explore ${property.title} located in ${property.location}.`;
+    const title =
+      getValid(seo?.title) ||
+      getValid(property.metaTitle) ||
+      `${property.title} in ${property.location} | Price & Details`;
+    const description =
+      getValid(seo?.description) ||
+      getValid(property.metaDescription) ||
+      `Explore ${property.title} located in ${property.location}.`;
+    const ogImage = getPropertyOgImage(property);
+
     return {
       title,
       description,
       keywords:
-        property.metaKeywords ||
+        getValid(seo?.metaKeywords) ||
+        getValid(property.metaKeywords) ||
         `${property.title}, property in ${property.location}, real estate ${property.location}`,
       alternates: {
         canonical: canonicalUrl,
@@ -42,11 +56,13 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
+        images: [ogImage],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: [ogImage.url],
       },
     };
   }

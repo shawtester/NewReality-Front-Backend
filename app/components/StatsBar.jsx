@@ -15,8 +15,8 @@ const defaultStats = [
     icon: "/images/homebanner/lg3.png",
   },
   {
-    finalValue: 15,
-    label: "Years of Trust and Experties",
+    finalValue: 50,
+    label: "Years of Collective Experience",
     icon: "/images/homebanner/lg2.png",
   },
   {

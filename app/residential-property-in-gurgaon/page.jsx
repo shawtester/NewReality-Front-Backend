@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import ApartmentsPage from "./ResidentialClient";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getSEO } from "@/lib/firestore/seo/read";
+import { getListingOgImage } from "@/lib/seo/propertyMetadata";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,7 +11,15 @@ export const revalidate = 0;
    ✅ CLEAN SEO (NO QUERY CANONICAL)
 ========================= */
 export async function generateMetadata() {
-  const seo = await getSEO("residential-property-in-gurgaon");
+  const [seo, allProperties] = await Promise.all([
+    getSEO("residential-property-in-gurgaon"),
+    getAllProperties(),
+  ]);
+  const residentialProperties = (allProperties || []).filter(
+    (property) =>
+      !property.propertyType ||
+      property.propertyType === "residential"
+  );
 
   const baseUrl =
     "https://www.neevrealty.com/residential-property-in-gurgaon";
@@ -25,6 +33,10 @@ export async function generateMetadata() {
     "Explore the best residential projects in Gurgaon.";
 
   const canonicalUrl = seo?.canonical || baseUrl;
+  const ogImage = getListingOgImage(
+    residentialProperties,
+    "Residential Property in Gurgaon"
+  );
 
   return {
     metadataBase: new URL("https://www.neevrealty.com"),
@@ -43,20 +55,13 @@ export async function generateMetadata() {
       url: canonicalUrl,
       siteName: "Neev Realty",
       type: "website",
-      images: [
-        {
-          url: "/images/neevlogo.png",
-          width: 1200,
-          height: 630,
-          alt: "Neev Realty",
-        },
-      ],
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/images/neevlogo.png"],
+      images: [ogImage.url],
     },
   };
 }

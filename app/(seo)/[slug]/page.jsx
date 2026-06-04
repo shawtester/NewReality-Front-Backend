@@ -11,7 +11,7 @@ import CommercialPropertyPage from "@/app/commercial-property-in-gurgaon/[slug]/
 import CommercialClient from "@/app/commercial-property-in-gurgaon/CommercialClient";
 import ResidentialClient from "@/app/residential-property-in-gurgaon/ResidentialClient";
 import Script from "next/script";
-import { getPropertyOgImage } from "@/lib/seo/propertyMetadata";
+import { getListingOgImage, getPropertyOgImage } from "@/lib/seo/propertyMetadata";
 
 export const dynamic = "force-dynamic";
 
@@ -73,14 +73,26 @@ export async function generateMetadata({ params }) {
     "sco-plots-in-gurgaon": "SCO Plots in Gurgaon",
     "office-space-in-gurgaon": "Office Space in Gurgaon",
   };
+  const COMMERCIAL_TYPE_OG_FIELD_MAP = {
+    "retail-shops-in-gurgaon": "isRetail",
+    "sco-plots-in-gurgaon": "isSCO",
+  };
 
   if (COMMERCIAL_TYPE_MAP[slug]) {
 
-    const seo = await getSEO(slug);
+    const [seo, allProperties] = await Promise.all([
+      getSEO(slug),
+      getAllProperties(),
+    ]);
+    const field = COMMERCIAL_TYPE_OG_FIELD_MAP[slug];
+    const categoryProperties = (allProperties || [])
+      .filter((p) => p.propertyType === "commercial")
+      .filter((p) => (field ? p[field] === true : true));
 
     const title = seo?.title || `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`;
     const description = seo?.description || `Explore the best ${COMMERCIAL_TYPE_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
     const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
+    const ogImage = getListingOgImage(categoryProperties, COMMERCIAL_TYPE_MAP[slug]);
 
     return {
       title,
@@ -98,20 +110,13 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
-        images: [
-          {
-            url: "/images/neevlogo.png",
-            width: 1200,
-            height: 630,
-            alt: "Neev Realty",
-          },
-        ],
+        images: [ogImage],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: ["/images/neevlogo.png"],
+        images: [ogImage.url],
       },
     };
   }
@@ -121,13 +126,25 @@ export async function generateMetadata({ params }) {
     "luxury-apartments-in-gurgaon": "Luxury Apartments in Gurgaon",
     "builder-floor-in-gurgaon": "Builder Floors in Gurgaon",
   };
+  const RESIDENTIAL_TYPE_OG_FIELD_MAP = {
+    "luxury-apartments-in-gurgaon": "isApartment",
+    "builder-floor-in-gurgaon": "isBuilderFloor",
+  };
   if (RESIDENTIAL_TYPE_META_MAP[slug]) {
 
-    const seo = await getSEO(slug);
+    const [seo, allProperties] = await Promise.all([
+      getSEO(slug),
+      getAllProperties(),
+    ]);
+    const field = RESIDENTIAL_TYPE_OG_FIELD_MAP[slug];
+    const categoryProperties = (allProperties || [])
+      .filter((p) => p.propertyType === "residential")
+      .filter((p) => (field ? p[field] === true : true));
 
     const title = seo?.title || `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`;
     const description = seo?.description || `Explore the best ${RESIDENTIAL_TYPE_META_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
     const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
+    const ogImage = getListingOgImage(categoryProperties, RESIDENTIAL_TYPE_META_MAP[slug]);
 
     return {
       title,
@@ -145,20 +162,13 @@ export async function generateMetadata({ params }) {
         url: canonicalUrl,
         siteName: "Neev Realty",
         type: "website",
-        images: [
-          {
-            url: "/images/neevlogo.png",
-            width: 1200,
-            height: 630,
-            alt: "Neev Realty",
-          },
-        ],
+        images: [ogImage],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: ["/images/neevlogo.png"],
+        images: [ogImage.url],
       },
     };
   }

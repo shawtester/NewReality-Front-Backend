@@ -25,6 +25,14 @@ const VIDEO_SIZES = {
   mobile: { maxWidth: "105px", height: "190px" },
 };
 
+const getHeroImages = (heroData) => {
+  if (!heroData) return [];
+
+  return heroData.desktopImages?.length
+    ? heroData.desktopImages
+    : heroData.mobileImages || [];
+};
+
 export default function SearchCard({ initialHeroData }) {
   const router = useRouter();
 
@@ -35,7 +43,11 @@ export default function SearchCard({ initialHeroData }) {
   const controllerRef = useRef(null);
 
 
-  const [hero, setHero] = useState(initialHeroData || null);
+  const [hero, setHero] = useState(
+    initialHeroData
+      ? { ...initialHeroData, images: getHeroImages(initialHeroData) }
+      : null
+  );
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playMobileVideo, setPlayMobileVideo] = useState(false);
   const [desktopVideoPlaying, setDesktopVideoPlaying] = useState(true);
@@ -47,18 +59,13 @@ export default function SearchCard({ initialHeroData }) {
   /* ================= FETCH HERO (FALLBACK) ================= */
   useEffect(() => {
     const updateImages = () => {
-      const isMobile = window.innerWidth < 768;
       const fullHero = initialHeroData || hero;
 
       if (!fullHero) return;
 
-      const images = isMobile
-        ? fullHero.mobileImages || []
-        : fullHero.desktopImages || [];
-
       setHero({
         ...fullHero,
-        images,
+        images: getHeroImages(fullHero),
       });
     };
 
@@ -70,9 +77,7 @@ export default function SearchCard({ initialHeroData }) {
         try {
           const res = await getHero();
           if (res) {
-             const isMobile = window.innerWidth < 768;
-             const images = isMobile ? res.mobileImages || [] : res.desktopImages || [];
-             setHero({ ...res, images });
+             setHero({ ...res, images: getHeroImages(res) });
           }
         } catch (error) {
           console.error("Hero fetch failed:", error);

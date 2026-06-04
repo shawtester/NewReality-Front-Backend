@@ -2,14 +2,22 @@ import { Suspense } from "react";
 import CommercialClient from "./CommercialClient";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getSEO } from "@/lib/firestore/seo/read";
-import { redirect } from "next/navigation";
+import { getListingOgImage } from "@/lib/seo/propertyMetadata";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 /* ================= METADATA ================= */
 export async function generateMetadata() {
-  const seo = await getSEO("commercial-property-in-gurgaon");
+  const [seo, allProperties] = await Promise.all([
+    getSEO("commercial-property-in-gurgaon"),
+    getAllProperties(),
+  ]);
+  const commercialProperties = (allProperties || []).filter(
+    (property) =>
+      !property.propertyType ||
+      property.propertyType === "commercial"
+  );
 
   const baseUrl =
     "https://www.neevrealty.com/commercial-property-in-gurgaon";
@@ -23,6 +31,10 @@ export async function generateMetadata() {
     "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.";
 
   const canonicalUrl = seo?.canonical || baseUrl;
+  const ogImage = getListingOgImage(
+    commercialProperties,
+    "Commercial Property in Gurgaon"
+  );
 
   return {
     metadataBase: new URL("https://www.neevrealty.com"),
@@ -37,20 +49,13 @@ export async function generateMetadata() {
       url: canonicalUrl,
       siteName: "Neev Realty",
       type: "website",
-      images: [
-        {
-          url: "/images/neevlogo.png",
-          width: 1200,
-          height: 630,
-          alt: "Neev Realty",
-        },
-      ],
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/images/neevlogo.png"],
+      images: [ogImage.url],
     },
   };
 }

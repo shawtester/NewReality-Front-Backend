@@ -168,13 +168,19 @@ export default async function PropertyPage({ params }) {
     updatedAt: property.lastUpdated,
     brochure: property.brochure || null,
     mainImage: property.mainImage || null,
-    gallery: property.gallery || [],
+    gallery: Array.from(
+      new Map(
+        (property.gallery || [])
+          .filter((g) => g?.url && !g.url.toLowerCase().endsWith(".pdf"))
+          .map((g) => [g.url, g])
+      ).values()
+    ),
     images: Array.from(
       new Set([
         ...(property.mainImage?.url ? [property.mainImage.url] : []),
         ...(property.gallery?.map((g) => g.url) || []),
-      ]),
-    ),
+      ])
+    ).filter((url) => url && !url.toLowerCase().endsWith(".pdf")),
     video: property.video || null,
     overview: property.overview || {},
     floorPlans: property.floorPlans || [],

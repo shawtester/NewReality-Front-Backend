@@ -26,6 +26,7 @@ import Footer from "@/app/components/Footer";
 
 import { getSEO } from "@/lib/firestore/seo/read";
 import { getPropertyOgImage } from "@/lib/seo/propertyMetadata";
+import { getSimilarProjectCards } from "@/lib/seo/similarProjects";
 
 export const dynamic = "force-dynamic";
 
@@ -193,7 +194,11 @@ export default async function PropertyPage({ params }) {
     possession: property.possession || "",
   };
 
-
+  const similarProjectCards = getSimilarProjectCards({
+    projects: allProjects,
+    currentSlug: cleanProperty.slug,
+    currentDeveloper: cleanProperty.builderName,
+  });
 
   return (
     <>
@@ -334,9 +339,7 @@ export default async function PropertyPage({ params }) {
             )}
 
             <SimilarProjectsSection
-              projects={allProjects}
-              currentSlug={cleanProperty.slug}
-              currentDeveloper={cleanProperty.builderName}
+              projects={similarProjectCards}
             />
 
             <DisclaimerSection text={cleanProperty.disclaimer} />

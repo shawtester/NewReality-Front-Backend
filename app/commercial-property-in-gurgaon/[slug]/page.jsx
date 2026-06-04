@@ -7,6 +7,7 @@ import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
 import { getAmenitiesByIds } from "@/lib/firestore/amenities/read_server";
 import { getSEO } from "@/lib/firestore/seo/read";
 import { getPropertyOgImage } from "@/lib/seo/propertyMetadata";
+import { getSimilarProjectCards } from "@/lib/seo/similarProjects";
 
 import AutoPopup from "./components/AutoPopup";
 import ApartmentClient from "./components/ApartmentClient";
@@ -194,6 +195,11 @@ export default async function PropertyPage({ params }) {
     projectElevation: property.projectElevation || "",
     possession: property.possession || "",
   };
+  const similarProjectCards = getSimilarProjectCards({
+    projects: allProjects,
+    currentSlug: cleanProperty.slug,
+    currentDeveloper: cleanProperty.builderName,
+  });
 
   const baseUrl = "https://www.neevrealty.com";
 
@@ -330,9 +336,7 @@ export default async function PropertyPage({ params }) {
             )}
 
             <SimilarProjectsSection
-              projects={allProjects}
-              currentSlug={cleanProperty.slug}
-              currentDeveloper={cleanProperty.builderName}
+              projects={similarProjectCards}
             />
 
             <DisclaimerSection text={cleanProperty.disclaimer} />

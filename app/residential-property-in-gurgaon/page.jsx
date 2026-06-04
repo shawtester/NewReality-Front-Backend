@@ -30,6 +30,7 @@ export async function generateMetadata() {
 
   const description =
     seo?.description ||
+    seo?.metaDescription ||
     "Explore the best residential projects in Gurgaon.";
 
   const canonicalUrl = seo?.canonical || baseUrl;

@@ -85,16 +85,25 @@ export async function generateMetadata({ params }) {
       getAllProperties(),
     ]);
     const field = COMMERCIAL_TYPE_OG_FIELD_MAP[slug];
-    const categoryProperties = (allProperties || [])
-      .filter((p) => p.propertyType === "commercial")
-      .filter((p) => (field ? p[field] === true : true));
+    const sameTypeProperties = (allProperties || []).filter(
+      (p) => !p.propertyType || p.propertyType === "commercial"
+    );
+    const exactCategoryProperties = sameTypeProperties.filter((p) =>
+      field ? p[field] === true : true
+    );
+    const categoryProperties = exactCategoryProperties.length
+      ? exactCategoryProperties
+      : sameTypeProperties.length
+        ? sameTypeProperties
+        : allProperties || [];
 
     const title = seo?.title || `${COMMERCIAL_TYPE_MAP[slug]} | Neev Realty`;
-    const description = seo?.description || `Explore the best ${COMMERCIAL_TYPE_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
+    const description = seo?.description || seo?.metaDescription || `Explore the best ${COMMERCIAL_TYPE_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
     const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
     const ogImage = getListingOgImage(categoryProperties, COMMERCIAL_TYPE_MAP[slug]);
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords:
@@ -137,16 +146,25 @@ export async function generateMetadata({ params }) {
       getAllProperties(),
     ]);
     const field = RESIDENTIAL_TYPE_OG_FIELD_MAP[slug];
-    const categoryProperties = (allProperties || [])
-      .filter((p) => p.propertyType === "residential")
-      .filter((p) => (field ? p[field] === true : true));
+    const sameTypeProperties = (allProperties || []).filter(
+      (p) => !p.propertyType || p.propertyType === "residential"
+    );
+    const exactCategoryProperties = sameTypeProperties.filter((p) =>
+      field ? p[field] === true : true
+    );
+    const categoryProperties = exactCategoryProperties.length
+      ? exactCategoryProperties
+      : sameTypeProperties.length
+        ? sameTypeProperties
+        : allProperties || [];
 
     const title = seo?.title || `${RESIDENTIAL_TYPE_META_MAP[slug]} | Neev Realty`;
-    const description = seo?.description || `Explore the best ${RESIDENTIAL_TYPE_META_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
+    const description = seo?.description || seo?.metaDescription || `Explore the best ${RESIDENTIAL_TYPE_META_MAP[slug].toLowerCase()} available for sale in Gurgaon.`;
     const canonicalUrl = seo?.canonical || `https://www.neevrealty.com/${slug}`;
     const ogImage = getListingOgImage(categoryProperties, RESIDENTIAL_TYPE_META_MAP[slug]);
 
     return {
+      metadataBase: new URL("https://www.neevrealty.com"),
       title,
       description,
       keywords:

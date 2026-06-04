@@ -28,6 +28,7 @@ export async function generateMetadata() {
 
   const description =
     seo?.description ||
+    seo?.metaDescription ||
     "Browse the best commercial properties and investment-ready commercial projects in Gurgaon.";
 
   const canonicalUrl = seo?.canonical || baseUrl;

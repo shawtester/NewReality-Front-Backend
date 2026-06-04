@@ -348,7 +348,7 @@ export default async function PropertyPage({ params }) {
             <DisclaimerSection text={cleanProperty.disclaimer} />
           </div>
 
-          <RightSidebar property={cleanProperty} />
+          <RightSidebar property={{ ...cleanProperty, brochure: undefined }} />
         </section>
 
         <Footer />

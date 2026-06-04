@@ -207,6 +207,39 @@ export default async function PropertyPage({ params }) {
     currentDeveloper: cleanProperty.builderName,
   });
 
+  const titleBlockProps = {
+    title: cleanProperty.title,
+    location: cleanProperty.location,
+    builderName: cleanProperty.builderName,
+    size: cleanProperty.size,
+    rera: cleanProperty.rera,
+    updatedAt: cleanProperty.updatedAt,
+    price: cleanProperty.price,
+    bhk: cleanProperty.bhk,
+    brochure: cleanProperty.brochure,
+    slug: cleanProperty.slug,
+    sector: cleanProperty.sector,
+    locationName: cleanProperty.locationName,
+    projectArea: cleanProperty.projectArea,
+    projectType: cleanProperty.projectType,
+    projectStatus: cleanProperty.projectStatus,
+    projectElevation: cleanProperty.projectElevation,
+    possession: cleanProperty.possession,
+  };
+
+  const rightSidebarProps = {
+    title: cleanProperty.title,
+    mainImage: cleanProperty.mainImage,
+    gallery: cleanProperty.gallery,
+    video: cleanProperty.video,
+    projectArea: cleanProperty.projectArea,
+    projectType: cleanProperty.projectType,
+    projectStatus: cleanProperty.projectStatus,
+    projectElevation: cleanProperty.projectElevation,
+    rera: cleanProperty.rera,
+    possession: cleanProperty.possession,
+  };
+
   const baseUrl = "https://www.neevrealty.com";
 
   const schema = {
@@ -317,7 +350,7 @@ export default async function PropertyPage({ params }) {
               title={cleanProperty.title}
             />
 
-            <TitleBlockWithBrochure property={cleanProperty} />
+            <TitleBlockWithBrochure property={titleBlockProps} />
 
             <div className="sticky top-[64px] md:top-[96px] z-30 bg-white">
               <ScrollTabs />
@@ -348,7 +381,7 @@ export default async function PropertyPage({ params }) {
             <DisclaimerSection text={cleanProperty.disclaimer} />
           </div>
 
-          <RightSidebar property={{ ...cleanProperty, brochure: undefined }} />
+          <RightSidebar property={rightSidebarProps} />
         </section>
 
         <Footer />

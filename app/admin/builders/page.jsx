@@ -7,6 +7,18 @@ import toast from "react-hot-toast";
 
 import { useBuilders } from "@/lib/firestore/builders/read";
 import { deleteBuilder } from "@/lib/firestore/builders/write";
+import { useBuilderProjectCount } from "@/lib/firestore/products/count/read_client";
+
+function BuilderProjectCountCell({ builderId, staticTotal }) {
+  const { data, isLoading } = useBuilderProjectCount(builderId);
+  
+  if (isLoading) {
+    return <span className="text-gray-400">...</span>;
+  }
+  
+  // Use dynamically calculated count, fallback to static if not available
+  return <span>{data ?? staticTotal ?? 0}</span>;
+}
 
 export default function BuildersPage() {
   const { builders, isLoading } = useBuilders();
@@ -119,9 +131,12 @@ export default function BuildersPage() {
                   {b.citiesPresent ?? 0}
                 </td>
 
-                {/* AUTO TOTAL */}
+                {/* AUTO TOTAL (DYNAMIC) */}
                 <td className="p-3 font-semibold">
-                  {b.totalProjects ?? 0}
+                  <BuilderProjectCountCell 
+                    builderId={b.id} 
+                    staticTotal={b.totalProjects} 
+                  />
                 </td>
 
                 {/* 🔥 MANUAL TOTAL */}

@@ -244,10 +244,10 @@ export default async function Page({ params }) {
 
   if (property) {
     if (property.propertyType === "commercial") {
-      return <CommercialPropertyPage params={params} />;
+      return <CommercialPropertyPage params={params} isShortUrl={true} />;
     }
 
-    return <ResidentialPropertyPage params={params} />;
+    return <ResidentialPropertyPage params={params} isShortUrl={true} />;
   }
 
   const allProperties = await getAllProperties();
@@ -305,7 +305,7 @@ export default async function Page({ params }) {
           itemListElement: filtered.slice(0, 12).map((p, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            url: `${baseUrl}/commercial-property-in-gurgaon/${p.slug}`,
+            url: `${baseUrl}/${p.slug}`,
             name: p.title,
           })),
         },
@@ -393,7 +393,7 @@ export default async function Page({ params }) {
           itemListElement: filtered.slice(0, 12).map((p, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            url: `${baseUrl}/residential-property-in-gurgaon/${p.slug}`,
+            url: `${baseUrl}/${p.slug}`,
             name: p.title,
           })),
         },

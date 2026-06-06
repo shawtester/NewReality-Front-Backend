@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
@@ -116,10 +116,14 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function PropertyPage({ params }) {
+export default async function PropertyPage({ params, isShortUrl }) {
   console.log("🚀 COMMERCIAL PAGE HIT");
 
   const slug = params.slug;
+
+  if (!isShortUrl) {
+    permanentRedirect(`/${slug}`);
+  }
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();
 

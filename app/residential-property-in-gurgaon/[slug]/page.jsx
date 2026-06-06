@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getAllProperties } from "@/lib/firestore/products/read_server";
 import { getBuilderById } from "@/lib/firestore/builders/read_server";
 import { getPropertyBySlugOrId } from "@/lib/firestore/products/read_server";
@@ -114,9 +114,13 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function PropertyPage({ params }) {
+export default async function PropertyPage({ params, isShortUrl }) {
   console.log("🔥 RESIDENTIAL PAGE HIT");
   const slug = params.slug;
+
+  if (!isShortUrl) {
+    permanentRedirect(`/${slug}`);
+  }
 
   const property = await getPropertyBySlugOrId(slug);
   if (!property) return notFound();

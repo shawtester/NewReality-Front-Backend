@@ -74,6 +74,8 @@ export default function FooterSeoPageClient({
 
   const normalizedSlug = slug
     .toLowerCase()
+    .replace("project-in-", "")
+    .replace("property-in-", "")
     .replace("-in-gurgaon", "")
     .replace("-property", "")
     .replace("-properties", "")
@@ -126,35 +128,25 @@ export default function FooterSeoPageClient({
   /* SIZE FILTER */
 
   if (normalizedSlug.includes("bhk")) {
-
     filtered = filtered.filter((p) => {
-
       if (!p.configurations) return false;
 
       if (normalizedSlug === "above-5-bhk") {
-
         return p.configurations.some((cfg) => {
-
-          const match = cfg.match(/\d+(\.\d+)?/);
-
-          return match && parseFloat(match[0]) > 5;
-
+          const matches = cfg.match(/\d+(\.\d+)?/g);
+          if (!matches) return false;
+          return matches.some(m => parseFloat(m) > 5);
         });
-
       }
 
       const selectedBhk = parseFloat(normalizedSlug);
 
       return p.configurations.some((cfg) => {
-
-        const match = cfg.match(/\d+(\.\d+)?/);
-
-        return match && parseFloat(match[0]) === selectedBhk;
-
+        const matches = cfg.match(/\d+(\.\d+)?/g);
+        if (!matches) return false;
+        return matches.some(m => parseFloat(m) === selectedBhk);
       });
-
     });
-
   }
 
   /* STATUS FILTER */

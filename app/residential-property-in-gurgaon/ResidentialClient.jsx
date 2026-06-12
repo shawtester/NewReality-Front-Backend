@@ -226,9 +226,6 @@ const applyAllFilters = ({
         });
     }
 
-
-
-
     // 🛏️ BHK
     if (bhk) {
         filtered = filtered.filter((item) => {
@@ -237,10 +234,9 @@ const applyAllFilters = ({
             // Handle "above-5-bhk"
             if (bhk === "above-5-bhk") {
                 return item.configurations.some((config) => {
-                    const match = config.match(/\d+(\.\d+)?/);
-                    if (!match) return false;
-                    const bhkValue = parseFloat(match[0]);
-                    return bhkValue > 5;
+                    const matches = config.match(/\d+(\.\d+)?/g);
+                    if (!matches) return false;
+                    return matches.some(m => parseFloat(m) > 5);
                 });
             }
 
@@ -248,14 +244,12 @@ const applyAllFilters = ({
             const selectedBhk = parseFloat(bhk);
 
             return item.configurations.some((config) => {
-                const match = config.match(/\d+(\.\d+)?/);
-                if (!match) return false;
-                const bhkValue = parseFloat(match[0]);
-                return bhkValue === selectedBhk;
+                const matches = config.match(/\d+(\.\d+)?/g);
+                if (!matches) return false;
+                return matches.some(m => parseFloat(m) === selectedBhk);
             });
         });
     }
-
 
     return filtered;
 };
@@ -294,7 +288,6 @@ export default function ResidentialPage({ apartments = [], forcedTypeSlug }) {
         searchParams.get("budget") ||
         searchParams.get("bhk") ||
         searchParams.get("q");
-
 
     const apartmentsPerPage = 12;
 

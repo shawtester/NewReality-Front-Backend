@@ -466,11 +466,20 @@ export default async function Page({ params }) {
 
   /* ================= FALLBACK FOR BUDGET/LOCATION SLUGS ================= */
   // If no SEO data but slug looks like a budget, location, or filter slug, show with default data
-  const isBudgetSlug = slug.includes("cr");
-  const isLocationSlug = ["dwarka-expressway", "golf-course-road", "golf-course-extension", "sohna-road", "new-gurgaon", "old-gurgaon", "spr", "nh8"].includes(slug);
-  const isStatusSlug = ["new-launch", "ready-to-move", "under-construction", "pre-launch", "trending"].includes(slug);
-  const isTypeSlug = ["retail-shops", "sco-plots", "builder-floor", "luxury-apartment"].includes(slug);
-  const isBhkSlug = slug.includes("bhk");
+  const normalizedSlug = slug
+    .toLowerCase()
+    .replace("project-in-", "")
+    .replace("property-in-", "")
+    .replace("-in-gurgaon", "")
+    .replace("-property", "")
+    .replace("-properties", "")
+    .replace("-projects", "");
+
+  const isBudgetSlug = normalizedSlug.includes("cr");
+  const isLocationSlug = ["dwarka-expressway", "golf-course-road", "golf-course-extension", "sohna-road", "new-gurgaon", "old-gurgaon", "spr", "nh8"].includes(normalizedSlug);
+  const isStatusSlug = ["new-launch", "ready-to-move", "under-construction", "pre-launch", "trending"].includes(normalizedSlug);
+  const isTypeSlug = ["retail-shops", "sco-plots", "builder-floor", "luxury-apartment"].includes(normalizedSlug);
+  const isBhkSlug = normalizedSlug.includes("bhk");
 
   if (isBudgetSlug || isLocationSlug || isStatusSlug || isTypeSlug || isBhkSlug) {
     const safeProperties = (allProperties || []).map((p) => ({

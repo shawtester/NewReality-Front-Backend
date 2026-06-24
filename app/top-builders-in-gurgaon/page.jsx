@@ -35,8 +35,12 @@ export const metadata = {
   },
 };
 
-export default function TopBuildersPage() {
+import { getSEO } from "@/lib/firestore/seo/read";
+
+export default async function TopBuildersPage() {
   const baseUrl = "https://www.neevrealty.com";
+  const seoData = await getSEO("top-builders-in-gurgaon");
+  const pageContent = seoData?.pageContent || null;
 
   const schema = {
     "@context": "https://schema.org",
@@ -68,7 +72,7 @@ export default function TopBuildersPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <Suspense fallback={<div className="p-10">Loading...</div>}>
-        <BuildersClient />
+        <BuildersClient pageContent={pageContent} />
       </Suspense>
     </>
   );

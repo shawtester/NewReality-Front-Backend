@@ -126,6 +126,7 @@ export default function DevelopersSection() {
 
       {/* ===== MOBILE / TABLET SLIDER ===== */}
       <div className="lg:hidden">
+      <div className="lg:hidden">
         <div
           ref={scrollRef}
           onTouchStart={onTouchStart}
@@ -133,9 +134,10 @@ export default function DevelopersSection() {
           className="flex gap-6 overflow-x-auto scrollbar-hide px-20 py-6 snap-x snap-mandatory"
         >
           {activeBuilders.map((b) => (
-            <div
+            <Link
               key={b.id}
-              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow"
+              href={`/top-builders-in-gurgaon/${b.slug || b.id}`}
+              className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow hover:shadow-md transition-shadow cursor-pointer block"
             >
               <div className="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-white border shadow">
                 <Image
@@ -154,7 +156,7 @@ export default function DevelopersSection() {
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
                 {(b.totalProjects ?? 0)} Projects
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -167,9 +169,10 @@ export default function DevelopersSection() {
           style={{ gridAutoColumns: "160px" }}
         >
           {activeBuilders.map((b) => (
-            <div
+            <Link
               key={b.id}
-              className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow"
+              href={`/top-builders-in-gurgaon/${b.slug || b.id}`}
+              className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow hover:shadow-md transition-shadow cursor-pointer block"
             >
               <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
                 <Image
@@ -188,7 +191,7 @@ export default function DevelopersSection() {
               <p className="mt-1 text-xs text-gray-500">
                 {(b.totalProjects ?? 0)} Projects
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

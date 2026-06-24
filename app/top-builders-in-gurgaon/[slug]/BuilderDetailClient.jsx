@@ -35,14 +35,8 @@ const sanitizeSchemaHtml = (input = "") =>
 
 const stripHtml = (value = "") => value.replace(/<[^>]*>/g, " ").trim();
 
-const getProjectCount = (builder, projectsLength) => {
-  const count =
-    builder?.manualTotalProjects ??
-    builder?.totalProjects ??
-    projectsLength ??
-    0;
-
-  return Number(count) || 0;
+const getProjectCount = (builder) => {
+  return Number(builder?.totalProjects) || 0;
 };
 
 function LogoBlock({ builder }) {
@@ -184,8 +178,8 @@ export default function BuilderDetailClient({ builderId }) {
   const description = sanitizeSchemaHtml(builder?.description || "");
   const hasDescription = stripHtml(description).length > 0;
   const totalProjects = useMemo(
-    () => getProjectCount(builder, projects.length),
-    [builder, projects.length]
+    () => getProjectCount(builder),
+    [builder]
   );
 
   return (

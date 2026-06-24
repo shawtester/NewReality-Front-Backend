@@ -13,13 +13,7 @@ const introText =
   "Gurgaon has become one of the most searched residential markets in North India, and the reason is simple. The city offers jobs, infrastructure, and lifestyle in one place. Over the years, planned sectors, wide roads, metro connectivity, and corporate hubs have completely changed how people look at property investment in Gurgaon.";
 
 const getProjectCount = (builder) => {
-  const count =
-    builder?.manualTotalProjects ??
-    builder?.totalProjects ??
-    builder?.ongoingProjects ??
-    0;
-
-  return Number(count) || 0;
+  return Number(builder?.totalProjects) || 0;
 };
 
 function BuilderLogo({ builder }) {
@@ -83,7 +77,7 @@ function BuilderCard({ builder }) {
   );
 }
 
-export default function BuildersClient({ builders: initialBuilders = [] }) {
+export default function BuildersClient({ builders: initialBuilders = [], pageContent }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(false);
@@ -133,7 +127,14 @@ export default function BuildersClient({ builders: initialBuilders = [] }) {
           </div>
 
           <div className="mt-3 max-w-[980px] text-[13px] leading-6 text-gray-800">
-            <p className={expanded ? "" : "line-clamp-2"}>{introText}</p>
+            {pageContent ? (
+              <div 
+                className={expanded ? "" : "line-clamp-2 prose prose-sm max-w-none"}
+                dangerouslySetInnerHTML={{ __html: pageContent }} 
+              />
+            ) : (
+              <p className={expanded ? "" : "line-clamp-2"}>{introText}</p>
+            )}
             <button
               type="button"
               onClick={() => setExpanded((value) => !value)}

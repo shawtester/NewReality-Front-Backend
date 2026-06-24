@@ -45,12 +45,20 @@ export default function BuildersPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Builder List</h1>
 
-        <Link
-          href="/admin/builders/create"
-          className="px-4 py-2 bg-green-500 text-white rounded"
-        >
-          Add Builder
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/builders/page-content"
+            className="px-4 py-2 bg-[#DBA40D] text-white rounded"
+          >
+            Edit Page Content
+          </Link>
+          <Link
+            href="/admin/builders/create"
+            className="px-4 py-2 bg-green-500 text-white rounded"
+          >
+            Add Builder
+          </Link>
+        </div>
       </div>
 
       {/* SEARCH */}

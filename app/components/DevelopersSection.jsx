@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useBuilders } from "@/lib/firestore/builders/read";
 
 export default function DevelopersSection() {
@@ -105,11 +106,22 @@ export default function DevelopersSection() {
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
-      <div className="mx-auto max-w-5xl text-center px-6">
-        <h2 className="text-3xl font-semibold text-gray-900">
-          Top Real Estate Builders in{" "}
-          <span className="text-[#DBA40D]">Gurgaon</span>
-        </h2>
+      <div className="relative mx-auto max-w-[1240px] px-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-semibold text-gray-900">
+            Top Real Estate Builders in{" "}
+            <span className="text-[#DBA40D]">Gurgaon</span>
+          </h2>
+        </div>
+
+        <div className="mt-4 text-center md:mt-0 md:absolute md:right-6 md:top-1/2 md:-translate-y-1/2">
+          <Link
+            href="/top-builders-in-gurgaon"
+            className="inline-flex items-center justify-center bg-[#DBA40D] border border-[#DBA40D] rounded-sm text-white font-medium px-5 py-2 text-sm transition hover:bg-[#c9920b]"
+          >
+            Explore More
+          </Link>
+        </div>
       </div>
 
       {/* ===== MOBILE / TABLET SLIDER ===== */}

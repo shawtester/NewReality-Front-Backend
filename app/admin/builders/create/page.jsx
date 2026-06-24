@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
-
 import { uploadBuilderLogo } from "@/lib/cloudinary/uploadBuilderLogo";
 import { createBuilder } from "@/lib/firestore/builders/write";
 
-const ReactQuill = dynamic(() => import("react-quill"), {
+const TinyEditor = dynamic(() => import("@/app/components/RichEditor"), {
   ssr: false,
 });
 
@@ -85,16 +83,8 @@ export default function CreateBuilderPage() {
   };
 
   return (
-    <>
-      {/* 🔥 QUILL FIX – LOCAL CSS (NO GLOBAL FILE) */}
-      <style jsx global>{`
-        .ql-tooltip {
-          z-index: 9999 !important;
-        }
-      `}</style>
-
-      <form onSubmit={handleSubmit} className="p-6 max-w-2xl space-y-6">
-        <h1 className="text-xl font-semibold">Add Builder</h1>
+    <form onSubmit={handleSubmit} className="p-6 max-w-2xl space-y-6">
+      <h1 className="text-xl font-semibold">Add Builder</h1>
 
         {/* NAME */}
         <div>
@@ -113,15 +103,10 @@ export default function CreateBuilderPage() {
             Description
           </label>
 
-          <ReactQuill
-            theme="snow"
+          <TinyEditor
             value={description}
             onChange={setDescription}
-            placeholder="About the builder..."
-            modules={modules}
-            formats={formats}
-            bounds="body"
-            className="bg-white"
+            imageUploadFolder="builders/content"
           />
         </div>
 
@@ -249,25 +234,5 @@ export default function CreateBuilderPage() {
           </button>
         </div>
       </form>
-    </>
   );
 }
-
-/* 🔹 Toolbar */
-const modules = {
-  toolbar: [
-    ["bold", "italic", "underline"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link"],
-    ["clean"],
-  ],
-};
-
-const formats = [
-  "bold",
-  "italic",
-  "underline",
-  "list",
-  "bullet",
-  "link",
-];

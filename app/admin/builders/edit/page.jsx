@@ -5,15 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
-
 import { uploadBuilderLogo } from "@/lib/cloudinary/uploadBuilderLogo";
 import { updateBuilder } from "@/lib/firestore/builders/write";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-// 🔥 ReactQuill (SSR OFF)
-const ReactQuill = dynamic(() => import("react-quill"), {
+const TinyEditor = dynamic(() => import("@/app/components/RichEditor"), {
   ssr: false,
 });
 
@@ -174,14 +171,10 @@ export default function EditBuilderPage() {
             Description
           </label>
 
-          <ReactQuill
-            theme="snow"
+          <TinyEditor
             value={description}
             onChange={setDescription}
-            modules={modules}
-            formats={formats}
-            bounds="body"
-            className="bg-white"
+            imageUploadFolder="builders/content"
           />
         </div>
 

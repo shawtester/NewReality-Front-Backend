@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
 import { getSEO } from "@/lib/firestore/seo/read";
 import { saveSEO } from "@/lib/firestore/seo/write";
 
-const ReactQuill = dynamic(() => import("react-quill"), {
+const TinyEditor = dynamic(() => import("@/app/components/RichEditor"), {
   ssr: false,
   loading: () => <p>Loading editor...</p>,
 });
@@ -51,17 +50,6 @@ export default function TopBuildersPageContentAdmin() {
     }
   };
 
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link", "image", "video"],
-      [{ color: [] }, { background: [] }],
-      ["clean"],
-    ],
-  };
-
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Top Builders Page - Description Content</h1>
@@ -74,12 +62,10 @@ export default function TopBuildersPageContentAdmin() {
             Page Introduction / Description
           </label>
           <div className="bg-white rounded-lg overflow-hidden border">
-            <ReactQuill
-              theme="snow"
+            <TinyEditor
               value={content}
               onChange={setContent}
-              modules={modules}
-              className="h-64 mb-12"
+              imageUploadFolder="seo/content"
             />
           </div>
           

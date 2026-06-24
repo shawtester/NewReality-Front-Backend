@@ -55,7 +55,7 @@ function BuilderCard({ builder }) {
   const projectLabel = `${projectCount} ${
     projectCount === 1 ? "Project" : "Projects"
   } in Gurgaon`;
-  const href = `/top-builders-in-gurgaon/${builder?.id || ""}`;
+  const href = `/top-builders-in-gurgaon/${builder?.slug || builder?.id || ""}`;
 
   return (
     <Link

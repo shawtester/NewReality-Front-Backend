@@ -24,6 +24,11 @@ export default function CreateBuilderPage() {
   const [citiesPresent, setCitiesPresent] = useState("");
   const [manualTotalProjects, setManualTotalProjects] = useState(""); // 🔥 NEW
 
+  // 🔹 SEO
+  const [slug, setSlug] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+
   const [logo, setLogo] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,6 +68,9 @@ export default function CreateBuilderPage() {
           citiesPresent: Number(citiesPresent) || 0,
           totalProjects: 0, // 🔥 AUTO
           manualTotalProjects: Number(manualTotalProjects) || 0, // 🔥 ADMIN EDITABLE
+          slug: slug.trim(),
+          metaTitle: metaTitle.trim(),
+          metaDescription: metaDescription.trim(),
         },
       });
 
@@ -174,6 +182,41 @@ export default function CreateBuilderPage() {
               />
             </div>
           )}
+        </div>
+
+        {/* SEO CONFIGURATION */}
+        <div className="border-t pt-6">
+          <h2 className="text-lg font-semibold mb-4">SEO Configuration</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs text-gray-500">Slug (Optional, auto-generated if blank)</label>
+              <input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="max-estates"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500">Meta Title</label>
+              <input
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="Top Projects by Max Estates"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Meta Description</label>
+              <textarea
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                rows="3"
+                placeholder="Explore the best properties by Max Estates in Gurgaon..."
+              />
+            </div>
+          </div>
         </div>
 
         {/* ACTIONS */}

@@ -126,7 +126,6 @@ export default function DevelopersSection() {
 
       {/* ===== MOBILE / TABLET SLIDER ===== */}
       <div className="lg:hidden">
-      <div className="lg:hidden">
         <div
           ref={scrollRef}
           onTouchStart={onTouchStart}

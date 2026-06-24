@@ -19,6 +19,7 @@ export async function generateMetadata({ params }) {
   return {
     title: builder.metaTitle || `${builder.name} - Builder Details | Neev Realty`,
     description: builder.metaDescription || defaultDescription,
+    keywords: builder.metaKeywords || "real estate, builders, gurgaon, property",
   };
 }
 

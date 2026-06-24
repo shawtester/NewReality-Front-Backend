@@ -36,6 +36,7 @@ export default function EditBuilderPage() {
   const [slug, setSlug] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -69,6 +70,7 @@ export default function EditBuilderPage() {
         setSlug(data.slug || "");
         setMetaTitle(data.metaTitle || "");
         setMetaDescription(data.metaDescription || "");
+        setMetaKeywords(data.metaKeywords || "");
       } catch {
         toast.error("Failed to load builder");
       }
@@ -122,6 +124,7 @@ export default function EditBuilderPage() {
           slug: slug.trim(),
           metaTitle: metaTitle.trim(),
           metaDescription: metaDescription.trim(),
+          metaKeywords: metaKeywords.trim(),
         },
       });
 
@@ -299,6 +302,15 @@ export default function EditBuilderPage() {
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 rows="3"
                 placeholder="Explore the best properties by Max Estates in Gurgaon..."
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Meta Keywords</label>
+              <input
+                value={metaKeywords}
+                onChange={(e) => setMetaKeywords(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="real estate, builders, gurgaon"
               />
             </div>
           </div>

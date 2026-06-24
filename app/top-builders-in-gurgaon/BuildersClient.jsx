@@ -55,12 +55,13 @@ function BuilderCard({ builder }) {
   const projectLabel = `${projectCount} ${
     projectCount === 1 ? "Project" : "Projects"
   } in Gurgaon`;
-  const href = `/residential-property-in-gurgaon?q=${encodeURIComponent(
-    builder?.name || ""
-  )}`;
+  const href = `/top-builders-in-gurgaon/${builder?.id || ""}`;
 
   return (
-    <article className="relative flex min-h-[154px] flex-col items-center justify-end rounded-[4px] border border-gray-100 bg-white px-5 pb-5 pt-12 shadow-[0_12px_28px_rgba(15,23,42,0.04)]">
+    <Link
+      href={href}
+      className="relative flex min-h-[154px] flex-col items-center justify-end rounded-[4px] border border-gray-100 bg-white px-5 pb-5 pt-12 shadow-[0_12px_28px_rgba(15,23,42,0.04)] transition hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(15,23,42,0.08)]"
+    >
       <div className="absolute -top-8 flex h-[86px] w-[86px] items-center justify-center rounded-full border border-gray-100 bg-white shadow-[0_10px_22px_rgba(15,23,42,0.06)]">
         <BuilderLogo builder={builder} />
       </div>
@@ -73,13 +74,12 @@ function BuilderCard({ builder }) {
         {projectLabel}
       </p>
 
-      <Link
-        href={href}
+      <span
         className="mt-5 flex h-8 w-full max-w-[250px] items-center justify-center rounded-full border border-[#E9A91B] text-[11px] font-medium text-gray-800 transition hover:bg-[#E9A91B] hover:text-white"
       >
         View More
-      </Link>
-    </article>
+      </span>
+    </Link>
   );
 }
 

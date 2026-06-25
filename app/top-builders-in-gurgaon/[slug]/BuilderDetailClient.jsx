@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -35,9 +35,6 @@ const sanitizeSchemaHtml = (input = "") =>
 
 const stripHtml = (value = "") => value.replace(/<[^>]*>/g, " ").trim();
 
-const getProjectCount = (builder) => {
-  return Number(builder?.totalProjects) || 0;
-};
 
 function LogoBlock({ builder }) {
   if (builder?.logo?.url) {
@@ -177,10 +174,7 @@ export default function BuilderDetailClient({ builderId }) {
 
   const description = sanitizeSchemaHtml(builder?.description || "");
   const hasDescription = stripHtml(description).length > 0;
-  const totalProjects = useMemo(
-    () => getProjectCount(builder),
-    [builder]
-  );
+  const totalProjects = projects.length;
 
   return (
     <>

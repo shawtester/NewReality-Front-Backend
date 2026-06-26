@@ -174,7 +174,11 @@ export default function BuilderDetailClient({ builderId }) {
 
   const description = sanitizeSchemaHtml(builder?.description || "");
   const hasDescription = stripHtml(description).length > 0;
-  const totalProjects = projects.length;
+  const totalProjects =
+    Number(builder?.manualTotalProjects) > 0
+      ? Number(builder.manualTotalProjects)
+      : projects.length;
+
 
   return (
     <>

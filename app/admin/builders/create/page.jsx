@@ -27,6 +27,7 @@ export default function CreateBuilderPage() {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [metaKeywords, setMetaKeywords] = useState("");
+  const [canonicalUrl, setCanonicalUrl] = useState("");
 
   const [logo, setLogo] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -71,6 +72,7 @@ export default function CreateBuilderPage() {
           metaTitle: metaTitle.trim(),
           metaDescription: metaDescription.trim(),
           metaKeywords: metaKeywords.trim(),
+          canonicalUrl: canonicalUrl.trim(),
         },
       });
 
@@ -211,6 +213,16 @@ export default function CreateBuilderPage() {
                 className="w-full border rounded-lg px-3 py-2 text-sm"
                 placeholder="real estate, builders, gurgaon"
               />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Canonical URL (Optional)</label>
+              <input
+                value={canonicalUrl}
+                onChange={(e) => setCanonicalUrl(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                placeholder="https://www.neevrealty.com/builder/max-estates"
+              />
+              <p className="mt-1 text-[11px] text-gray-400">Leave blank to auto-generate from slug</p>
             </div>
           </div>
         </div>

@@ -18,6 +18,7 @@ const staticRoutes = [
   { path: "/commercial-property-in-gurgaon", priority: 0.9 },
   { path: "/residential-property-in-gurgaon", priority: 0.9 },
   { path: "/blog", priority: 0.9 },
+  { path: "/top-builders-in-gurgaon", priority: 0.9 },
 ];
 
 /* ===============================
@@ -117,6 +118,21 @@ export default async function sitemap() {
 
     });
 
+    /* BUILDERS */
+    const buildersSnapshot = await db.collection("builders").get();
+
+    const builderEntries = buildersSnapshot.docs
+      .filter((doc) => doc.data()?.isActive !== false)
+      .map((doc) => {
+        const data = doc.data();
+        const slug = data.slug || doc.id;
+        return formatEntry(
+          `/builder/${slug}`,
+          data.updatedAt?.toDate?.() || new Date(),
+          0.8
+        );
+      });
+
     /* FOOTER LINKS */
     const footerEntries = await getFooterLinks();
 
@@ -125,6 +141,7 @@ export default async function sitemap() {
       ...staticEntries,
       ...blogEntries,
       ...propertyEntries,
+      ...builderEntries,
       ...footerEntries,
     ];
 

@@ -199,7 +199,7 @@ export default function BuilderDetailClient({ builderId }) {
             onClick={() => router.push("/top-builders-in-gurgaon")}
             className="transition hover:text-[#DBA40D]"
           >
-            Top Builders in Gurgaon
+            Builders
           </button>
           {builder?.name && (
             <>

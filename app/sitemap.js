@@ -145,10 +145,29 @@ export default async function sitemap() {
       ...footerEntries,
     ];
 
-    /* REMOVE DUPLICATES */
+    /* REMOVE DUPLICATES AND KEEP THE HIGHEST PRIORITY ENTRY */
     const uniqueEntries = Array.from(
-      new Map(allEntries.map((item) => [item.url, item])).values()
+      allEntries.reduce((map, item) => {
+        const existing = map.get(item.url);
+
+        if (
+          !existing ||
+          item.priority > existing.priority ||
+          (item.priority === existing.priority && item.lastModified > existing.lastModified)
+        ) {
+          map.set(item.url, item);
+        }
+
+        return map;
+      }, new Map())
+      .values()
     );
+
+    /* SORT BY PRIORITY DESC, THEN BY URL ASC */
+    uniqueEntries.sort((a, b) => {
+      if (b.priority !== a.priority) return b.priority - a.priority;
+      return a.url.localeCompare(b.url);
+    });
 
     return uniqueEntries;
 

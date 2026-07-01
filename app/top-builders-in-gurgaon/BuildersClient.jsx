@@ -6,14 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { useBuilders } from "@/lib/firestore/builders/read";
+import { useActiveBuilderProjectCounts } from "@/lib/firestore/products/count/read_client";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const introText =
   "Gurgaon has become one of the most searched residential markets in North India, and the reason is simple. The city offers jobs, infrastructure, and lifestyle in one place. Over the years, planned sectors, wide roads, metro connectivity, and corporate hubs have completely changed how people look at property investment in Gurgaon.";
 
-const getProjectCount = (builder) => {
-  return Number(builder?.totalProjects) || 0;
+const getProjectCount = (builder, activeProjectCounts) => {
+  return (activeProjectCounts[builder.id] ?? Number(builder?.totalProjects)) || 0;
 };
 
 function BuilderLogo({ builder }) {
@@ -44,8 +45,8 @@ function BuilderLogo({ builder }) {
   );
 }
 
-function BuilderCard({ builder }) {
-  const projectCount = getProjectCount(builder);
+function BuilderCard({ builder, activeProjectCounts }) {
+  const projectCount = getProjectCount(builder, activeProjectCounts);
   const projectLabel = `${projectCount} ${
     projectCount === 1 ? "Project" : "Projects"
   } in Gurgaon`;
@@ -82,6 +83,7 @@ export default function BuildersClient({ builders: initialBuilders = [], pageCon
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(false);
   const { builders: liveBuilders, isLoading } = useBuilders();
+  const { counts: activeProjectCounts } = useActiveBuilderProjectCounts();
   const builders = liveBuilders?.length ? liveBuilders : initialBuilders;
 
   const filteredBuilders = useMemo(() => {
@@ -161,7 +163,11 @@ export default function BuildersClient({ builders: initialBuilders = [], pageCon
           {filteredBuilders.length > 0 ? (
             <div className="mx-auto grid max-w-[900px] grid-cols-1 gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {filteredBuilders.map((builder) => (
-                <BuilderCard key={builder.id} builder={builder} />
+                <BuilderCard
+                  key={builder.id}
+                  builder={builder}
+                  activeProjectCounts={activeProjectCounts}
+                />
               ))}
             </div>
           ) : isLoading ? (

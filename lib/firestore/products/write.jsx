@@ -5,14 +5,14 @@ import {
   setDoc,
   Timestamp,
   deleteDoc,
-  increment,
   updateDoc,
   getDoc,
+  getDocs,
+  query,
+  where,
 } from "firebase/firestore";
 import slugify from "slugify";
-import { defaultProperty } from "@/constants/propertyDefaults";
 
-/* ================= UTILS ================= */
 const removeUndefined = (obj) => {
   if (Array.isArray(obj)) {
     return obj.map(removeUndefined).filter((v) => v !== undefined);
@@ -45,8 +45,6 @@ const removeEmpty = (obj) => {
   return obj;
 };
 
-
-/* ================= SLUG HELPER ================= */
 const generateSlug = (data) => {
   const base =
     data?.slug?.trim() ||
@@ -59,7 +57,23 @@ const generateSlug = (data) => {
   });
 };
 
-/* ================= CREATE PROPERTY ================= */
+const recalculateBuilderTotalProjects = async (builderId) => {
+  if (!builderId) return;
+
+  const q = query(
+    collection(db, "properties"),
+    where("builderId", "==", builderId)
+  );
+  const snap = await getDocs(q);
+  const totalProjects = snap.docs.filter(
+    (docSnap) => docSnap.data()?.isActive !== false
+  ).length;
+
+  await updateDoc(doc(db, "builders", builderId), {
+    totalProjects,
+  });
+};
+
 export const createNewProperty = async ({ data }) => {
   if (!data?.title) throw new Error("Project name is required");
   if (!data?.location) throw new Error("Location is required");
@@ -74,9 +88,9 @@ export const createNewProperty = async ({ data }) => {
 
   const safeBrochure = data.brochure
     ? {
-      url: data.brochure.url || "",
-      name: data.brochure.name || "",
-    }
+        url: data.brochure.url || "",
+        name: data.brochure.name || "",
+      }
     : null;
 
   const payload = removeEmpty(
@@ -84,9 +98,7 @@ export const createNewProperty = async ({ data }) => {
       ...data,
       slug,
 
-      floorPlans: Array.isArray(data.floorPlans)
-        ? data.floorPlans
-        : [],
+      floorPlans: Array.isArray(data.floorPlans) ? data.floorPlans : [],
 
       mainImage: safeMainImage,
       brochure: safeBrochure,
@@ -95,24 +107,22 @@ export const createNewProperty = async ({ data }) => {
     })
   );
 
-
-  // ✅ SAVE PROPERTY (SAFE)
   await setDoc(doc(db, "properties", newId), payload, {
     merge: true,
   });
 
-  // 🔥 AUTO INCREMENT BUILDER TOTAL PROJECTS (ONLY ON CREATE)
   if (data.builderId) {
-    await updateDoc(doc(db, "builders", data.builderId), {
-      totalProjects: increment(1),
-    });
+    await recalculateBuilderTotalProjects(data.builderId);
   }
 };
 
-/* ================= UPDATE PROPERTY ================= */
 export const updateProperty = async ({ data }) => {
   if (!data?.id) throw new Error("Property ID is required");
 
+  const existingSnap = await getDoc(doc(db, "properties", data.id));
+  const previousBuilderId = existingSnap.exists()
+    ? existingSnap.data()?.builderId
+    : null;
   const slug = generateSlug(data);
 
   const safeMainImage = {
@@ -122,37 +132,33 @@ export const updateProperty = async ({ data }) => {
 
   const safeBrochure = data.brochure
     ? {
-      url: data.brochure.url || "",
-      name: data.brochure.name || "",
-    }
+        url: data.brochure.url || "",
+        name: data.brochure.name || "",
+      }
     : null;
 
   const payload = removeUndefined({
     ...data,
-
     slug,
-
-    // 🔥 FORCE INCLUDE FLOOR PLANS
-    floorPlans: Array.isArray(data.floorPlans)
-      ? data.floorPlans
-      : [],
-
+    floorPlans: Array.isArray(data.floorPlans) ? data.floorPlans : [],
     mainImage: safeMainImage,
     brochure: safeBrochure,
-
     timestampUpdate: Timestamp.now(),
   });
 
-  await setDoc(
-    doc(db, "properties", data.id),
-    payload,
-    { merge: true }
-  );
+  await setDoc(doc(db, "properties", data.id), payload, {
+    merge: true,
+  });
 
-  // ❌ UPDATE PE totalProjects KO TOUCH NAHI KARNA
+  if (previousBuilderId && previousBuilderId !== data.builderId) {
+    await recalculateBuilderTotalProjects(previousBuilderId);
+  }
+
+  if (data.builderId) {
+    await recalculateBuilderTotalProjects(data.builderId);
+  }
 };
 
-/* ================= DELETE PROPERTY ================= */
 export const deleteProperty = async ({ id }) => {
   if (!id) throw new Error("Property ID is required");
 
@@ -163,14 +169,9 @@ export const deleteProperty = async ({ id }) => {
 
   const data = snap.data();
 
-  // ❌ DELETE PROPERTY
   await deleteDoc(ref);
 
-  // 🔥 AUTO DECREMENT BUILDER TOTAL PROJECTS
   if (data?.builderId) {
-    await updateDoc(doc(db, "builders", data.builderId), {
-      totalProjects: increment(-1),
-    });
+    await recalculateBuilderTotalProjects(data.builderId);
   }
 };
-

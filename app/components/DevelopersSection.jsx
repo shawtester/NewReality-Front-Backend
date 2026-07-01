@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useBuilders } from "@/lib/firestore/builders/read";
+import { useActiveBuilderProjectCounts } from "@/lib/firestore/products/count/read_client";
 
 export default function DevelopersSection() {
   const scrollRef = useRef(null);
@@ -13,6 +14,7 @@ export default function DevelopersSection() {
   const cardWidth = 280;
 
   const { builders, isLoading } = useBuilders();
+  const { counts: activeProjectCounts } = useActiveBuilderProjectCounts();
 
   /* ================= AUTO SCROLL ================= */
   const startAutoScroll = useCallback(() => {
@@ -103,6 +105,9 @@ export default function DevelopersSection() {
   if (isLoading || !builders?.length) return null;
 
   const activeBuilders = builders.filter((b) => b.isActive);
+  const getBuilderHref = (builder) => `/builder/${builder.slug || builder.id}`;
+  const getProjectCount = (builder) =>
+    (activeProjectCounts[builder.id] ?? Number(builder.totalProjects)) || 0;
 
   return (
     <section className="w-full bg-[#F5F7FB] py-6">
@@ -135,7 +140,7 @@ export default function DevelopersSection() {
           {activeBuilders.map((b) => (
             <Link
               key={b.id}
-              href={`/top-builders-in-gurgaon/${b.slug || b.id}`}
+              href={getBuilderHref(b)}
               className="min-w-[240px] snap-center flex-shrink-0 flex flex-col items-center rounded-xl bg-white px-6 py-8 border shadow hover:shadow-md transition-shadow cursor-pointer block"
             >
               <div className="-mt-14 flex h-24 w-24 items-center justify-center rounded-full bg-white border shadow">
@@ -153,7 +158,7 @@ export default function DevelopersSection() {
               </p>
 
               <p className="mt-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
-                {(b.totalProjects ?? 0)} Projects
+                {getProjectCount(b)} Projects
               </p>
             </Link>
           ))}
@@ -170,7 +175,7 @@ export default function DevelopersSection() {
           {activeBuilders.map((b) => (
             <Link
               key={b.id}
-              href={`/top-builders-in-gurgaon/${b.slug || b.id}`}
+              href={getBuilderHref(b)}
               className="flex flex-col items-center rounded-xl bg-white px-6 py-6 border shadow hover:shadow-md transition-shadow cursor-pointer block"
             >
               <div className="-mt-12 flex h-20 w-20 items-center justify-center rounded-full bg-white border shadow-sm">
@@ -188,7 +193,7 @@ export default function DevelopersSection() {
               </p>
 
               <p className="mt-1 text-xs text-gray-500">
-                {(b.totalProjects ?? 0)} Projects
+                {getProjectCount(b)} Projects
               </p>
             </Link>
           ))}

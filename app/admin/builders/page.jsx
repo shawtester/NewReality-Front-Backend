@@ -47,6 +47,13 @@ export default function BuildersPage() {
 
         <div className="flex gap-3">
           <Link
+            href="/admin/builders/migrate-slugs"
+            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+            title="Migrate builder URLs from IDs to SEO-friendly slugs"
+          >
+            Migrate URL Slugs
+          </Link>
+          <Link
             href="/admin/builders/page-content"
             className="px-4 py-2 bg-[#DBA40D] text-white rounded"
           >

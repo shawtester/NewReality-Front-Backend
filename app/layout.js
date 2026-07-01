@@ -58,6 +58,11 @@ export const metadata = {
     locale: "en_US",
     type: "website",
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   twitter: {
     card: "summary_large_image",
     title: "Neev Realty",

@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import BuildersClient from "./BuildersClient";
 
+export const dynamic = "force-dynamic";
+
 const pageUrl = "https://www.neevrealty.com/top-builders-in-gurgaon";
 
 export const metadata = {

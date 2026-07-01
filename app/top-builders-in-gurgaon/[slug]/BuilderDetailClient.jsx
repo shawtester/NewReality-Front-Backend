@@ -175,7 +175,10 @@ export default function BuilderDetailClient({ builderId }) {
   const description = sanitizeSchemaHtml(builder?.description || "");
   const hasDescription = stripHtml(description).length > 0;
   const totalProjects = projects.length;
-
+  const displayTotalProjects =
+    builder?.manualTotalProjects !== undefined && builder?.manualTotalProjects !== null
+      ? builder.manualTotalProjects
+      : totalProjects;
 
   return (
     <>
@@ -267,7 +270,11 @@ export default function BuilderDetailClient({ builderId }) {
                   label="Established"
                   value={builder.establishedYear || "-"}
                 />
-                <Stat icon={Building2} label="Total Projects" value={totalProjects} />
+                <Stat
+                  icon={Building2}
+                  label="Total Projects"
+                  value={displayTotalProjects}
+                />
                 <Stat
                   icon={Home}
                   label="Ongoing Projects"

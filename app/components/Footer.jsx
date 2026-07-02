@@ -94,8 +94,14 @@ export default function Footer() {
   // ✅ FIXED: Projects by budget links - CORRECTED value format
   const [projectBudgetLinks, setProjectBudgetLinks] = useState([]);
 
-  // ✅ NEW: Projects by builder links
-  const [projectBuilderLinks, setProjectBuilderLinks] = useState([]);
+  const projectBuilderLinks = [
+    { id: "sobha", label: "Sobha", value: "sobha" },
+    { id: "whiteland", label: "Whiteland", value: "whiteland" },
+    { id: "dlf", label: "DLF", value: "dlf" },
+    { id: "m3m", label: "M3M", value: "m3m" },
+    { id: "elan", label: "Elan", value: "elan" },
+    { id: "central-park", label: "Central Park", value: "central-park" },
+  ];
 
   useEffect(() => {
     const fetchProjectBudgets = async () => {
@@ -109,20 +115,6 @@ export default function Footer() {
 
     fetchProjectBudgets();
   }, []);
-
-  useEffect(() => {
-    const fetchProjectBuilders = async () => {
-      const snap = await getDoc(
-        doc(db, "footer_links", "projects_by_builder")
-      );
-      if (snap.exists()) {
-        setProjectBuilderLinks(snap.data().links);
-      }
-    };
-
-    fetchProjectBuilders();
-  }, []);
-
 
   // ✅ NEW: Social media links configuration
   const socialLinks = [

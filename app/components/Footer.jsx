@@ -95,7 +95,7 @@ export default function Footer() {
   const [projectBudgetLinks, setProjectBudgetLinks] = useState([]);
 
   const projectBuilderLinks = [
-    { id: "sobha-limited", label: "Sobha", value: "sobha-limited" },
+    { id: "sobha-limited", label: "Sobha Limited", value: "sobha-limited" },
     { id: "whiteland", label: "Whiteland", value: "whiteland" },
     { id: "dlf", label: "DLF", value: "dlf" },
     { id: "m3m", label: "M3M", value: "m3m" },

@@ -24,6 +24,11 @@ const footerSections = [
     href: "/admin/footer/projects-by-location",
   },
   {
+    title: "Projects by builder",
+    description: "Selected builders to feature in the footer",
+    href: "/admin/footer/projects-by-builder",
+  },
+  {
     title: "Projects by budget",
     description: "Price-based footer links",
     href: "/admin/footer/projects-by-budget",

@@ -39,6 +39,7 @@ async function getFooterLinks() {
 
   const docs = [
     "projects_by_budget",
+    "projects_by_builder",
     "projects_by_location",
     "projects_by_size",
     "projects_by_status",

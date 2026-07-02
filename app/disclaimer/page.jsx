@@ -229,17 +229,43 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl lg:text-2xl font-bold mb-2">
               10. Contact Us
             </h2>
+
             <p className="leading-relaxed mb-2">
               If you have any questions or concerns about this Privacy Policy
               or our data handling practices, please contact us at:
             </p>
+
             <p className="font-semibold">Neev Realty</p>
-            <p>Email: info@neevrealty.com</p>
-            <p>Phone: +91 8824-966-966</p>
+
+            <p className="mt-2 font-medium">Sales Enquiries</p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:sales@neevrealty.com"
+                className="text-blue-600 hover:underline"
+              >
+                sales@neevrealty.com
+              </a>
+            </p>
+
+            <p className="mt-2 font-medium">General Enquiries</p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:info@neevrealty.com"
+                className="text-blue-600 hover:underline"
+              >
+                info@neevrealty.com
+              </a>
+            </p>
+
+            <p className="mt-2">Phone: +91 8824-966-966</p>
+
             <p>
               Address: SF 09, Ninex City Mart, Sector 49, Gurgaon, Haryana,
               122018
             </p>
+
             <p className="mt-2 leading-relaxed">
               By using our services, you agree to the terms outlined in this
               disclaimer. We are committed to ensuring your privacy and

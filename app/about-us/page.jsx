@@ -107,7 +107,7 @@ export default async function AboutPage() {
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     SF-09, Ninex City Mart, Sector <br />
-                    49, Sohna Road, Gurgaon
+                    49, Sohna Road, Gurgaon - 122018
                   </p>
                 </div>
 
@@ -116,7 +116,7 @@ export default async function AboutPage() {
 
             <div className="w-full h-[162px] rounded-2xl overflow-hidden border">
               <iframe
-                src="https://www.google.com/maps?q=Gurugram,Haryana&output=embed"
+                src="https://www.google.com/maps?q=SF-09,+Ninex+City+Mart,+Sector+49,+Sohna+Road,+Gurugram,+Haryana+122018&output=embed"
                 width="100%"
                 height="100%"
                 loading="lazy"

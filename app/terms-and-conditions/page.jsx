@@ -24,10 +24,10 @@ export async function generateMetadata() {
     const keywords = Array.isArray(seo?.keywords)
       ? seo.keywords
       : seo?.keywords?.split(",").map((k) => k.trim()) || [
-          "terms and conditions neev realty",
-          "real estate website terms india",
-          "property platform legal terms",
-        ];
+        "terms and conditions neev realty",
+        "real estate website terms india",
+        "property platform legal terms",
+      ];
 
     return {
       metadataBase: new URL("https://www.neevrealty.com"),
@@ -301,8 +301,31 @@ export default function TermsAndConditions() {
             </p>
 
             <p className="font-semibold">Neev Realty</p>
-            <p>Email: info@neevrealty.com</p>
-            <p>Phone: +91 8824-966-966</p>
+
+            <p className="mt-2 font-medium">Sales Enquiries</p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:sales@neevrealty.com"
+                className="text-blue-600 hover:underline"
+              >
+                sales@neevrealty.com
+              </a>
+            </p>
+
+            <p className="mt-2 font-medium">General Enquiries</p>
+            <p>
+              Email:{" "}
+              <a
+                href="mailto:info@neevrealty.com"
+                className="text-blue-600 hover:underline"
+              >
+                info@neevrealty.com
+              </a>
+            </p>
+
+            <p className="mt-2">Phone: +91 8824-966-966</p>
+
             <p>
               Address: SF 09, Ninex City Mart, Sector 49, Gurgaon, Haryana,
               122018

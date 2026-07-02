@@ -94,6 +94,9 @@ export default function Footer() {
   // ✅ FIXED: Projects by budget links - CORRECTED value format
   const [projectBudgetLinks, setProjectBudgetLinks] = useState([]);
 
+  // ✅ NEW: Projects by builder links
+  const [projectBuilderLinks, setProjectBuilderLinks] = useState([]);
+
   useEffect(() => {
     const fetchProjectBudgets = async () => {
       const snap = await getDoc(
@@ -105,6 +108,19 @@ export default function Footer() {
     };
 
     fetchProjectBudgets();
+  }, []);
+
+  useEffect(() => {
+    const fetchProjectBuilders = async () => {
+      const snap = await getDoc(
+        doc(db, "footer_links", "projects_by_builder")
+      );
+      if (snap.exists()) {
+        setProjectBuilderLinks(snap.data().links);
+      }
+    };
+
+    fetchProjectBuilders();
   }, []);
 
 
@@ -205,7 +221,24 @@ export default function Footer() {
                 </ul>
               </div>
 
-              {/* ===== COLUMN 5 - Budget ===== */}
+              {/* ===== COLUMN 5 - Builder ===== */}
+              <div className="min-w-[260px] whitespace-normal">
+                <h4 className="text-white font-semibold mb-4">Projects by builder</h4>
+                <ul className="flex flex-col gap-2 text-sm text-gray-400">
+                  {projectBuilderLinks.map(item => (
+                    <li key={item.id}>
+                      <Link
+                        href={`/builder/${item.value}`}
+                        className="block leading-6 hover:text-white"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* ===== COLUMN 6 - Budget ===== */}
               <div className="min-w-[260px] whitespace-normal">
                 <h4 className="text-white font-semibold mb-4">Projects by budget</h4>
                 <ul className="flex flex-col gap-2 text-sm text-gray-400">
@@ -260,7 +293,8 @@ export default function Footer() {
             <Link href="/our-services">Services</Link>
             <Link href="/contact-us">Contact</Link>
             <Link href="/careers">Careers</Link>
-            
+            <Link href="/top-builders-in-gurgaon">Builders</Link>
+
           </div>
         </div>
 
@@ -268,14 +302,27 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-semibold mb-4">Connect with us</h4>
 
-          <a
-            href="mailto:sales@neevrealty.com"
-            className="block text-sm text-gray-400 hover:text-white"
-          >
-            sales@neevrealty.com
-          </a>
+          <div className="mb-4">
+            <p className="text-sm font-medium text-white">Sales Enquiries</p>
+            <a
+              href="mailto:sales@neevrealty.com"
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              sales@neevrealty.com
+            </a>
+          </div>
 
-          
+          <div>
+            <p className="text-sm font-medium text-white">General Enquiries</p>
+            <a
+              href="mailto:info@neevrealty.com"
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              info@neevrealty.com
+            </a>
+          </div>
+
+
 
           {/* Social icons */}
           <div className="mt-4 flex gap-2">
